@@ -62,6 +62,11 @@ func serveRequests() {
 	// Static Files
 	router.ServeFiles("/public/*filepath", http.Dir("public"))
 
+	// 404 Handler
+	router.NotFound = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "Error 404: Not Found", 404)
+	})
+
 	fmt.Println("Listening on Port " + strconv.Itoa(lib.Config.Port) + "...")
 	http.ListenAndServe(":"+strconv.Itoa(lib.Config.Port), router)
 }
