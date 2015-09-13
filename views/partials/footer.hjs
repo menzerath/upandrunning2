@@ -1,0 +1,5 @@
+<footer class="footer">
+	<div class="container">
+		<p class="text-footer">Powered by <a href="https://github.com/MarvinMenzerath/UpAndRunning" target="_blank"><b>UpAndRunning</b></a> and <a href="https://nodejs.org/" target="_blank"><b>Node.js</b></a>.</p>
+	</div>
+</footer>

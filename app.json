@@ -1,0 +1,16 @@
+{
+	"name": "UpAndRunning2",
+	"description": "UpAndRunning2 is a lightweight Go application which monitors all of your websites for availability and offers a simple JSON-API.",
+	"repository": "https://github.com/MarvinMenzerath/UpAndRunning2",
+	"logo": "https://raw.githubusercontent.com/MarvinMenzerath/UpAndRunning2/master/public/favicon.png",
+	"keywords": [
+		"go",
+		"website",
+		"availability",
+		"json",
+		"api"
+	],
+	"addons": [
+		"cleardb:ignite"
+	]
+}

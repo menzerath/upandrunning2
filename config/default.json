@@ -1,0 +1,10 @@
+{
+	"port": 8080,
+	"database": {
+		"host": "localhost",
+		"user": "myUser",
+		"password": "mySecretPassword",
+		"database": "myDatabase",
+		"connectionLimit": 10
+	}
+}

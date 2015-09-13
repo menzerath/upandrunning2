@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{ code }}: {{ message }}</title>
+</head>
+<body>
+	<h1>{{ code }}: {{ message }}</h1>
+</body>
+</html>

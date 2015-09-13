@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>Administration | {{ title }}</title>
+	{{> styles}}
+</head>
+<body>
+	<div class="navbar navbar-default navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<a href="/" class="navbar-brand">{{ title }}</a>
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="navbar-main">
+				<ul class="nav navbar-nav navbar-right">
+					<li><a onclick="reloadWebsites()" style="cursor:pointer">Reload</a></li>
+					<li><a onclick="checkNow()" style="cursor:pointer">Check Now</a></li>
+					<li><a onclick="logout()" style="cursor:pointer">Logout</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="container" id="container-admin">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="well form-horizontal">
+							<legend>All Websites</legend>
+							<table class="table table-striped table-hover">
+								<thead>
+									<tr>
+										<th>#</th>
+										<th>Name</th>
+										<th>Enabled</th>
+										<th>Visible</th>
+										<th>Protocol</th>
+										<th>URL</th>
+										<th>Status</th>
+										<th>Last Check</th>
+										<th>Availability</th>
+										<th width="12%">Actions</th>
+									</tr>
+								</thead>
+								<tbody id="table-websites">
+									<tr>
+										<td colspan="10">Loading data...</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-12" id="form-edit-website">
+						<div class="well form-horizontal">
+							<legend>Edit Website</legend>
+							<fieldset>
+								<div class="form-group">
+									<label class="col-lg-2 control-label">Name</label>
+									<div class="col-lg-10"><input type="text" class="form-control" id="input-edit-name" placeholder="My Website"></div>
+								</div>
+								<div class="form-group">
+									<label class="col-lg-2 control-label">Protocol</label>
+									<div class="col-lg-10">
+										<select class="form-control" id="input-edit-protocol">
+											<option value="http">http</option>
+											<option value="https" selected>https</option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-lg-2 control-label">URL</label>
+									<div class="col-lg-10"><input type="text" class="form-control" id="input-edit-url" placeholder="google.com"></div>
+								</div>
+								<div class="form-group">
+									<div class="col-lg-12">
+										<button type="button" class="btn btn-primary" id="button-edit-website-save" onclick="saveWebsite()">Save</button>
+										<button type="button" class="btn btn-danger" id="button-edit-website-cancle" onclick="cancleSaveWebsite()">Cancle</button>
+									</div>
+								</div>
+							</fieldset>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-lg-6">
+						<div class="well form-horizontal">
+							<legend>Add Website</legend>
+							<fieldset>
+								<div class="form-group">
+									<label class="col-lg-2 control-label">Name</label>
+									<div class="col-lg-10"><input type="text" class="form-control" id="input-add-name" placeholder="My Website"></div>
+								</div>
+								<div class="form-group">
+									<label class="col-lg-2 control-label">Protocol</label>
+									<div class="col-lg-10">
+										<select class="form-control" id="input-add-protocol">
+											<option value="http">http</option>
+											<option value="https" selected>https</option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-lg-2 control-label">URL</label>
+									<div class="col-lg-10"><input type="text" class="form-control" id="input-add-url" placeholder="google.com"></div>
+								</div>
+								<div class="form-group">
+									<div class="col-lg-12"><button type="button" class="btn btn-primary" id="button-add-website" onclick="addWebsite()">Add Website</button></div>
+								</div>
+							</fieldset>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="row">
+							<div class="col-lg-12">
+								<div class="well form-horizontal">
+									<legend>Settings</legend>
+									<fieldset>
+										<div class="form-group">
+											<label class="col-lg-2 control-label">Title:</label>
+											<div class="col-lg-7">
+												<input class="form-control" id="input-new-title" placeholder="UpAndRunning" value="{{ title }}">
+											</div>
+											<div class="col-lg-3">
+												<button type="button" class="btn btn-primary pull-right" id="button-change-title" onclick="changeTitle()">Save</button>
+											</div>
+										</div>
+									</fieldset>
+									<fieldset>
+										<div class="form-group">
+											<label class="col-lg-2 control-label">Password:</label>
+											<div class="col-lg-7">
+												<input type="password" class="form-control" id="input-new-password" placeholder="P4sSW0rD">
+											</div>
+											<div class="col-lg-3">
+												<button type="button" class="btn btn-primary pull-right" id="button-change-password" onclick="changePassword()">Save</button>
+											</div>
+										</div>
+									</fieldset>
+									<fieldset>
+										<div class="form-group">
+											<label class="col-lg-2 control-label">Interval:</label>
+											<div class="col-lg-4">
+												<input type="number" class="form-control" id="input-new-interval" min="1" max="60" placeholder="5" value="{{ interval }}">
+											</div>
+											<label class="col-lg-3 control-label">Minutes</label>
+											<div class="col-lg-3">
+												<button type="button" class="btn btn-primary pull-right" id="button-change-interval" onclick="changeInterval()">Save</button>
+											</div>
+										</div>
+									</fieldset>
+									<fieldset>
+                                    	<div class="form-group">
+                                    		<label class="col-lg-2 control-label">PushBullet:</label>
+                                    		<div class="col-lg-7">
+                                    			<input class="form-control" id="input-new-pb_key" placeholder="API-Key" value="{{ pb_key }}">
+                                    		</div>
+                                    		<div class="col-lg-3">
+                                    			<button type="button" class="btn btn-primary pull-right" id="button-change-pb_key" onclick="changePBKey()">Save</button>
+                                    		</div>
+                                    	</div>
+                                    </fieldset>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="notifications bottom-right"></div>
+	</div>
+	<footer class="footer">
+		<div class="container">
+			<p class="text-footer">Powered by <a href="https://github.com/MarvinMenzerath/UpAndRunning" target="_blank"><b>UpAndRunning</b></a> <b>v{{ version.app }}</b> and <a href="https://nodejs.org/" target="_blank"><b>Node.js</b></a> <b>{{ version.node }}</b>.</p>
+		</div>
+	</footer>
+
+	{{> scripts}}
+	<script src="/js/scripts-admin.js"></script>
+</body>
+</html>
