@@ -12,6 +12,7 @@ import (
 
 const VERSION = "1.0"
 
+var Admin lib.Admin
 var Config lib.Configuration
 var Database *sql.DB
 
@@ -24,6 +25,11 @@ func main() {
 	lib.OpenDatabase(Config.Database)
 	Database = lib.GetDatabase()
 	Config.Dynamic.ReadFromDatabase(Database)
+
+	Admin = lib.Admin{}
+	if !Admin.Exists() {
+		Admin.Add()
+	}
 
 	go startChecking()
 	serveRequests()
