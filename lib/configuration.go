@@ -1,12 +1,11 @@
 package lib
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"os"
 )
-
-var Config Configuration
 
 type Configuration struct {
 	Port     int
@@ -29,28 +28,28 @@ type dynamicConfiguration struct {
 	PushbulletKey string
 }
 
-func ReadConfigFromFile(filePath string) {
+func (c *Configuration) ReadFromFile(filePath string) {
 	fmt.Println("Reading Configuration from File...")
 
 	file, _ := os.Open(filePath)
 	decoder := json.NewDecoder(file)
 
-	err := decoder.Decode(&Config)
+	err := decoder.Decode(&c)
 	if err != nil {
 		fmt.Println("Unable to read Configuration: ", err)
 	}
 }
 
-func ReadConfigFromDatabase() {
+func (c *dynamicConfiguration) ReadFromDatabase(db *sql.DB) {
 	fmt.Println("Reading Configuration from Database...")
 
 	var title string
 	var interval int
 	var pushbulletKey string
 
-	err := Database.QueryRow("SELECT value FROM settings where name = 'title';").Scan(&title)
+	err := db.QueryRow("SELECT value FROM settings where name = 'title';").Scan(&title)
 	if err != nil {
-		stmt, err := Database.Prepare("INSERT INTO settings (name, value) VALUES ('title', 'UpAndRunning');")
+		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('title', 'UpAndRunning');")
 		if err != nil {
 			fmt.Println("Unable to insert 'title'-setting: ", err)
 			os.Exit(1)
@@ -63,9 +62,9 @@ func ReadConfigFromDatabase() {
 		title = "UpAndRunning"
 	}
 
-	err = Database.QueryRow("SELECT value FROM settings where name = 'interval';").Scan(&interval)
+	err = db.QueryRow("SELECT value FROM settings where name = 'interval';").Scan(&interval)
 	if err != nil {
-		stmt, err := Database.Prepare("INSERT INTO settings (name, value) VALUES ('interval', 5);")
+		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('interval', 5);")
 		if err != nil {
 			fmt.Println("Unable to insert 'interval'-setting: ", err)
 			os.Exit(1)
@@ -78,9 +77,9 @@ func ReadConfigFromDatabase() {
 		interval = 5
 	}
 
-	err = Database.QueryRow("SELECT value FROM settings where name = 'pushbullet_key';").Scan(&pushbulletKey)
+	err = db.QueryRow("SELECT value FROM settings where name = 'pushbullet_key';").Scan(&pushbulletKey)
 	if err != nil {
-		stmt, err := Database.Prepare("INSERT INTO settings (name, value) VALUES ('pushbullet_key', '');")
+		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('pushbullet_key', '');")
 		if err != nil {
 			fmt.Println("Unable to insert 'pushbullet_key'-setting: ", err)
 			os.Exit(1)
@@ -92,4 +91,8 @@ func ReadConfigFromDatabase() {
 		}
 		pushbulletKey = ""
 	}
+
+	c.Title = title
+	c.Interval = interval
+	c.PushbulletKey = pushbulletKey
 }

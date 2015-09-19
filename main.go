@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/MarvinMenzerath/UpAndRunning2/lib"
 	"github.com/MarvinMenzerath/UpAndRunning2/routes"
@@ -11,15 +12,23 @@ import (
 
 const VERSION = "1.0"
 
+var Config lib.Configuration
+var Database *sql.DB
+
 func main() {
 	fmt.Printf("Welcome to UpAndRunning2 v%s!\n\n", VERSION)
 
-	lib.ReadConfigFromFile("config/local.json")
-	lib.PrepareDatabase()
-	lib.ReadConfigFromDatabase()
+	Config = lib.Configuration{}
+	Config.ReadFromFile("config/local.json")
+
+	lib.OpenDatabase(Config.Database)
+	Database = lib.GetDatabase()
+	Config.Dynamic.ReadFromDatabase(Database)
 
 	go startChecking()
 	serveRequests()
+
+	lib.GetDatabase().Close()
 }
 
 func serveRequests() {
@@ -67,8 +76,8 @@ func serveRequests() {
 		http.Error(w, "Error 404: Not Found", 404)
 	})
 
-	fmt.Println("Listening on Port " + strconv.Itoa(lib.Config.Port) + "...")
-	http.ListenAndServe(":"+strconv.Itoa(lib.Config.Port), router)
+	fmt.Println("Listening on Port " + strconv.Itoa(Config.Port) + "...")
+	http.ListenAndServe(":"+strconv.Itoa(Config.Port), router)
 }
 
 func startChecking() {
