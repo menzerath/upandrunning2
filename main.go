@@ -19,18 +19,25 @@ var Database *sql.DB
 func main() {
 	fmt.Printf("Welcome to UpAndRunning2 v%s!\n\n", VERSION)
 
+	// Config
 	Config = lib.Configuration{}
 	Config.ReadFromFile("config/local.json")
 
+	// Database
 	lib.OpenDatabase(Config.Database)
 	Database = lib.GetDatabase()
 	Config.Dynamic.ReadFromDatabase(Database)
 
+	// Admin-User
 	Admin = lib.Admin{}
 	if !Admin.Exists() {
 		Admin.Add()
 	}
 
+	// Additional Libraries
+	lib.InitHttpStatusCodeMap()
+
+	// Start Checking and Serving
 	go startChecking()
 	serveRequests()
 
