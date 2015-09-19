@@ -1,12 +1,14 @@
 package routes
 
 import (
+	"encoding/json"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 )
 
 func ApiAdminIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-
+	response := BasicResponse{true, "Welcome to UpAndRunning's Admin-API! Please be aware that most operations need an incoming POST-request."}
+	json.NewEncoder(w).Encode(response)
 }
 
 func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
