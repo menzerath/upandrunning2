@@ -12,15 +12,26 @@ Coming soon(ish)!
 * Visit `http://localhost:8080/admin` and use `admin` to authenticate. You should change the password immediately.
 * Done!
 
+### Upgrading from UpAndRunning
+When upgrading from UpAndRunning (UpAndRunning1) you need to manually delete two rows from your database:
+* `salt`@settings
+* `password`@settings
+
+You may use the following SQL-Query to remove those rows:
+```sql
+DELETE FROM settings WHERE name = 'salt';
+DELETE FROM settings WHERE name = 'password';
+```
+
 ## API
 
 ### User
 Notice: Everyone is able to access those APIs.
 
 #### Status
-```
-/api/status/website.com
+`/api/status/website.com`:
 
+```json
 {
 	"requestSuccess": true,
 	"websiteData": {
@@ -46,9 +57,9 @@ Notice: Everyone is able to access those APIs.
 ```
 
 #### List
-```
-/api/websites
+`/api/websites`:
 
+```json
 {
 	"requestSuccess": true,
 	"websites": [
@@ -66,9 +77,9 @@ Notice: Everyone is able to access those APIs.
 Notice: You have to login before you are able to use those APIs.
 
 #### List all Websites
-```
-/api/admin/website/list
+`/api/admin/website/list`:
 
+```json
 {
 	"requestSuccess": true,
 	"websites": [
