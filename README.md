@@ -29,7 +29,7 @@ DELETE FROM settings WHERE name = 'password';
 Notice: Everyone is able to access those APIs.
 
 #### Status
-`/api/status/website.com`:
+`GET` `/api/status/website.com`:
 
 ```json
 {
@@ -57,7 +57,7 @@ Notice: Everyone is able to access those APIs.
 ```
 
 #### List
-`/api/websites`:
+`GET` `/api/websites`:
 
 ```json
 {
@@ -77,7 +77,7 @@ Notice: Everyone is able to access those APIs.
 Notice: You have to login before you are able to use those APIs.
 
 #### List all Websites
-`/api/admin/website/list`:
+`GET` `/api/admin/website/list`:
 
 ```json
 {
@@ -99,86 +99,100 @@ Notice: You have to login before you are able to use those APIs.
 ```
 
 #### Add a Website
-```
-/api/admin/website/add
+`POST` `/api/admin/website/add`:
+
+```json
 POST-parameters: name, protocol, url
 ```
 
 #### Enable a Website
-```
-/api/admin/website/enable
+`POST` `/api/admin/website/enable`:
+
+```json
 POST-parameters: id
 ```
 
 #### Disable a Website
-```
-/api/admin/website/disable
+`POST` `/api/admin/website/disable`:
+
+```json
 POST-parameters: id
 ```
 
 #### Set a Website visible
-```
-/api/admin/website/visible
+`POST` `/api/admin/website/visible`:
+
+```json
 POST-parameters: id
 ```
 
 #### Set a Website invisible
-```
-/api/admin/website/invisible
+`POST` `/api/admin/website/invisible`:
+
+```json
 POST-parameters: id
 ```
 
 #### Edit a Website
-```
-/api/admin/website/edit
+`POST` `/api/admin/website/edit`:
+
+```json
 POST-parameters: id, name, protocol, url
 ```
 
 #### Delete a Website
-```
-/api/admin/website/delete
+`POST` `/api/admin/website/delete`:
+
+```json
 POST-parameters: id
 ```
 
 #### Change Application-Title
-```
-/api/admin/settings/title
+`POST` `/api/admin/settings/title`:
+
+```json
 POST-parameters: title
 ```
 
 #### Change Admin-Password
-```
-/api/admin/settings/password
+`POST` `/api/admin/settings/password`:
+
+```json
 POST-parameters: password
 ```
 
 #### Change Check-Interval
-```
-/api/admin/settings/interval
+`POST` `/api/admin/settings/interval`:
+
+```json
 POST-parameters: interval
 ```
 
 #### Change PushBullet-API-Key
-```
-/api/admin/settings/pbkey
+`POST` `/api/admin/settings/pbkey`:
+
+```json
 POST-parameters: key
 ```
 
 #### Trigger a Check
-```
-/api/admin/check
+`POST` `/api/admin/check`:
+
+```json
 POST-parameters: - none -
 ```
 
 #### Login
-```
-/api/admin/login
+`POST` `/api/admin/login`:
+
+```json
 POST-parameters: password
 ```
 
 #### Logout
-```
-/api/admin/logout
+`POST` `/api/admin/logout`:
+
+```json
 POST-parameters: - none -
 ```
 
