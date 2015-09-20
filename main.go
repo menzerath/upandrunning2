@@ -7,10 +7,14 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/op/go-logging"
 	"net/http"
+	"runtime"
 	"strconv"
 )
 
 const VERSION = "1.0"
+
+var goVersion = runtime.Version()
+var goArch = runtime.GOOS + "_" + runtime.GOARCH
 
 var Admin lib.Admin
 var Config *lib.Configuration
@@ -21,10 +25,11 @@ func main() {
 	lib.SetupLogger()
 
 	// Welcome
-	logging.MustGetLogger("logger").Info("Welcome to UpAndRunning2 v%s!", VERSION)
+	logging.MustGetLogger("logger").Info("Welcome to UpAndRunning2 v%s [running %s@%s]!", VERSION, goVersion, goArch)
 
 	// Config
 	lib.ReadConfigurationFromFile("config/local.json")
+	lib.SetStaticConfiguration(lib.StaticConfiguration{VERSION, goVersion, goArch})
 	Config = lib.GetConfiguration()
 
 	// Database

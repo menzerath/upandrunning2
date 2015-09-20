@@ -11,6 +11,9 @@ type SiteData struct {
 
 type AdminSiteData struct {
 	Title      string
-	GoVersion  string
+	Interval   int
+	PbKey      string
 	AppVersion string
+	GoVersion  string
+	GoArch     string
 }

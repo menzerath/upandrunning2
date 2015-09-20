@@ -1,14 +1,14 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-	<title>Administration | {{ title }}</title>
-	{{> styles}}
+	<title>Administration | {{ .Title }}</title>
+	{{ template "styles" }}
 </head>
 <body>
 	<div class="navbar navbar-default navbar-fixed-top">
 		<div class="container">
 			<div class="navbar-header">
-				<a href="/" class="navbar-brand">{{ title }}</a>
+				<a href="/" class="navbar-brand">{{ .Title }}</a>
 				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
@@ -124,7 +124,7 @@
 										<div class="form-group">
 											<label class="col-lg-2 control-label">Title:</label>
 											<div class="col-lg-7">
-												<input class="form-control" id="input-new-title" placeholder="UpAndRunning" value="{{ title }}">
+												<input class="form-control" id="input-new-title" placeholder="UpAndRunning" value="{{ .Title }}">
 											</div>
 											<div class="col-lg-3">
 												<button type="button" class="btn btn-primary pull-right" id="button-change-title" onclick="changeTitle()">Save</button>
@@ -146,7 +146,7 @@
 										<div class="form-group">
 											<label class="col-lg-2 control-label">Interval:</label>
 											<div class="col-lg-4">
-												<input type="number" class="form-control" id="input-new-interval" min="1" max="60" placeholder="5" value="{{ interval }}">
+												<input type="number" class="form-control" id="input-new-interval" min="1" max="60" placeholder="5" value="{{ .Interval }}">
 											</div>
 											<label class="col-lg-3 control-label">Minutes</label>
 											<div class="col-lg-3">
@@ -158,7 +158,7 @@
                                     	<div class="form-group">
                                     		<label class="col-lg-2 control-label">PushBullet:</label>
                                     		<div class="col-lg-7">
-                                    			<input class="form-control" id="input-new-pb_key" placeholder="API-Key" value="{{ pb_key }}">
+                                    			<input class="form-control" id="input-new-pb_key" placeholder="API-Key" value="{{ .PbKey }}">
                                     		</div>
                                     		<div class="col-lg-3">
                                     			<button type="button" class="btn btn-primary pull-right" id="button-change-pb_key" onclick="changePBKey()">Save</button>
@@ -176,11 +176,11 @@
 	</div>
 	<footer class="footer">
 		<div class="container">
-			<p class="text-footer">Powered by <a href="https://github.com/MarvinMenzerath/UpAndRunning2" target="_blank"><b>UpAndRunning2</b></a> <b>v{{ version.app }}</b> and <a href="https://golang.org/" target="_blank"><b>Go</b></a> <b>{{ version.node }}</b>.</p>
+			<p class="text-footer">Powered by <a href="https://github.com/MarvinMenzerath/UpAndRunning2" target="_blank"><b>UpAndRunning2</b></a> <b>v{{ .AppVersion }}</b> and <a href="https://golang.org/" target="_blank"><b>{{ .GoVersion }}</b></a> <b>(@{{ .GoArch }})</b>.</p>
 		</div>
 	</footer>
 
-	{{> scripts}}
-	<script src="/js/scripts-admin.js"></script>
+	{{ template "scripts" }}
+	<script src="/public/js/scripts-admin.js"></script>
 </body>
 </html>

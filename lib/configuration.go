@@ -13,6 +13,7 @@ type Configuration struct {
 	Port     int
 	Database databaseConfiguration
 	Dynamic  dynamicConfiguration
+	Static   StaticConfiguration
 }
 
 type databaseConfiguration struct {
@@ -28,6 +29,12 @@ type dynamicConfiguration struct {
 	Title         string
 	Interval      int
 	PushbulletKey string
+}
+
+type StaticConfiguration struct {
+	Version   string
+	GoVersion string
+	GoArch    string
 }
 
 func ReadConfigurationFromFile(filePath string) {
@@ -91,6 +98,10 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	config.Dynamic.Title = title
 	config.Dynamic.Interval = interval
 	config.Dynamic.PushbulletKey = pushbulletKey
+}
+
+func SetStaticConfiguration(c StaticConfiguration) {
+	config.Static = c
 }
 
 func GetConfiguration() *Configuration {
