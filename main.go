@@ -13,20 +13,22 @@ import (
 const VERSION = "1.0"
 
 var Admin lib.Admin
-var Config lib.Configuration
+var Config *lib.Configuration
 var Database *sql.DB
 
 func main() {
 	fmt.Printf("Welcome to UpAndRunning2 v%s!\n\n", VERSION)
 
 	// Config
-	Config = lib.Configuration{}
-	Config.ReadFromFile("config/local.json")
+	lib.ReadConfigurationFromFile("config/local.json")
+	Config = lib.GetConfiguration()
 
 	// Database
 	lib.OpenDatabase(Config.Database)
 	Database = lib.GetDatabase()
-	Config.Dynamic.ReadFromDatabase(Database)
+
+	// Config (again)
+	lib.ReadConfigurationFromDatabase(Database)
 
 	// Admin-User
 	Admin = lib.Admin{}

@@ -7,8 +7,16 @@ import (
 )
 
 func ApiAdminIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	response := BasicResponse{true, "Welcome to UpAndRunning's Admin-API! Please be aware that most operations need an incoming POST-request."}
-	json.NewEncoder(w).Encode(response)
+	responseJson := BasicResponse{true, "Welcome to UpAndRunning's Admin-API! Please be aware that most operations need an incoming POST-request."}
+
+	responseBytes, err := json.Marshal(responseJson)
+	if err != nil {
+		http.Error(w, "Error 500: Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBytes)
 }
 
 func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

@@ -7,6 +7,8 @@ import (
 	"os"
 )
 
+var config *Configuration
+
 type Configuration struct {
 	Port     int
 	Database databaseConfiguration
@@ -28,19 +30,19 @@ type dynamicConfiguration struct {
 	PushbulletKey string
 }
 
-func (c *Configuration) ReadFromFile(filePath string) {
+func ReadConfigurationFromFile(filePath string) {
 	fmt.Println("Reading Configuration from File...")
 
 	file, _ := os.Open(filePath)
 	decoder := json.NewDecoder(file)
 
-	err := decoder.Decode(&c)
+	err := decoder.Decode(&config)
 	if err != nil {
 		fmt.Println("Unable to read Configuration: ", err)
 	}
 }
 
-func (c *dynamicConfiguration) ReadFromDatabase(db *sql.DB) {
+func ReadConfigurationFromDatabase(db *sql.DB) {
 	fmt.Println("Reading Configuration from Database...")
 
 	var title string
@@ -92,7 +94,17 @@ func (c *dynamicConfiguration) ReadFromDatabase(db *sql.DB) {
 		pushbulletKey = ""
 	}
 
-	c.Title = title
-	c.Interval = interval
-	c.PushbulletKey = pushbulletKey
+	config.Dynamic.Title = title
+	config.Dynamic.Interval = interval
+	config.Dynamic.PushbulletKey = pushbulletKey
+}
+
+func GetConfiguration() *Configuration {
+	if config == nil {
+		fmt.Println("No active Configuration found.")
+		os.Exit(1)
+	} else {
+		return config
+	}
+	return nil
 }
