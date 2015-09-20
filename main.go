@@ -2,10 +2,10 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/MarvinMenzerath/UpAndRunning2/lib"
 	"github.com/MarvinMenzerath/UpAndRunning2/routes"
 	"github.com/julienschmidt/httprouter"
+	"github.com/op/go-logging"
 	"net/http"
 	"strconv"
 )
@@ -17,7 +17,11 @@ var Config *lib.Configuration
 var Database *sql.DB
 
 func main() {
-	fmt.Printf("Welcome to UpAndRunning2 v%s!\n\n", VERSION)
+	// Logger
+	lib.SetupLogger()
+
+	// Welcome
+	logging.MustGetLogger("logger").Info("Welcome to UpAndRunning2 v%s!", VERSION)
 
 	// Config
 	lib.ReadConfigurationFromFile("config/local.json")
@@ -91,8 +95,8 @@ func serveRequests() {
 		http.Error(w, "Error 404: Not Found", 404)
 	})
 
-	fmt.Println("Listening on Port " + strconv.Itoa(Config.Port) + "...")
-	http.ListenAndServe(":"+strconv.Itoa(Config.Port), router)
+	logging.MustGetLogger("logger").Debug("Listening on Port " + strconv.Itoa(Config.Port) + "...")
+	logging.MustGetLogger("logger").Fatal(http.ListenAndServe(":"+strconv.Itoa(Config.Port), router))
 }
 
 func startChecking() {
@@ -100,5 +104,5 @@ func startChecking() {
 }
 
 func CheckAllSites() {
-	fmt.Println("Checking X active Websites...")
+	logging.MustGetLogger("logger").Info("Checking X active Websites...")
 }

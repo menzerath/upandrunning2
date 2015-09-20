@@ -2,7 +2,7 @@ package lib
 
 import (
 	"database/sql"
-	"fmt"
+	"github.com/op/go-logging"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -13,10 +13,10 @@ type Admin struct {
 func (a *Admin) ValidatePassword(userInput string) bool {
 	err := bcrypt.CompareHashAndPassword(a.password, []byte(userInput))
 	if err != nil {
-		fmt.Println("Invalid Password: ", err)
+		logging.MustGetLogger("logger").Warning("Invalid Password: ", err)
 		return false
 	}
-	fmt.Println("Login successful.")
+	logging.MustGetLogger("logger").Info("Login successful.")
 	return true
 }
 
@@ -25,32 +25,32 @@ func (a *Admin) Exists() bool {
 	err := db.QueryRow("SELECT value FROM settings WHERE name = 'password';").Scan(&value)
 	switch {
 	case err == sql.ErrNoRows:
-		fmt.Println("No Admin-Password found.")
+		logging.MustGetLogger("logger").Warning("No Admin-Password found.")
 		return false
 	case err != nil:
-		fmt.Println("Error while checking for Admin-Password: ", err)
+		logging.MustGetLogger("logger").Error("Error while checking for Admin-Password: ", err)
 		return false
 	default:
 		a.password = value
 	}
 
-	fmt.Println("Existing Admin-Password found.")
+	logging.MustGetLogger("logger").Debug("Existing Admin-Password found.")
 	return true
 }
 
 func (a *Admin) ChangePassword(userInput string) {
-	fmt.Println("Changing Admin-Password...")
+	logging.MustGetLogger("logger").Debug("Changing Admin-Password...")
 
 	clearPassword := []byte(userInput)
 	passwordHash, err := bcrypt.GenerateFromPassword(clearPassword, 15)
 
 	stmt, err := db.Prepare("UPDATE settings SET value = (?) WHERE name = 'password';")
 	if err != nil {
-		fmt.Println("Unable to update Admin-Password: ", err)
+		logging.MustGetLogger("logger").Error("Unable to update Admin-Password: ", err)
 	} else {
 		_, err = stmt.Exec(passwordHash)
 		if err != nil {
-			fmt.Println("Unable to update Admin-Password: ", err)
+			logging.MustGetLogger("logger").Error("Unable to update Admin-Password: ", err)
 		}
 	}
 
@@ -58,18 +58,18 @@ func (a *Admin) ChangePassword(userInput string) {
 }
 
 func (a *Admin) Add() {
-	fmt.Println("Adding default Admin...")
+	logging.MustGetLogger("logger").Info("Adding default Admin...")
 
 	clearPassword := []byte("admin")
 	passwordHash, err := bcrypt.GenerateFromPassword(clearPassword, 15)
 
 	stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('password', (?));")
 	if err != nil {
-		fmt.Println("Unable to insert Admin-Password: ", err)
+		logging.MustGetLogger("logger").Error("Unable to insert Admin-Password: ", err)
 	} else {
 		_, err = stmt.Exec(passwordHash)
 		if err != nil {
-			fmt.Println("Unable to insert Admin-Password: ", err)
+			logging.MustGetLogger("logger").Error("Unable to insert Admin-Password: ", err)
 		}
 	}
 

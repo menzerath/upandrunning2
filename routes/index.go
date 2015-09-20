@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"fmt"
 	"github.com/MarvinMenzerath/UpAndRunning2/lib"
 	"github.com/julienschmidt/httprouter"
+	"github.com/op/go-logging"
 	"html/template"
 	"net/http"
 )
@@ -16,7 +16,7 @@ func IndexIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		w.Header().Set("Content-Type", "text/html")
 		t.Execute(w, data)
 	} else {
-		fmt.Println("Error while parsing Template: ", err)
+		logging.MustGetLogger("logger").Error("Error while parsing Template: ", err)
 		http.Error(w, "Error 500: Internal Server Error", http.StatusInternalServerError)
 	}
 }

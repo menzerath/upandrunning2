@@ -3,7 +3,7 @@ package lib
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
+	"github.com/op/go-logging"
 	"os"
 )
 
@@ -31,19 +31,19 @@ type dynamicConfiguration struct {
 }
 
 func ReadConfigurationFromFile(filePath string) {
-	fmt.Println("Reading Configuration from File...")
+	logging.MustGetLogger("logger").Info("Reading Configuration from File...")
 
 	file, _ := os.Open(filePath)
 	decoder := json.NewDecoder(file)
 
 	err := decoder.Decode(&config)
 	if err != nil {
-		fmt.Println("Unable to read Configuration: ", err)
+		logging.MustGetLogger("logger").Fatal("Unable to read Configuration: ", err)
 	}
 }
 
 func ReadConfigurationFromDatabase(db *sql.DB) {
-	fmt.Println("Reading Configuration from Database...")
+	logging.MustGetLogger("logger").Info("Reading Configuration from Database...")
 
 	var title string
 	var interval int
@@ -53,13 +53,11 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	if err != nil {
 		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('title', 'UpAndRunning');")
 		if err != nil {
-			fmt.Println("Unable to insert 'title'-setting: ", err)
-			os.Exit(1)
+			logging.MustGetLogger("logger").Fatal("Unable to insert 'title'-setting: ", err)
 		}
 		_, err = stmt.Exec()
 		if err != nil {
-			fmt.Println("Unable to insert 'title'-setting: ", err)
-			os.Exit(1)
+			logging.MustGetLogger("logger").Fatal("Unable to insert 'title'-setting: ", err)
 		}
 		title = "UpAndRunning"
 	}
@@ -68,13 +66,11 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	if err != nil {
 		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('interval', 5);")
 		if err != nil {
-			fmt.Println("Unable to insert 'interval'-setting: ", err)
-			os.Exit(1)
+			logging.MustGetLogger("logger").Fatal("Unable to insert 'interval'-setting: ", err)
 		}
 		_, err = stmt.Exec()
 		if err != nil {
-			fmt.Println("Unable to insert 'interval'-setting: ", err)
-			os.Exit(1)
+			logging.MustGetLogger("logger").Fatal("Unable to insert 'interval'-setting: ", err)
 		}
 		interval = 5
 	}
@@ -83,13 +79,11 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	if err != nil {
 		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('pushbullet_key', '');")
 		if err != nil {
-			fmt.Println("Unable to insert 'pushbullet_key'-setting: ", err)
-			os.Exit(1)
+			logging.MustGetLogger("logger").Fatal("Unable to insert 'pushbullet_key'-setting: ", err)
 		}
 		_, err = stmt.Exec()
 		if err != nil {
-			fmt.Println("Unable to insert 'pushbullet_key'-setting: ", err)
-			os.Exit(1)
+			logging.MustGetLogger("logger").Fatal("Unable to insert 'pushbullet_key'-setting: ", err)
 		}
 		pushbulletKey = ""
 	}
@@ -101,8 +95,7 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 
 func GetConfiguration() *Configuration {
 	if config == nil {
-		fmt.Println("No active Configuration found.")
-		os.Exit(1)
+		logging.MustGetLogger("logger").Fatal("No active Configuration found.")
 	} else {
 		return config
 	}
