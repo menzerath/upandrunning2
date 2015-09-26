@@ -4,7 +4,6 @@ You can also enter your PushBullet-API-Key to get a Push each time the status of
 
 ## Installation
 [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/MarvinMenzerath/UpAndRunning2)  
-Coming soon(ish)!
 
 * Download and extract all the files in a directory
 * Prepare your MySQL-Server: create a new user and a new database
