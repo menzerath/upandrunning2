@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func IndexIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func Index(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	data := SiteData{lib.GetConfiguration().Dynamic.Title}
 	t, err := template.ParseFiles("views/index.html", "views/partials/styles.html", "views/partials/footer.html", "views/partials/scripts.html")
 
@@ -19,8 +19,4 @@ func IndexIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		logging.MustGetLogger("logger").Error("Error while parsing Template: ", err)
 		http.Error(w, "Error 500: Internal Server Error", http.StatusInternalServerError)
 	}
-}
-
-func IndexStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-
 }
