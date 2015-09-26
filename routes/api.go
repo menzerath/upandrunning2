@@ -7,6 +7,7 @@ import (
 	"github.com/op/go-logging"
 	"net/http"
 	"strconv"
+	"database/sql"
 )
 
 func ApiIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -20,7 +21,7 @@ func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	db := lib.GetDatabase()
 	stmt, err := db.Prepare("SELECT id, name, protocol, url, status, time, lastFailStatus, lastFailTime, ups, downs, totalChecks, avgAvail FROM website WHERE url = ? AND enabled = 1;")
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
+		logging.MustGetLogger("logger").Error("Unable to fetch Website-Status: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, "Unable to process your Request.")
 		return
 	}
@@ -41,8 +42,12 @@ func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	)
 
 	err = stmt.QueryRow(ps.ByName("url")).Scan(&id, &name, &protocol, &url, &status, &time, &lastFailStatus, &lastFailTime, &ups, &downs, &totalChecks, &avgAvail)
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
+	switch {
+	case err == sql.ErrNoRows:
+		SendJsonMessage(w, http.StatusNotFound, "Unable to find any data matching the given url.")
+		return
+	case err != nil:
+		logging.MustGetLogger("logger").Error("Unable to fetch Website-Status: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, "Unable to process your Request.")
 		return
 	}
