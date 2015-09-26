@@ -1,13 +1,13 @@
 package routes
 
 import (
+	"database/sql"
 	"encoding/json"
 	"github.com/MarvinMenzerath/UpAndRunning2/lib"
 	"github.com/julienschmidt/httprouter"
 	"github.com/op/go-logging"
 	"net/http"
 	"strconv"
-	"database/sql"
 )
 
 func ApiIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
