@@ -151,13 +151,6 @@ POST-parameters: id
 POST-parameters: title
 ```
 
-#### Change Admin-Password
-`POST` `/api/admin/settings/password`:
-
-```json
-POST-parameters: password
-```
-
 #### Change Check-Interval
 `POST` `/api/admin/settings/interval`:
 
@@ -170,6 +163,13 @@ POST-parameters: interval
 
 ```json
 POST-parameters: key
+```
+
+#### Change Admin-Password
+`POST` `/api/admin/settings/password`:
+
+```json
+POST-parameters: password
 ```
 
 #### Trigger a Check

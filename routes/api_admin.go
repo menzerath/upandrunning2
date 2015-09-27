@@ -55,15 +55,15 @@ func ApiAdminSettingTitle(w http.ResponseWriter, r *http.Request, ps httprouter.
 
 }
 
-func ApiAdminSettingPassword(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-
-}
-
 func ApiAdminSettingInterval(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 }
 
 func ApiAdminSettingPushbulletKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+
+}
+
+func ApiAdminSettingPassword(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 }
 
