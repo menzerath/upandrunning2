@@ -45,12 +45,16 @@ func ReadConfigurationFromFile(filePath string) {
 	decoder := json.NewDecoder(file)
 
 	err := decoder.Decode(&config)
-	if err != nil {
-		logging.MustGetLogger("logger").Fatal("Unable to read Configuration: ", err)
-	}
 
+	allowFatalError := true
 	if os.Getenv("PORT") != "" {
 		config.Port, _ = strconv.Atoi(os.Getenv("PORT"))
+		logging.MustGetLogger("logger").Warning("Using Port provided by Environment.")
+		allowFatalError = false
+	}
+
+	if err != nil && allowFatalError {
+		logging.MustGetLogger("logger").Fatal("Unable to read Configuration: ", err)
 	}
 }
 

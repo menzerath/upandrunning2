@@ -17,6 +17,7 @@ func OpenDatabase(config databaseConfiguration) {
 	var openString string
 	if os.Getenv("CLEARDB_DATABASE_URL") != "" {
 		openString = os.Getenv("CLEARDB_DATABASE_URL")
+		logging.MustGetLogger("logger").Warning("Using Database-Connection provided by Environment.")
 	} else {
 		openString = config.User + ":" + config.Password + "@tcp(" + config.Host + ":" + strconv.Itoa(config.Port) + ")/" + config.Database
 	}
