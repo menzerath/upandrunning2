@@ -1,8 +1,8 @@
 package lib
 
 import (
-	"github.com/MarvinMenzerath/UpAndRunning2/Godeps/_workspace/src/github.com/mattn/go-colorable"
-	"github.com/MarvinMenzerath/UpAndRunning2/Godeps/_workspace/src/github.com/op/go-logging"
+	"github.com/mattn/go-colorable"
+	"github.com/op/go-logging"
 )
 
 var format = logging.MustStringFormatter(

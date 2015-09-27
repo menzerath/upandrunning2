@@ -2,8 +2,8 @@ package lib
 
 import (
 	"database/sql"
-	_ "github.com/MarvinMenzerath/UpAndRunning2/Godeps/_workspace/src/github.com/go-sql-driver/mysql"
-	"github.com/MarvinMenzerath/UpAndRunning2/Godeps/_workspace/src/github.com/op/go-logging"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/op/go-logging"
 	"strconv"
 )
 
@@ -14,7 +14,7 @@ func OpenDatabase(config databaseConfiguration) {
 	var err error = nil
 
 	// username:password@protocol(address)/dbname
-	db, err = sql.Open("mysql", config.User + ":" + config.Password + "@tcp(" + config.Host + ":" + strconv.Itoa(config.Port) + ")/" + config.Database)
+	db, err = sql.Open("mysql", config.User+":"+config.Password+"@tcp("+config.Host+":"+strconv.Itoa(config.Port)+")/"+config.Database)
 	if err != nil {
 		logging.MustGetLogger("logger").Fatal("Unable to open Database-Connection: ", err)
 	}

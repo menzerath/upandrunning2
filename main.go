@@ -2,10 +2,10 @@ package main
 
 import (
 	"database/sql"
-	"github.com/MarvinMenzerath/UpAndRunning2/Godeps/_workspace/src/github.com/julienschmidt/httprouter"
-	"github.com/MarvinMenzerath/UpAndRunning2/Godeps/_workspace/src/github.com/op/go-logging"
 	"github.com/MarvinMenzerath/UpAndRunning2/lib"
 	"github.com/MarvinMenzerath/UpAndRunning2/routes"
+	"github.com/julienschmidt/httprouter"
+	"github.com/op/go-logging"
 	"net/http"
 	"runtime"
 	"strconv"
@@ -108,7 +108,7 @@ func serveRequests() {
 func startCheckTimer() {
 	timer := time.NewTimer(time.Second * time.Duration(Config.Dynamic.Interval))
 	go func() {
-		<- timer.C
+		<-timer.C
 		CheckAllSites()
 		startCheckTimer()
 	}()

@@ -3,7 +3,7 @@ package lib
 import (
 	"database/sql"
 	"encoding/json"
-	"github.com/MarvinMenzerath/UpAndRunning2/Godeps/_workspace/src/github.com/op/go-logging"
+	"github.com/op/go-logging"
 	"os"
 )
 
