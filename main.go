@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"runtime"
 	"strconv"
+	"time"
 )
 
 const VERSION = "1.0"
@@ -49,7 +50,7 @@ func main() {
 	lib.InitHttpStatusCodeMap()
 
 	// Start Checking and Serving
-	go startChecking()
+	startCheckTimer()
 	serveRequests()
 
 	lib.GetDatabase().Close()
@@ -104,8 +105,13 @@ func serveRequests() {
 	logging.MustGetLogger("logger").Fatal(http.ListenAndServe(":"+strconv.Itoa(Config.Port), router))
 }
 
-func startChecking() {
-	CheckAllSites()
+func startCheckTimer() {
+	timer := time.NewTimer(time.Second * time.Duration(Config.Dynamic.Interval))
+	go func() {
+		<- timer.C
+		CheckAllSites()
+		startCheckTimer()
+	}()
 }
 
 func CheckAllSites() {

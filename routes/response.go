@@ -66,8 +66,8 @@ type AdminSiteData struct {
 }
 
 // Functions
-func SendJsonMessage(w http.ResponseWriter, code int, message string) {
-	responseBytes, _ := json.Marshal(BasicResponse{false, message})
+func SendJsonMessage(w http.ResponseWriter, code int, success bool, message string) {
+	responseBytes, _ := json.Marshal(BasicResponse{success, message})
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(responseBytes)

@@ -22,7 +22,7 @@ func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	stmt, err := db.Prepare("SELECT id, name, protocol, url, status, time, lastFailStatus, lastFailTime, ups, downs, totalChecks, avgAvail FROM website WHERE url = ? AND enabled = 1;")
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to fetch Website-Status: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, "Unable to process your Request.")
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 		return
 	}
 
@@ -44,11 +44,11 @@ func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	err = stmt.QueryRow(ps.ByName("url")).Scan(&id, &name, &protocol, &url, &status, &time, &lastFailStatus, &lastFailTime, &ups, &downs, &totalChecks, &avgAvail)
 	switch {
 	case err == sql.ErrNoRows:
-		SendJsonMessage(w, http.StatusNotFound, "Unable to find any data matching the given url.")
+		SendJsonMessage(w, http.StatusNotFound, false, "Unable to find any data matching the given url.")
 		return
 	case err != nil:
 		logging.MustGetLogger("logger").Error("Unable to fetch Website-Status: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, "Unable to process your Request.")
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 		return
 	}
 
@@ -58,7 +58,7 @@ func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Send Response
 	responseBytes, err := json.Marshal(responseJson)
 	if err != nil {
-		SendJsonMessage(w, http.StatusInternalServerError, "Unable to process your Request.")
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -71,7 +71,7 @@ func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	rows, err := db.Query("SELECT name, protocol, url, status FROM website WHERE enabled = 1 AND visible = 1;")
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, "Unable to process your Request.")
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 		return
 	}
 	defer rows.Close()
@@ -83,7 +83,7 @@ func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		err = rows.Scan(&row.Name, &row.Protocol, &row.Url, &row.Status)
 		if err != nil {
 			logging.MustGetLogger("logger").Error("Unable to read Website-Row: ", err)
-			SendJsonMessage(w, http.StatusInternalServerError, "Unable to process your Request.")
+			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 			return
 		}
 		websites = append(websites, row)
@@ -93,14 +93,14 @@ func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	err = rows.Err()
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to read Website-Rows: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, "Unable to process your Request.")
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 		return
 	}
 
 	// Send Response
 	responseBytes, err := json.Marshal(WebsiteResponse{true, websites})
 	if err != nil {
-		SendJsonMessage(w, http.StatusInternalServerError, "Unable to process your Request.")
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
