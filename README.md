@@ -3,8 +3,6 @@ UpAndRunning2 is a lightweight Go application which monitors all of your website
 You can also enter your PushBullet-API-Key to get a Push each time the status of one of your websites changes.
 
 ## Installation
-[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/MarvinMenzerath/UpAndRunning2)  
-
 * Download and extract all the files in a directory
 * Prepare your MySQL-Server: create a new user and a new database
 * Copy `config/default.json` to `config/local.json` and change this file to your needs

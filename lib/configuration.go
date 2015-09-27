@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/MarvinMenzerath/UpAndRunning2/Godeps/_workspace/src/github.com/op/go-logging"
 	"os"
-	"strconv"
 )
 
 var config *Configuration
@@ -46,14 +45,7 @@ func ReadConfigurationFromFile(filePath string) {
 
 	err := decoder.Decode(&config)
 
-	allowFatalError := true
-	if os.Getenv("PORT") != "" {
-		config.Port, _ = strconv.Atoi(os.Getenv("PORT"))
-		logging.MustGetLogger("logger").Warning("Using Port provided by Environment.")
-		allowFatalError = false
-	}
-
-	if err != nil && allowFatalError {
+	if err != nil {
 		logging.MustGetLogger("logger").Fatal("Unable to read Configuration: ", err)
 	}
 }
