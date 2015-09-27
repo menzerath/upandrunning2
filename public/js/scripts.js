@@ -47,7 +47,7 @@ function showInformation(website) {
 		error: function(error) {
 			$('.bottom-right').notify({
 				type: 'danger',
-				message: {text: "Sorry, but I was unable to process your request. Error: " + JSON.parse(error.responseText).message},
+				message: {text: "Sorry, but I was unable to process your Request. Error: " + JSON.parse(error.responseText).message},
 				fadeOut: {enabled: true, delay: 3000}
 			}).show();
 		}
@@ -86,7 +86,7 @@ function loadWebsiteData() {
 
 				newEntry += '</td><td> <span class="label label-primary" id="label-action" onclick="showInformation(\'' + loadedWebsiteData[i].url + '\')">More</span> </td></tr>';
 
-				if (loadedWebsiteData[i].status.indexOf("200") > -1) {
+				if (loadedWebsiteData[i].status.indexOf("200") > -1 || loadedWebsiteData[i].status.indexOf("301") > -1 || loadedWebsiteData[i].status.indexOf("302") > -1) {
 					dataStringUp += newEntry;
 				} else {
 					dataStringDown += newEntry;
@@ -94,18 +94,18 @@ function loadWebsiteData() {
 			}
 
 			if (dataStringUp === '') {
-				dataStringUp = '<tr><td colspan="4">No websites found.</td></tr>';
+				dataStringUp = '<tr><td colspan="4">No Websites found.</td></tr>';
 			}
 			if (dataStringDown === '') {
-				dataStringDown = '<tr><td colspan="4">No websites found.</td></tr>';
+				dataStringDown = '<tr><td colspan="4">No Websites found.</td></tr>';
 			}
 
 			$('#table-websites-up').html(dataStringUp);
 			$('#table-websites-down').html(dataStringDown);
 		},
 		error: function(error) {
-			$('#table-websites-up').html('<tr><td colspan="4">An error occured: ' + JSON.parse(error.responseText).message + '</td></tr>');
-			$('#table-websites-down').html('<tr><td colspan="4">An error occured: ' + JSON.parse(error.responseText).message + '</td></tr>');
+			$('#table-websites-up').html('<tr><td colspan="4">An Error occured: ' + JSON.parse(error.responseText).message + '</td></tr>');
+			$('#table-websites-down').html('<tr><td colspan="4">An Error occured: ' + JSON.parse(error.responseText).message + '</td></tr>');
 		}
 	});
 }
