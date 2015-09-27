@@ -29,6 +29,7 @@ type dynamicConfiguration struct {
 	Title         string
 	Interval      int
 	PushbulletKey string
+	CheckNow      bool
 }
 
 type StaticConfiguration struct {
@@ -99,6 +100,8 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	config.Dynamic.Title = title
 	config.Dynamic.Interval = interval
 	config.Dynamic.PushbulletKey = pushbulletKey
+
+	config.Dynamic.CheckNow = true
 }
 
 func SetStaticConfiguration(c StaticConfiguration) {

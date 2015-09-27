@@ -51,6 +51,7 @@ func main() {
 
 	// Start Checking and Serving
 	startCheckTimer()
+	startCheckNowTimer()
 	serveRequests()
 
 	lib.GetDatabase().Close()
@@ -109,12 +110,24 @@ func startCheckTimer() {
 	timer := time.NewTimer(time.Second * time.Duration(Config.Dynamic.Interval))
 	go func() {
 		<-timer.C
-		CheckAllSites()
+		checkAllSites()
 		startCheckTimer()
 	}()
 }
 
-func CheckAllSites() {
+func startCheckNowTimer() {
+	timer := time.NewTimer(time.Second * 1)
+	go func() {
+		<-timer.C
+		if Config.Dynamic.CheckNow {
+			checkAllSites()
+			Config.Dynamic.CheckNow = false
+		}
+		startCheckNowTimer()
+	}()
+}
+
+func checkAllSites() {
 	logging.MustGetLogger("logger").Debug("Checking every active Website...")
 
 	// Query the Database
