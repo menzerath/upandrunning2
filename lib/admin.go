@@ -2,8 +2,8 @@ package lib
 
 import (
 	"database/sql"
-	"github.com/op/go-logging"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/MarvinMenzerath/UpAndRunning2/Godeps/_workspace/src/github.com/op/go-logging"
+	"github.com/MarvinMenzerath/UpAndRunning2/Godeps/_workspace/src/golang.org/x/crypto/bcrypt"
 )
 
 type Admin struct {

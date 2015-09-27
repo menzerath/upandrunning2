@@ -2,7 +2,7 @@ package routes
 
 import (
 	"encoding/json"
-	"github.com/julienschmidt/httprouter"
+	"github.com/MarvinMenzerath/UpAndRunning2/Godeps/_workspace/src/github.com/julienschmidt/httprouter"
 	"net/http"
 )
 

@@ -2,10 +2,10 @@ package lib
 
 import (
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/op/go-logging"
-	"strconv"
+	_ "github.com/MarvinMenzerath/UpAndRunning2/Godeps/_workspace/src/github.com/go-sql-driver/mysql"
+	"github.com/MarvinMenzerath/UpAndRunning2/Godeps/_workspace/src/github.com/op/go-logging"
 	"os"
+	"strconv"
 )
 
 var db *sql.DB
@@ -18,7 +18,7 @@ func OpenDatabase(config databaseConfiguration) {
 	if os.Getenv("CLEARDB_DATABASE_URL") != "" {
 		openString = os.Getenv("CLEARDB_DATABASE_URL")
 	} else {
-		openString = config.User+":"+config.Password+"@tcp("+config.Host+":"+strconv.Itoa(config.Port)+")/"+config.Database
+		openString = config.User + ":" + config.Password + "@tcp(" + config.Host + ":" + strconv.Itoa(config.Port) + ")/" + config.Database
 	}
 
 	// username:password@protocol(address)/dbname

@@ -1,9 +1,9 @@
 package routes
 
 import (
+	"github.com/MarvinMenzerath/UpAndRunning2/Godeps/_workspace/src/github.com/julienschmidt/httprouter"
+	"github.com/MarvinMenzerath/UpAndRunning2/Godeps/_workspace/src/github.com/op/go-logging"
 	"github.com/MarvinMenzerath/UpAndRunning2/lib"
-	"github.com/julienschmidt/httprouter"
-	"github.com/op/go-logging"
 	"html/template"
 	"net/http"
 )
