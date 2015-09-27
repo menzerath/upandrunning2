@@ -115,5 +115,36 @@ func startCheckTimer() {
 }
 
 func CheckAllSites() {
-	logging.MustGetLogger("logger").Info("Checking X active Websites...")
+	logging.MustGetLogger("logger").Debug("Checking every active Website...")
+
+	// Query the Database
+	db := lib.GetDatabase()
+	rows, err := db.Query("SELECT id, protocol, url FROM website WHERE enabled = 1;")
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
+		return
+	}
+	defer rows.Close()
+
+	// Check every Website
+	count := 0
+	for rows.Next() {
+		var website lib.Website
+		err = rows.Scan(&website.Id, &website.Protocol, &website.Url)
+		if err != nil {
+			logging.MustGetLogger("logger").Error("Unable to read Website-Row: ", err)
+			return
+		}
+		website.RunCheck()
+		count++
+	}
+
+	// Check for Errors
+	err = rows.Err()
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to read Website-Rows: ", err)
+		return
+	}
+
+	logging.MustGetLogger("logger").Info("Checked " + strconv.Itoa(count) + " active Websites...")
 }
