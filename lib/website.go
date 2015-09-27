@@ -1,10 +1,12 @@
 package lib
 
 import (
+	"github.com/franela/goreq"
 	"github.com/mitsuse/pushbullet-go"
 	"github.com/mitsuse/pushbullet-go/requests"
 	"github.com/op/go-logging"
 	"strconv"
+	"time"
 )
 
 type Website struct {
@@ -14,6 +16,74 @@ type Website struct {
 }
 
 func (w *Website) RunCheck() {
+	// Request new Status
+	res, err := goreq.Request{Uri: w.Protocol + "://" + w.Url, Method: "HEAD", UserAgent: "UpAndRunning2 (https://github.com/MarvinMenzerath/UpAndRunning2)", MaxRedirects: 10, Timeout: 10 * time.Second}.Do()
+
+	var newStatus string
+	var newStatusCode int
+	if err != nil {
+		logging.MustGetLogger("logger").Warning("Error while requesting Status: ", err)
+		newStatus = "Server not found"
+		newStatusCode = 0
+	} else {
+		newStatus = strconv.Itoa(res.StatusCode) + " - " + GetHttpStatus(res.StatusCode)
+		newStatusCode = res.StatusCode
+		defer res.Body.Close()
+	}
+
+	// If Pushbullet-notifications are active: get old Status and Website's name and send a Push
+	if GetConfiguration().Dynamic.PushbulletKey != "" {
+		db := GetDatabase()
+		stmt, err := db.Prepare("SELECT name, status FROM website WHERE id = ?")
+		if err != nil {
+			logging.MustGetLogger("logger").Error("Unable to get Website's data: ", err)
+			return
+		}
+
+		var (
+			name   string
+			status string
+		)
+		err = stmt.QueryRow(w.Id).Scan(&name, &status)
+		if err != nil {
+			logging.MustGetLogger("logger").Error("Unable to get Website's data: ", err)
+			return
+		}
+
+		if newStatus != status {
+			sendPush(name, w.Url, newStatus, status)
+		}
+	}
+
+	// Save the new Result
+	if newStatusCode == 200 || newStatusCode == 301 || newStatusCode == 302 {
+		// Success
+		stmt, err := db.Prepare("UPDATE website SET status = ?, time = NOW(), ups = ups + 1, totalChecks = totalChecks + 1 WHERE id = ?;")
+		if err != nil {
+			logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
+			return
+		}
+
+		_, err = stmt.Exec(newStatus, w.Id)
+		if err != nil {
+			logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
+			return
+		}
+	} else {
+		// Failure
+		stmt, err := db.Prepare("UPDATE website SET status = ?, time = NOW(), lastFailStatus = ?, lastFailTime = NOW(), downs = downs + 1, totalChecks = totalChecks + 1 WHERE id = ?;")
+		if err != nil {
+			logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
+			return
+		}
+
+		_, err = stmt.Exec(newStatus, newStatus, w.Id)
+		if err != nil {
+			logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
+			return
+		}
+	}
+
 	w.calcAvgAvailability()
 }
 

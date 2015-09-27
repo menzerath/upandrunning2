@@ -128,8 +128,6 @@ func startCheckNowTimer() {
 }
 
 func checkAllSites() {
-	logging.MustGetLogger("logger").Debug("Checking every active Website...")
-
 	// Query the Database
 	db := lib.GetDatabase()
 	rows, err := db.Query("SELECT id, protocol, url FROM website WHERE enabled = 1;")
@@ -148,7 +146,7 @@ func checkAllSites() {
 			logging.MustGetLogger("logger").Error("Unable to read Website-Row: ", err)
 			return
 		}
-		website.RunCheck()
+		go website.RunCheck()
 		count++
 	}
 
@@ -159,5 +157,5 @@ func checkAllSites() {
 		return
 	}
 
-	logging.MustGetLogger("logger").Info("Checked " + strconv.Itoa(count) + " active Websites...")
+	logging.MustGetLogger("logger").Info("Checking " + strconv.Itoa(count) + " active Websites...")
 }
