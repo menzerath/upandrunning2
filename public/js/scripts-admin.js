@@ -308,6 +308,7 @@ function changeTitle() {
 			type: "POST",
 			data: {title: newTitle},
 			success: function() {
+				$(document).attr("title", "Administration | " + newTitle);
 				$('#navbar-title').text(newTitle);
 				$('.bottom-right').notify({
 					type: 'success',

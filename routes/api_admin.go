@@ -133,7 +133,7 @@ func ApiAdminSettingInterval(w http.ResponseWriter, r *http.Request, ps httprout
 
 	// Update Database-Row
 	db := lib.GetDatabase()
-	stmt, err := db.Prepare("UPDATE settings SET value = ? WHERE name = 'title';")
+	stmt, err := db.Prepare("UPDATE settings SET value = ? WHERE name = 'interval';")
 	if err != nil {
 		logging.MustGetLogger("logger").Fatal("Unable to change Interval: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
