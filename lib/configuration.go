@@ -60,7 +60,7 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 
 	err := db.QueryRow("SELECT value FROM settings where name = 'title';").Scan(&title)
 	if err != nil {
-		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('title', 'UpAndRunning');")
+		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('title', 'UpAndRunning2');")
 		if err != nil {
 			logging.MustGetLogger("logger").Fatal("Unable to insert 'title'-setting: ", err)
 		}

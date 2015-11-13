@@ -51,6 +51,24 @@ type WebsiteCheckResult struct {
 	Time   string `json:"time"`
 }
 
+// Admin Website Response
+type AdminWebsiteResponse struct {
+	Success  bool           `json:"requestSuccess"`
+	Websites []AdminWebsite `json:"websites"`
+}
+
+type AdminWebsite struct {
+	Id       int    `json:"id"`
+	Name     string `json:"name"`
+	Enabled  bool   `json:"enabled"`
+	Visible  bool   `json:"visible"`
+	Protocol string `json:"protocol"`
+	Url      string `json:"url"`
+	Status   string `json:"status"`
+	Time     string `json:"time"`
+	Average  string `json:"avgAvail"`
+}
+
 // Site-Data
 type SiteData struct {
 	Title string
@@ -67,7 +85,11 @@ type AdminSiteData struct {
 
 // Functions
 func SendJsonMessage(w http.ResponseWriter, code int, success bool, message string) {
-	responseBytes, _ := json.Marshal(BasicResponse{success, message})
+	responseBytes, err := json.Marshal(BasicResponse{success, message})
+	if err != nil {
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to send JSON-Message.")
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(responseBytes)

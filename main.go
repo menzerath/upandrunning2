@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-const VERSION = "1.0"
+const VERSION = "2.0.0"
 
 var goVersion = runtime.Version()
 var goArch = runtime.GOOS + "_" + runtime.GOARCH
@@ -81,7 +81,7 @@ func serveRequests() {
 	router.POST("/api/admin/settings/interval", routes.ApiAdminSettingInterval)
 	router.POST("/api/admin/settings/pbkey", routes.ApiAdminSettingPushbulletKey)
 
-	router.POST("/api/admin/websites", routes.ApiAdminWebsites)
+	router.GET("/api/admin/websites", routes.ApiAdminWebsites)
 	router.POST("/api/admin/websites/add", routes.ApiAdminWebsiteAdd)
 	router.POST("/api/admin/websites/enable", routes.ApiAdminWebsiteEnable)
 	router.POST("/api/admin/websites/disable", routes.ApiAdminWebsiteDisable)

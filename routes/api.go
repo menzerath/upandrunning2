@@ -11,9 +11,7 @@ import (
 )
 
 func ApiIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	responseBytes, _ := json.Marshal(BasicResponse{true, "Welcome to UpAndRunning's API!"})
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(responseBytes)
+	SendJsonMessage(w, http.StatusOK, true, "Welcome to UpAndRunning's API!")
 }
 
 func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

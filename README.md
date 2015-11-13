@@ -10,7 +10,7 @@ You can also enter your PushBullet-API-Key to get a Push each time the status of
 * Done!
 
 ### Upgrading from UpAndRunning
-When upgrading from UpAndRunning (UpAndRunning1) you need to manually delete two rows from your database:
+When upgrading from UpAndRunning (UpAndRunning v1.x.x) you need to manually delete two rows from your database:
 * `salt`@settings
 * `password`@settings
 
@@ -19,6 +19,8 @@ You may use the following SQL-Query to remove those rows:
 DELETE FROM settings WHERE name = 'salt';
 DELETE FROM settings WHERE name = 'password';
 ```
+
+Also you should notice that some of the APIs changed and you may need to adjust your applications.
 
 ## API
 
@@ -74,7 +76,7 @@ Notice: Everyone is able to access those APIs.
 Notice: You have to login before you are able to use those APIs.
 
 #### List all Websites
-`GET` `/api/admin/website/list`:
+`GET` `/api/admin/websites`:
 
 ```json
 {
@@ -96,52 +98,52 @@ Notice: You have to login before you are able to use those APIs.
 ```
 
 #### Add a Website
-`POST` `/api/admin/website/add`:
+`POST` `/api/admin/websites/add`:
 
 ```json
 POST-parameters: name, protocol, url
 ```
 
 #### Enable a Website
-`POST` `/api/admin/website/enable`:
+`POST` `/api/admin/websites/enable`:
 
 ```json
-POST-parameters: id
+POST-parameters: url
 ```
 
 #### Disable a Website
-`POST` `/api/admin/website/disable`:
+`POST` `/api/admin/websites/disable`:
 
 ```json
-POST-parameters: id
+POST-parameters: url
 ```
 
 #### Set a Website visible
-`POST` `/api/admin/website/visible`:
+`POST` `/api/admin/websites/visible`:
 
 ```json
-POST-parameters: id
+POST-parameters: url
 ```
 
 #### Set a Website invisible
-`POST` `/api/admin/website/invisible`:
+`POST` `/api/admin/websites/invisible`:
 
 ```json
-POST-parameters: id
+POST-parameters: url
 ```
 
 #### Edit a Website
-`POST` `/api/admin/website/edit`:
+`POST` `/api/admin/websites/edit`:
 
 ```json
 POST-parameters: id, name, protocol, url
 ```
 
 #### Delete a Website
-`POST` `/api/admin/website/delete`:
+`POST` `/api/admin/websites/delete`:
 
 ```json
-POST-parameters: id
+POST-parameters: url
 ```
 
 #### Change Application-Title
@@ -197,6 +199,11 @@ POST-parameters: - none -
 ![User-Interface](doc/Screenshot1.png)
 ![API](doc/Screenshot2.png)
 ![Admin-Backend](doc/Screenshot3.png)
+
+## ToDo
+* Details in Admin-Panel
+* Multi-User Setup
+* Send E-Mails
 
 ## Credits
 
