@@ -38,7 +38,7 @@ func (a *Admin) Exists() bool {
 	return true
 }
 
-func (a *Admin) ChangePassword(userInput string) {
+func (a *Admin) ChangePassword(userInput string) error {
 	logging.MustGetLogger("logger").Debug("Changing Admin-Password...")
 
 	clearPassword := []byte(userInput)
@@ -55,6 +55,7 @@ func (a *Admin) ChangePassword(userInput string) {
 	}
 
 	a.password = passwordHash
+	return err;
 }
 
 func (a *Admin) Add() {

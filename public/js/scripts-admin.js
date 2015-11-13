@@ -369,7 +369,7 @@ function changePassword() {
 function changeInterval() {
 	var newInterval = $('#input-new-interval').val();
 
-	if (newInterval.trim() && !(isNaN(newInterval) || newInterval < 1 || newInterval > 60)) {
+	if (newInterval.trim() && !(isNaN(newInterval) || newInterval < 1 || newInterval > 600)) {
 		$.ajax({
 			url: "/api/admin/settings/interval",
 			type: "POST",
@@ -392,7 +392,7 @@ function changeInterval() {
 	} else {
 		$('.bottom-right').notify({
 			type: 'danger',
-			message: {text: "Please enter a valid interval (numbers between 1 and 60) to change it."},
+			message: {text: "Please enter a valid interval (numbers between 1 and 600) to change it."},
 			fadeOut: {enabled: true, delay: 3000}
 		}).show();
 	}

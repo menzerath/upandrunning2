@@ -25,15 +25,15 @@ func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	defer rows.Close()
 
 	var (
-		id       int
-		name     string
-		enabled  bool
-		visible  bool
+		id int
+		name string
+		enabled bool
+		visible bool
 		protocol string
-		url      string
-		status   string
-		time     string
-		average  float64
+		url string
+		status string
+		time string
+		average float64
 	)
 
 	// Add every Website
@@ -95,19 +95,102 @@ func ApiAdminWebsiteDelete(w http.ResponseWriter, r *http.Request, ps httprouter
 }
 
 func ApiAdminSettingTitle(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	r.ParseForm()
+	value := r.Form.Get("title")
 
+	// Simple Validation
+	if (value == "") {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value.")
+		return
+	}
+
+	// Update Database-Row
+	db := lib.GetDatabase()
+	stmt, err := db.Prepare("UPDATE settings SET value = ? WHERE name = 'title';")
+	if err != nil {
+		logging.MustGetLogger("logger").Fatal("Unable to change Application-Title: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: " + err.Error())
+	}
+	_, err = stmt.Exec(value)
+	if err != nil {
+		logging.MustGetLogger("logger").Fatal("Unable to change Application-Title: ", err)
+	}
+
+	lib.GetConfiguration().Dynamic.Title = value;
+	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
 func ApiAdminSettingInterval(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	r.ParseForm()
+	temp := r.Form.Get("interval")
+	value, err := strconv.Atoi(temp)
 
+	// Simple Validation
+	if (err != nil || value < 1 || value > 600) {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value between 1 and 600 seconds.")
+		return
+	}
+
+	// Update Database-Row
+	db := lib.GetDatabase()
+	stmt, err := db.Prepare("UPDATE settings SET value = ? WHERE name = 'title';")
+	if err != nil {
+		logging.MustGetLogger("logger").Fatal("Unable to change Interval: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: " + err.Error())
+	}
+	_, err = stmt.Exec(value)
+	if err != nil {
+		logging.MustGetLogger("logger").Fatal("Unable to change Interval: ", err)
+	}
+
+	lib.GetConfiguration().Dynamic.Interval = value;
+	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
 func ApiAdminSettingPushbulletKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	r.ParseForm()
+	value := r.Form.Get("key")
 
+	// Simple Validation
+	if (value == "") {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value.")
+		return
+	}
+
+	// Update Database-Row
+	db := lib.GetDatabase()
+	stmt, err := db.Prepare("UPDATE settings SET value = ? WHERE name = 'pushbullet_key';")
+	if err != nil {
+		logging.MustGetLogger("logger").Fatal("Unable to change PushBullet-API-Key: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: " + err.Error())
+	}
+	_, err = stmt.Exec(value)
+	if err != nil {
+		logging.MustGetLogger("logger").Fatal("Unable to change PushBullet-API-Key: ", err)
+	}
+
+	lib.GetConfiguration().Dynamic.PushbulletKey = value;
+	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
 func ApiAdminSettingPassword(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	r.ParseForm()
+	value := r.Form.Get("password")
 
+	// Simple Validation
+	if (value == "") {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value.")
+		return
+	}
+
+	// Update Password
+	admin := lib.Admin{}
+	err := admin.ChangePassword(value)
+	if (err != nil) {
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: " + err.Error())
+		return
+	}
+	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
 func ApiAdminActionCheck(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
