@@ -55,7 +55,7 @@ func (a *Admin) ChangePassword(userInput string) error {
 	}
 
 	a.password = passwordHash
-	return err;
+	return err
 }
 
 func (a *Admin) Add() {
