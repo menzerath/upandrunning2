@@ -147,11 +147,11 @@ function addWebsite() {
 	}
 }
 
-function enableWebsite(id) {
+function enableWebsite(url) {
 	$.ajax({
 		url: "/api/admin/websites/enable",
 		type: "POST",
-		data: {id: id},
+		data: {url: url},
 		success: function() {
 			loadWebsites();
 		},
@@ -165,11 +165,11 @@ function enableWebsite(id) {
 	});
 }
 
-function disableWebsite(id) {
+function disableWebsite(url) {
 	$.ajax({
 		url: "/api/admin/websites/disable",
 		type: "POST",
-		data: {id: id},
+		data: {url: url},
 		success: function() {
 			loadWebsites();
 		},
@@ -183,11 +183,11 @@ function disableWebsite(id) {
 	});
 }
 
-function visibleWebsite(id) {
+function visibleWebsite(url) {
 	$.ajax({
 		url: "/api/admin/websites/visible",
 		type: "POST",
-		data: {id: id},
+		data: {url: url},
 		success: function() {
 			loadWebsites();
 		},
@@ -201,11 +201,11 @@ function visibleWebsite(id) {
 	});
 }
 
-function invisibleWebsite(id) {
+function invisibleWebsite(url) {
 	$.ajax({
 		url: "/api/admin/websites/invisible",
 		type: "POST",
-		data: {id: id},
+		data: {url: url},
 		success: function() {
 			loadWebsites();
 		},
@@ -273,12 +273,12 @@ function cancleSaveWebsite() {
 	$('#form-edit-website').fadeOut(200);
 }
 
-function deleteWebsite(id) {
+function deleteWebsite(url) {
 	if (window.confirm("Are you sure?")) {
 		$.ajax({
 			url: "/api/admin/websites/delete",
 			type: "POST",
-			data: {id: id},
+			data: {url: url},
 			success: function() {
 				loadWebsites();
 
@@ -308,9 +308,10 @@ function changeTitle() {
 			type: "POST",
 			data: {title: newTitle},
 			success: function() {
+				$('#navbar-title').text(newTitle);
 				$('.bottom-right').notify({
 					type: 'success',
-					message: {text: "Title successfully changed. Reload this page to see your changes."},
+					message: {text: "Title successfully changed."},
 					fadeOut: {enabled: true, delay: 3000}
 				}).show();
 			},
