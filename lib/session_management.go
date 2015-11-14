@@ -53,7 +53,7 @@ func IsLoggedIn(r *http.Request) bool {
 	// Do not allow expired Cookies in Storage
 	if sCookie.Expires.Before(time.Now()) {
 		delete(cookieStorage, rCookieData[0])
-		return false;
+		return false
 	}
 
 	// Check if the saved Cookie's randomId equals the received Cookie's randomId
