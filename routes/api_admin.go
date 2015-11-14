@@ -114,14 +114,20 @@ func ApiAdminWebsiteEnable(w http.ResponseWriter, r *http.Request, ps httprouter
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
-	_, err = stmt.Exec(value)
+	res, err := stmt.Exec(value)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to enable Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
 
-	SendJsonMessage(w, http.StatusOK, true, "")
+	// Check if exactly one Website has been enabled
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 1 {
+		SendJsonMessage(w, http.StatusOK, true, "")
+	} else {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Could not enable Website.")
+	}
 }
 
 func ApiAdminWebsiteDisable(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -142,14 +148,20 @@ func ApiAdminWebsiteDisable(w http.ResponseWriter, r *http.Request, ps httproute
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
-	_, err = stmt.Exec(value)
+	res, err := stmt.Exec(value)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to disable Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
 
-	SendJsonMessage(w, http.StatusOK, true, "")
+	// Check if exactly one Website has been disabled
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 1 {
+		SendJsonMessage(w, http.StatusOK, true, "")
+	} else {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Could not disable Website.")
+	}
 }
 
 func ApiAdminWebsiteVisible(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -170,14 +182,20 @@ func ApiAdminWebsiteVisible(w http.ResponseWriter, r *http.Request, ps httproute
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
-	_, err = stmt.Exec(value)
+	res, err := stmt.Exec(value)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to set Website visible: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
 
-	SendJsonMessage(w, http.StatusOK, true, "")
+	// Check if exactly one Website has been set to visible
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 1 {
+		SendJsonMessage(w, http.StatusOK, true, "")
+	} else {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Could not set Website to visible.")
+	}
 }
 
 func ApiAdminWebsiteInvisible(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -198,14 +216,20 @@ func ApiAdminWebsiteInvisible(w http.ResponseWriter, r *http.Request, ps httprou
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
-	_, err = stmt.Exec(value)
+	res, err := stmt.Exec(value)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to set Website invisible: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
 
-	SendJsonMessage(w, http.StatusOK, true, "")
+	// Check if exactly one Website has been set to invisible
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 1 {
+		SendJsonMessage(w, http.StatusOK, true, "")
+	} else {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Could not set Website to invisible.")
+	}
 }
 
 func ApiAdminWebsiteEdit(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -229,14 +253,20 @@ func ApiAdminWebsiteEdit(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
-	_, err = stmt.Exec(name, protocol, url, oldUrl)
+	res, err := stmt.Exec(name, protocol, url, oldUrl)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to edit Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
 
-	SendJsonMessage(w, http.StatusOK, true, "")
+	// Check if exactly one Website has been edited
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 1 {
+		SendJsonMessage(w, http.StatusOK, true, "")
+	} else {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Could not edit Website.")
+	}
 }
 
 func ApiAdminWebsiteDelete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -269,7 +299,7 @@ func ApiAdminWebsiteDelete(w http.ResponseWriter, r *http.Request, ps httprouter
 	if rowsAffected == 1 {
 		SendJsonMessage(w, http.StatusOK, true, "")
 	} else {
-		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: No Website deleted.")
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Could not delete Website.")
 	}
 }
 

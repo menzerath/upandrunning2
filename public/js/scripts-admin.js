@@ -1,5 +1,5 @@
 var loadedWebsiteData;
-var editUrl;
+var editName, editProtocol, editUrl;
 var allowCheck = true;
 
 $(document).ready(function() {
@@ -225,6 +225,9 @@ function editWebsite(url) {
 
 	for (var i = 0; i < loadedWebsiteData.length; i++) {
 		if (url === loadedWebsiteData[i].url) {
+			editName = loadedWebsiteData[i].name;
+			editProtocol = loadedWebsiteData[i].protocol;
+
 			$('#input-edit-name').val(loadedWebsiteData[i].name);
 			$('#input-edit-protocol').val(loadedWebsiteData[i].protocol);
 			$('#input-edit-url').val(loadedWebsiteData[i].url);
@@ -236,6 +239,11 @@ function saveWebsite() {
 	var name = $('#input-edit-name').val();
 	var protocol = $('#input-edit-protocol').val();
 	var url = $('#input-edit-url').val();
+
+	if (name == editName && protocol == editProtocol && editUrl == url) {
+		cancleSaveWebsite();
+		return;
+	}
 
 	if (name.trim() && protocol.trim() && url.trim()) {
 		$.ajax({
