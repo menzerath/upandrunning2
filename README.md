@@ -136,7 +136,7 @@ POST-parameters: url
 `POST` `/api/admin/websites/edit`:
 
 ```json
-POST-parameters: id, name, protocol, url
+POST-parameters: oldUrl, name, protocol, url
 ```
 
 #### Delete a Website

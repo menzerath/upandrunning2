@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"github.com/op/go-logging"
 	"net/http"
 )
 
@@ -87,7 +88,7 @@ type AdminSiteData struct {
 func SendJsonMessage(w http.ResponseWriter, code int, success bool, message string) {
 	responseBytes, err := json.Marshal(BasicResponse{success, message})
 	if err != nil {
-		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to send JSON-Message.")
+		logging.MustGetLogger("logger").Error("Unable to send JSON-Message: ", err)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")

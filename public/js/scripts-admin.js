@@ -1,5 +1,5 @@
 var loadedWebsiteData;
-var editId;
+var editUrl;
 var allowCheck = true;
 
 $(document).ready(function() {
@@ -59,15 +59,15 @@ function loadWebsites() {
 				dataString += '<tr><td>' + (i + 1) + '</td><td>' + loadedWebsiteData[i].name + '</td><td>';
 
 				if (loadedWebsiteData[i].enabled) {
-					dataString += ' <span class="label label-success" id="label-action" onclick="disableWebsite(' + loadedWebsiteData[i].id + ')">Enabled</span> </td><td>';
+					dataString += ' <span class="label label-success" id="label-action" onclick="disableWebsite(\'' + loadedWebsiteData[i].url + '\')">Enabled</span> </td><td>';
 				} else {
-					dataString += ' <span class="label label-warning" id="label-action" onclick="enableWebsite(' + loadedWebsiteData[i].id + ')">Disabled</span> </td><td>';
+					dataString += ' <span class="label label-warning" id="label-action" onclick="enableWebsite(\'' + loadedWebsiteData[i].url + '\')">Disabled</span> </td><td>';
 				}
 
 				if (loadedWebsiteData[i].visible) {
-					dataString += ' <span class="label label-success" id="label-action" onclick="invisibleWebsite(' + loadedWebsiteData[i].id + ')">Visbile</span> ';
+					dataString += ' <span class="label label-success" id="label-action" onclick="invisibleWebsite(\'' + loadedWebsiteData[i].url + '\')">Visbile</span> ';
 				} else {
-					dataString += ' <span class="label label-warning" id="label-action" onclick="visibleWebsite(' + loadedWebsiteData[i].id + ')">Invisible</span> ';
+					dataString += ' <span class="label label-warning" id="label-action" onclick="visibleWebsite(\'' + loadedWebsiteData[i].url + '\')">Invisible</span> ';
 				}
 
 				dataString += '</td><td>' + loadedWebsiteData[i].protocol + '</td><td>' + loadedWebsiteData[i].url + '</td><td>';
@@ -89,7 +89,7 @@ function loadWebsites() {
 
 				dataString += '<td>' + loadedWebsiteData[i].avgAvail + '</td>';
 
-				dataString += '<td><span class="label label-primary" id="label-action" onclick="editWebsite(' + loadedWebsiteData[i].id + ')">Edit</span> <span class="label label-danger" id="label-action" onclick="deleteWebsite(' + loadedWebsiteData[i].id + ')">Delete</span></td></tr>';
+				dataString += '<td><span class="label label-primary" id="label-action" onclick="editWebsite(\'' + loadedWebsiteData[i].url + '\')">Edit</span> <span class="label label-danger" id="label-action" onclick="deleteWebsite(\'' + loadedWebsiteData[i].url + '\')">Delete</span></td></tr>';
 			}
 			$('#table-websites').html(dataString);
 		},
@@ -219,12 +219,12 @@ function invisibleWebsite(url) {
 	});
 }
 
-function editWebsite(id) {
-	editId = id;
+function editWebsite(url) {
+	editUrl = url;
 	$('#form-edit-website').fadeIn(200);
 
 	for (var i = 0; i < loadedWebsiteData.length; i++) {
-		if (id === loadedWebsiteData[i].id) {
+		if (url === loadedWebsiteData[i].url) {
 			$('#input-edit-name').val(loadedWebsiteData[i].name);
 			$('#input-edit-protocol').val(loadedWebsiteData[i].protocol);
 			$('#input-edit-url').val(loadedWebsiteData[i].url);
@@ -241,7 +241,7 @@ function saveWebsite() {
 		$.ajax({
 			url: "/api/admin/websites/edit",
 			type: "POST",
-			data: {id: editId, name: name, protocol: protocol, url: url},
+			data: {oldUrl: editUrl, name: name, protocol: protocol, url: url},
 			success: function() {
 				cancleSaveWebsite();
 				loadWebsites();
@@ -310,6 +310,7 @@ function changeTitle() {
 			success: function() {
 				$(document).attr("title", "Administration | " + newTitle);
 				$('#navbar-title').text(newTitle);
+
 				$('.bottom-right').notify({
 					type: 'success',
 					message: {text: "Title successfully changed."},

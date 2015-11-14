@@ -67,31 +67,210 @@ func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 }
 
 func ApiAdminWebsiteAdd(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	r.ParseForm()
+	name := r.Form.Get("name")
+	protocol := r.Form.Get("protocol")
+	url := r.Form.Get("url")
 
+	// Simple Validation
+	if name == "" || protocol == "" || url == "" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit valid values.")
+		return
+	}
+
+	// Insert into Database
+	db := lib.GetDatabase()
+	stmt, err := db.Prepare("INSERT INTO website (name, protocol, url) VALUES (?, ?, ?);")
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to add Website: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
+	}
+	_, err = stmt.Exec(name, protocol, url)
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to add Website: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
+	}
+
+	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
 func ApiAdminWebsiteEnable(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	r.ParseForm()
+	value := r.Form.Get("url")
 
+	// Simple Validation
+	if value == "" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value.")
+		return
+	}
+
+	// Update Database-Row
+	db := lib.GetDatabase()
+	stmt, err := db.Prepare("UPDATE website SET enabled = 1 WHERE url = ?;")
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to enable Website: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
+	}
+	_, err = stmt.Exec(value)
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to enable Website: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
+	}
+
+	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
 func ApiAdminWebsiteDisable(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	r.ParseForm()
+	value := r.Form.Get("url")
 
+	// Simple Validation
+	if value == "" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value.")
+		return
+	}
+
+	// Update Database-Row
+	db := lib.GetDatabase()
+	stmt, err := db.Prepare("UPDATE website SET enabled = 0 WHERE url = ?;")
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to disable Website: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
+	}
+	_, err = stmt.Exec(value)
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to disable Website: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
+	}
+
+	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
 func ApiAdminWebsiteVisible(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	r.ParseForm()
+	value := r.Form.Get("url")
 
+	// Simple Validation
+	if value == "" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value.")
+		return
+	}
+
+	// Update Database-Row
+	db := lib.GetDatabase()
+	stmt, err := db.Prepare("UPDATE website SET visible = 1 WHERE url = ?;")
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to set Website visible: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
+	}
+	_, err = stmt.Exec(value)
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to set Website visible: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
+	}
+
+	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
 func ApiAdminWebsiteInvisible(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	r.ParseForm()
+	value := r.Form.Get("url")
 
+	// Simple Validation
+	if value == "" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value.")
+		return
+	}
+
+	// Update Database-Row
+	db := lib.GetDatabase()
+	stmt, err := db.Prepare("UPDATE website SET visible = 0 WHERE url = ?;")
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to set Website invisible: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
+	}
+	_, err = stmt.Exec(value)
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to set Website invisible: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
+	}
+
+	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
 func ApiAdminWebsiteEdit(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	r.ParseForm()
+	oldUrl := r.Form.Get("oldUrl")
+	name := r.Form.Get("name")
+	protocol := r.Form.Get("protocol")
+	url := r.Form.Get("url")
 
+	// Simple Validation
+	if oldUrl == "" || name == "" || protocol == "" || url == "" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit valid values.")
+		return
+	}
+
+	// Update Database
+	db := lib.GetDatabase()
+	stmt, err := db.Prepare("UPDATE website SET name = ?, protocol = ?, url = ? WHERE url = ?;")
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to edit Website: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
+	}
+	_, err = stmt.Exec(name, protocol, url, oldUrl)
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to edit Website: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
+	}
+
+	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
 func ApiAdminWebsiteDelete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	r.ParseForm()
+	value := r.Form.Get("url")
 
+	// Simple Validation
+	if value == "" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value.")
+		return
+	}
+
+	// Remove from Database
+	db := lib.GetDatabase()
+	stmt, err := db.Prepare("DELETE FROM website WHERE url = ?;")
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to delete Website: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
+	}
+	res, err := stmt.Exec(value)
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to delete Website: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
+	}
+
+	// Check if exactly one Website has been deleted
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 1 {
+		SendJsonMessage(w, http.StatusOK, true, "")
+	} else {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: No Website deleted.")
+	}
 }
 
 func ApiAdminSettingTitle(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -108,12 +287,15 @@ func ApiAdminSettingTitle(w http.ResponseWriter, r *http.Request, ps httprouter.
 	db := lib.GetDatabase()
 	stmt, err := db.Prepare("UPDATE settings SET value = ? WHERE name = 'title';")
 	if err != nil {
-		logging.MustGetLogger("logger").Fatal("Unable to change Application-Title: ", err)
+		logging.MustGetLogger("logger").Error("Unable to change Application-Title: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
 	}
 	_, err = stmt.Exec(value)
 	if err != nil {
-		logging.MustGetLogger("logger").Fatal("Unable to change Application-Title: ", err)
+		logging.MustGetLogger("logger").Error("Unable to change Application-Title: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
 	}
 
 	lib.GetConfiguration().Dynamic.Title = value
@@ -135,12 +317,15 @@ func ApiAdminSettingInterval(w http.ResponseWriter, r *http.Request, ps httprout
 	db := lib.GetDatabase()
 	stmt, err := db.Prepare("UPDATE settings SET value = ? WHERE name = 'interval';")
 	if err != nil {
-		logging.MustGetLogger("logger").Fatal("Unable to change Interval: ", err)
+		logging.MustGetLogger("logger").Error("Unable to change Interval: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
 	}
 	_, err = stmt.Exec(value)
 	if err != nil {
-		logging.MustGetLogger("logger").Fatal("Unable to change Interval: ", err)
+		logging.MustGetLogger("logger").Error("Unable to change Interval: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
 	}
 
 	lib.GetConfiguration().Dynamic.Interval = value
@@ -161,12 +346,15 @@ func ApiAdminSettingPushbulletKey(w http.ResponseWriter, r *http.Request, ps htt
 	db := lib.GetDatabase()
 	stmt, err := db.Prepare("UPDATE settings SET value = ? WHERE name = 'pushbullet_key';")
 	if err != nil {
-		logging.MustGetLogger("logger").Fatal("Unable to change PushBullet-API-Key: ", err)
+		logging.MustGetLogger("logger").Error("Unable to change PushBullet-API-Key: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
 	}
 	_, err = stmt.Exec(value)
 	if err != nil {
-		logging.MustGetLogger("logger").Fatal("Unable to change PushBullet-API-Key: ", err)
+		logging.MustGetLogger("logger").Error("Unable to change PushBullet-API-Key: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
 	}
 
 	lib.GetConfiguration().Dynamic.PushbulletKey = value
