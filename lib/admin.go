@@ -10,7 +10,14 @@ type Admin struct {
 	password []byte
 }
 
+func (a *Admin) Init() {
+	if !a.LoadPassword() {
+		a.Add()
+	}
+}
+
 func (a *Admin) ValidatePassword(userInput string) bool {
+	a.LoadPassword()
 	err := bcrypt.CompareHashAndPassword(a.password, []byte(userInput))
 	if err != nil {
 		logging.MustGetLogger("logger").Warning("Invalid Password: ", err)
@@ -20,7 +27,7 @@ func (a *Admin) ValidatePassword(userInput string) bool {
 	return true
 }
 
-func (a *Admin) Exists() bool {
+func (a *Admin) LoadPassword() bool {
 	var value []byte
 	err := db.QueryRow("SELECT value FROM settings WHERE name = 'password';").Scan(&value)
 	switch {

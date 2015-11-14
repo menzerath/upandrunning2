@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"github.com/MarvinMenzerath/UpAndRunning2/lib"
 	"github.com/MarvinMenzerath/UpAndRunning2/routes"
 	"github.com/julienschmidt/httprouter"
@@ -17,10 +16,6 @@ const VERSION = "2.0.0"
 var goVersion = runtime.Version()
 var goArch = runtime.GOOS + "_" + runtime.GOARCH
 
-var Admin lib.Admin
-var Config *lib.Configuration
-var Database *sql.DB
-
 func main() {
 	// Logger
 	lib.SetupLogger()
@@ -31,20 +26,19 @@ func main() {
 	// Config
 	lib.ReadConfigurationFromFile("config/local.json")
 	lib.SetStaticConfiguration(lib.StaticConfiguration{VERSION, goVersion, goArch})
-	Config = lib.GetConfiguration()
 
 	// Database
-	lib.OpenDatabase(Config.Database)
-	Database = lib.GetDatabase()
+	lib.OpenDatabase(lib.GetConfiguration().Database)
 
 	// Config (again)
-	lib.ReadConfigurationFromDatabase(Database)
+	lib.ReadConfigurationFromDatabase(lib.GetDatabase())
 
 	// Admin-User
-	Admin = lib.Admin{}
-	if !Admin.Exists() {
-		Admin.Add()
-	}
+	admin := lib.Admin{}
+	admin.Init()
+
+	// Session-Management
+	lib.InitSessionManagement()
 
 	// Additional Libraries
 	lib.InitHttpStatusCodeMap()
@@ -102,12 +96,12 @@ func serveRequests() {
 		http.Error(w, "Error 404: Not Found", 404)
 	})
 
-	logging.MustGetLogger("logger").Debug("Listening on Port " + strconv.Itoa(Config.Port) + "...")
-	logging.MustGetLogger("logger").Fatal(http.ListenAndServe(":"+strconv.Itoa(Config.Port), router))
+	logging.MustGetLogger("logger").Debug("Listening on Port " + strconv.Itoa(lib.GetConfiguration().Port) + "...")
+	logging.MustGetLogger("logger").Fatal(http.ListenAndServe(":"+strconv.Itoa(lib.GetConfiguration().Port), router))
 }
 
 func startCheckTimer() {
-	timer := time.NewTimer(time.Second * time.Duration(Config.Dynamic.Interval))
+	timer := time.NewTimer(time.Second * time.Duration(lib.GetConfiguration().Dynamic.Interval))
 	go func() {
 		<-timer.C
 		checkAllSites()
@@ -119,9 +113,9 @@ func startCheckNowTimer() {
 	timer := time.NewTimer(time.Second * 1)
 	go func() {
 		<-timer.C
-		if Config.Dynamic.CheckNow {
+		if lib.GetConfiguration().Dynamic.CheckNow {
 			checkAllSites()
-			Config.Dynamic.CheckNow = false
+			lib.GetConfiguration().Dynamic.CheckNow = false
 		}
 		startCheckNowTimer()
 	}()

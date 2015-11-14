@@ -200,11 +200,6 @@ POST-parameters: - none -
 ![API](doc/Screenshot2.png)
 ![Admin-Backend](doc/Screenshot3.png)
 
-## ToDo
-* Details in Admin-Panel
-* Multi-User Setup
-* Send E-Mails
-
 ## Credits
 
 ### Application Icon

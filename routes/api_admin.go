@@ -14,6 +14,11 @@ func ApiAdminIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 }
 
 func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
+
 	// Query the Database
 	db := lib.GetDatabase()
 	rows, err := db.Query("SELECT id, name, enabled, visible, protocol, url, status, time, avgAvail FROM website;")
@@ -67,6 +72,11 @@ func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 }
 
 func ApiAdminWebsiteAdd(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
+
 	r.ParseForm()
 	name := r.Form.Get("name")
 	protocol := r.Form.Get("protocol")
@@ -97,6 +107,11 @@ func ApiAdminWebsiteAdd(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 }
 
 func ApiAdminWebsiteEnable(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
+
 	r.ParseForm()
 	value := r.Form.Get("url")
 
@@ -131,6 +146,11 @@ func ApiAdminWebsiteEnable(w http.ResponseWriter, r *http.Request, ps httprouter
 }
 
 func ApiAdminWebsiteDisable(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
+
 	r.ParseForm()
 	value := r.Form.Get("url")
 
@@ -165,6 +185,11 @@ func ApiAdminWebsiteDisable(w http.ResponseWriter, r *http.Request, ps httproute
 }
 
 func ApiAdminWebsiteVisible(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
+
 	r.ParseForm()
 	value := r.Form.Get("url")
 
@@ -199,6 +224,11 @@ func ApiAdminWebsiteVisible(w http.ResponseWriter, r *http.Request, ps httproute
 }
 
 func ApiAdminWebsiteInvisible(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
+
 	r.ParseForm()
 	value := r.Form.Get("url")
 
@@ -233,6 +263,11 @@ func ApiAdminWebsiteInvisible(w http.ResponseWriter, r *http.Request, ps httprou
 }
 
 func ApiAdminWebsiteEdit(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
+
 	r.ParseForm()
 	oldUrl := r.Form.Get("oldUrl")
 	name := r.Form.Get("name")
@@ -270,6 +305,11 @@ func ApiAdminWebsiteEdit(w http.ResponseWriter, r *http.Request, ps httprouter.P
 }
 
 func ApiAdminWebsiteDelete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
+
 	r.ParseForm()
 	value := r.Form.Get("url")
 
@@ -304,6 +344,11 @@ func ApiAdminWebsiteDelete(w http.ResponseWriter, r *http.Request, ps httprouter
 }
 
 func ApiAdminSettingTitle(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
+
 	r.ParseForm()
 	value := r.Form.Get("title")
 
@@ -333,6 +378,11 @@ func ApiAdminSettingTitle(w http.ResponseWriter, r *http.Request, ps httprouter.
 }
 
 func ApiAdminSettingInterval(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
+
 	r.ParseForm()
 	temp := r.Form.Get("interval")
 	value, err := strconv.Atoi(temp)
@@ -363,6 +413,11 @@ func ApiAdminSettingInterval(w http.ResponseWriter, r *http.Request, ps httprout
 }
 
 func ApiAdminSettingPushbulletKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
+
 	r.ParseForm()
 	value := r.Form.Get("key")
 
@@ -392,6 +447,11 @@ func ApiAdminSettingPushbulletKey(w http.ResponseWriter, r *http.Request, ps htt
 }
 
 func ApiAdminSettingPassword(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
+
 	r.ParseForm()
 	value := r.Form.Get("password")
 
@@ -412,14 +472,42 @@ func ApiAdminSettingPassword(w http.ResponseWriter, r *http.Request, ps httprout
 }
 
 func ApiAdminActionCheck(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
+
 	lib.GetConfiguration().Dynamic.CheckNow = true
 	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
 func ApiAdminActionLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Already logged in.")
+		return
+	}
 
+	r.ParseForm()
+	value := r.Form.Get("password")
+
+	// Check Password
+	admin := lib.Admin{}
+	if admin.ValidatePassword(value) {
+		cookie := lib.LoginAndGetCookie("admin")
+		http.SetCookie(w, &cookie)
+		SendJsonMessage(w, http.StatusOK, true, "")
+	} else {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Invalid Password.")
+	}
 }
 
 func ApiAdminActionLogout(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
 
+	cookie := lib.LogoutAndDestroyCookie(r)
+	http.SetCookie(w, &cookie)
+	SendJsonMessage(w, http.StatusOK, true, "")
 }
