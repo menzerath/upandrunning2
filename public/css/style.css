@@ -45,9 +45,12 @@ body > .container {
 	padding-top: 10px;
 }
 
-#label-action {
-	cursor: pointer;
+.label {
 	text-transform: uppercase;
+}
+
+.label-action {
+	cursor: pointer;
 }
 
 .close {

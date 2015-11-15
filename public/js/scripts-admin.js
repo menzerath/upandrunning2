@@ -89,7 +89,7 @@ function loadWebsites() {
 
 				dataString += '<td>' + loadedWebsiteData[i].avgAvail + '</td>';
 
-				dataString += '<td><span class="label label-primary" id="label-action" onclick="editWebsite(\'' + loadedWebsiteData[i].url + '\')">Edit</span> <span class="label label-danger" id="label-action" onclick="deleteWebsite(\'' + loadedWebsiteData[i].url + '\')">Delete</span></td></tr>';
+				dataString += '<td><span class="label label-primary label-action" onclick="editWebsite(\'' + loadedWebsiteData[i].url + '\')">Edit</span> <span class="label label-danger label-action" onclick="deleteWebsite(\'' + loadedWebsiteData[i].url + '\')">Delete</span></td></tr>';
 			}
 			$('#table-websites').html(dataString);
 		},
