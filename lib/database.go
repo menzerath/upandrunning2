@@ -2,10 +2,10 @@ package lib
 
 import (
 	"database/sql"
+	"github.com/go-sql-driver/mysql"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/op/go-logging"
 	"strconv"
-	"github.com/go-sql-driver/mysql"
 )
 
 // This is the one and only Database-object.
