@@ -25,7 +25,7 @@ func main() {
 	logging.MustGetLogger("logger").Info("Welcome to UpAndRunning2 v%s [%s@%s]!", VERSION, goVersion, goArch)
 
 	// Config
-	lib.ReadConfigurationFromFile("config/local.json")
+	lib.ReadConfigurationFromFile("config/local.json", false)
 	lib.SetStaticConfiguration(lib.StaticConfiguration{VERSION, goVersion, goArch})
 
 	// Database
