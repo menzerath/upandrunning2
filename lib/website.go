@@ -9,12 +9,14 @@ import (
 	"time"
 )
 
+// Represents a single Website-object.
 type Website struct {
 	Id       int
 	Protocol string
 	Url      string
 }
 
+// Runs a check and saves the result inside the database.
 func (w *Website) RunCheck() {
 	// Request new Status
 	res, err := goreq.Request{Uri: w.Protocol + "://" + w.Url, Method: "HEAD", UserAgent: "UpAndRunning2 (https://github.com/MarvinMenzerath/UpAndRunning2)", MaxRedirects: 10, Timeout: 10 * time.Second}.Do()
@@ -31,7 +33,7 @@ func (w *Website) RunCheck() {
 		defer res.Body.Close()
 	}
 
-	// If Pushbullet-notifications are active: get old Status and Website's name and send a Push
+	// If Pushbullet-notifications are active: get old status and Website's name and send a Push
 	if GetConfiguration().Dynamic.PushbulletKey != "" {
 		db := GetDatabase()
 		stmt, err := db.Prepare("SELECT name, status FROM website WHERE id = ?")
@@ -87,6 +89,7 @@ func (w *Website) RunCheck() {
 	w.calcAvgAvailability()
 }
 
+// Calculates the average Website availability and stores it inside the database.
 func (w *Website) calcAvgAvailability() {
 	// Query the Database
 	db := GetDatabase()
@@ -96,13 +99,13 @@ func (w *Website) calcAvgAvailability() {
 		return
 	}
 
+	// Format the returned value
 	var avg float64
 	err = stmt.QueryRow(w.Id, w.Id).Scan(&avg)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to calculate Website-Availability: ", err)
 		return
 	}
-
 	strconv.FormatFloat(avg, 'f', 2, 64)
 
 	// Save the new value
@@ -119,6 +122,7 @@ func (w *Website) calcAvgAvailability() {
 	}
 }
 
+// Sends a Pushbullet-Push containing the given data to the saved API-key.
 func sendPush(name string, url string, newStatus string, oldStatus string) {
 	if GetConfiguration().Dynamic.PushbulletKey == "" {
 		return

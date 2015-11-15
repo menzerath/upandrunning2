@@ -13,13 +13,16 @@ import (
 	"io"
 )
 
+// Contains every user and the user's authentication Cookie.
 var cookieStorage map[string]http.Cookie
 
+// Init the cookieStorage-map.
 func InitSessionManagement() {
 	logging.MustGetLogger("logger").Debug("Initializing Session-Management...")
 	cookieStorage = make(map[string]http.Cookie)
 }
 
+// Logs the user in by returning a Cookie containing a randomId.
 func LoginAndGetCookie(username string) http.Cookie {
 	// sessionValue: username + randomString
 	randomId := getRandomId()
@@ -33,6 +36,7 @@ func LoginAndGetCookie(username string) http.Cookie {
 	return cookie
 }
 
+// Checks if the given Request contains a Cookie and if the Cookie authenticates a specific user.
 func IsLoggedIn(r *http.Request) bool {
 	// Get Cookie from Request
 	rCookie, err := r.Cookie("session")
@@ -60,6 +64,7 @@ func IsLoggedIn(r *http.Request) bool {
 	return rCookieData[1] == sCookieData[1]
 }
 
+// Logs the user out by returning a Cookie, which expired a day ago.
 func LogoutAndDestroyCookie(r *http.Request) http.Cookie {
 	cookie, _ := r.Cookie("session")
 
@@ -71,6 +76,7 @@ func LogoutAndDestroyCookie(r *http.Request) http.Cookie {
 	return http.Cookie{Name: "session", Value: "", Path: "/", Expires: time.Now().AddDate(0, 0, -1), HttpOnly: true}
 }
 
+// Returns a random, base64-encoded, string.
 func getRandomId() string {
 	b := make([]byte, 32)
 	if _, err := io.ReadFull(rand.Reader, b); err != nil {

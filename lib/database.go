@@ -7,8 +7,10 @@ import (
 	"strconv"
 )
 
+// This is the one and only Database-object.
 var db *sql.DB
 
+// Opens a new connection-pool to the database using the given databaseConfiguration.
 func OpenDatabase(config databaseConfiguration) {
 	logging.MustGetLogger("logger").Info("Opening Database...")
 	var err error = nil
@@ -28,6 +30,7 @@ func OpenDatabase(config databaseConfiguration) {
 	prepareDatabase()
 }
 
+// Creates the needed tables in the database.
 func prepareDatabase() {
 	logging.MustGetLogger("logger").Debug("Preparing Database...")
 
@@ -42,6 +45,7 @@ func prepareDatabase() {
 	}
 }
 
+// Returns the current Database-object.
 func GetDatabase() *sql.DB {
 	if db == nil {
 		logging.MustGetLogger("logger").Fatal("No active Database found.")

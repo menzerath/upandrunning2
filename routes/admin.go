@@ -9,12 +9,15 @@ import (
 	"runtime"
 )
 
+// Renders the admin-backend if the user is logged in.
+// If the user is not logged in, he will be redirected to the login-page.
 func AdminIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
 		http.Redirect(w, r, "/admin/login", http.StatusFound)
 		return
 	}
 
+	// Parse template-files
 	c := lib.GetConfiguration()
 	data := AdminSiteData{c.Dynamic.Title, c.Dynamic.Interval, c.Dynamic.PushbulletKey, c.Static.Version, runtime.Version(), runtime.GOOS + "_" + runtime.GOARCH}
 	t, err := template.ParseFiles("views/admin.html", "views/partials/styles.html", "views/partials/footer.html", "views/partials/scripts.html")
@@ -28,12 +31,15 @@ func AdminIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 }
 
+// Renders the login-page if the user is not logged in.
+// If the user is logged in, he will be redirected to the admin-backend.
 func AdminLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if lib.IsLoggedIn(r) {
 		http.Redirect(w, r, "/admin", http.StatusFound)
 		return
 	}
 
+	// Parse template-files
 	data := SiteData{lib.GetConfiguration().Dynamic.Title}
 	t, err := template.ParseFiles("views/login.html", "views/partials/styles.html", "views/partials/footer.html", "views/partials/scripts.html")
 

@@ -2,6 +2,7 @@ package lib
 
 var httpCodes map[int]string
 
+// Init the httpCodes-map.
 func InitHttpStatusCodeMap() {
 	httpCodes = map[int]string{
 		100: "Continue",
@@ -56,6 +57,7 @@ func InitHttpStatusCodeMap() {
 	}
 }
 
+// Returns a HTTP-status-code-string representing the given HTTP-status-code.
 func GetHttpStatus(code int) string {
 	return httpCodes[code]
 }

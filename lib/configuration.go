@@ -7,8 +7,11 @@ import (
 	"os"
 )
 
+// This the one and only Configuration-object.
 var config *Configuration
 
+// The whole configuration.
+// Contains all other configuration-data.
 type Configuration struct {
 	Port     int
 	Database databaseConfiguration
@@ -16,6 +19,7 @@ type Configuration struct {
 	Static   StaticConfiguration
 }
 
+// The database configuration.
 type databaseConfiguration struct {
 	Host            string
 	Port            int
@@ -25,6 +29,8 @@ type databaseConfiguration struct {
 	ConnectionLimit int
 }
 
+// A dynamic Configuration.
+// Used to store data, which may be changed through the API.
 type dynamicConfiguration struct {
 	Title         string
 	Interval      int
@@ -32,12 +38,14 @@ type dynamicConfiguration struct {
 	CheckNow      bool
 }
 
+// Static data about (e.g.) the application's version.
 type StaticConfiguration struct {
 	Version   string
 	GoVersion string
 	GoArch    string
 }
 
+// Reads a configuration-file from a specified path.
 func ReadConfigurationFromFile(filePath string) {
 	logging.MustGetLogger("logger").Info("Reading Configuration from File...")
 
@@ -51,6 +59,7 @@ func ReadConfigurationFromFile(filePath string) {
 	}
 }
 
+// Reads all configuration-data from the database.
 func ReadConfigurationFromDatabase(db *sql.DB) {
 	logging.MustGetLogger("logger").Info("Reading Configuration from Database...")
 
@@ -58,6 +67,7 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	var interval int
 	var pushbulletKey string
 
+	// Title
 	err := db.QueryRow("SELECT value FROM settings where name = 'title';").Scan(&title)
 	if err != nil {
 		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('title', 'UpAndRunning2');")
@@ -71,6 +81,7 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 		title = "UpAndRunning"
 	}
 
+	// Interval
 	err = db.QueryRow("SELECT value FROM settings where name = 'interval';").Scan(&interval)
 	if err != nil {
 		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('interval', 5);")
@@ -84,6 +95,7 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 		interval = 5
 	}
 
+	// Pushbullet-Key
 	err = db.QueryRow("SELECT value FROM settings where name = 'pushbullet_key';").Scan(&pushbulletKey)
 	if err != nil {
 		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('pushbullet_key', '');")
@@ -104,10 +116,12 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	config.Dynamic.CheckNow = true
 }
 
+// Allows to replace the current StaticConfiguration.
 func SetStaticConfiguration(c StaticConfiguration) {
 	config.Static = c
 }
 
+// Returns the current Configuration-object.
 func GetConfiguration() *Configuration {
 	if config == nil {
 		logging.MustGetLogger("logger").Fatal("No active Configuration found.")

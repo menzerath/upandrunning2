@@ -10,20 +10,13 @@ import (
 	"strconv"
 )
 
+// Sends a simple welcome-message to the user.
 func ApiIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	SendJsonMessage(w, http.StatusOK, true, "Welcome to UpAndRunning's API!")
 }
 
+// Returns a DetailedWebsiteResponse containing all the Website's important data if the Website is enabled.
 func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	// Query the Database
-	db := lib.GetDatabase()
-	stmt, err := db.Prepare("SELECT id, name, protocol, url, status, time, lastFailStatus, lastFailTime, ups, downs, totalChecks, avgAvail FROM website WHERE url = ? AND enabled = 1;")
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to fetch Website-Status: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
-		return
-	}
-
 	var (
 		id             int
 		name           string
@@ -39,7 +32,9 @@ func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		avgAvail       float64
 	)
 
-	err = stmt.QueryRow(ps.ByName("url")).Scan(&id, &name, &protocol, &url, &status, &time, &lastFailStatus, &lastFailTime, &ups, &downs, &totalChecks, &avgAvail)
+	// Query the Database
+	db := lib.GetDatabase()
+	err := db.QueryRow("SELECT id, name, protocol, url, status, time, lastFailStatus, lastFailTime, ups, downs, totalChecks, avgAvail FROM website WHERE url = ? AND enabled = 1;", ps.ByName("url")).Scan(&id, &name, &protocol, &url, &status, &time, &lastFailStatus, &lastFailTime, &ups, &downs, &totalChecks, &avgAvail)
 	switch {
 	case err == sql.ErrNoRows:
 		SendJsonMessage(w, http.StatusNotFound, false, "Unable to find any data matching the given url.")
@@ -63,6 +58,7 @@ func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Write(responseBytes)
 }
 
+// Returns a WebsiteResponse containing all publicly visible Websites as BasicWebsite.
 func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Query the Database
 	db := lib.GetDatabase()

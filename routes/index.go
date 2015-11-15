@@ -8,7 +8,9 @@ import (
 	"net/http"
 )
 
+// Renders the main-page
 func Index(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	// Parse template-files
 	data := SiteData{lib.GetConfiguration().Dynamic.Title}
 	t, err := template.ParseFiles("views/index.html", "views/partials/styles.html", "views/partials/footer.html", "views/partials/scripts.html")
 

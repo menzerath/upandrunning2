@@ -6,18 +6,19 @@ import (
 	"net/http"
 )
 
-// Basic Response
+// Contains a success-bool and a message, which may be empty.
 type BasicResponse struct {
 	Success bool   `json:"requestSuccess"`
 	Message string `json:"message"`
 }
 
-// Website Response
+// Contains a success-bool and an array of BasicWebsites.
 type WebsiteResponse struct {
 	Success  bool           `json:"requestSuccess"`
 	Websites []BasicWebsite `json:"websites"`
 }
 
+// Contains the Website's basic data such as name, protocol, url and current status.
 type BasicWebsite struct {
 	Name     string `json:"name"`
 	Protocol string `json:"protocol"`
@@ -25,7 +26,7 @@ type BasicWebsite struct {
 	Status   string `json:"status"`
 }
 
-// Detailed Website-Status Response
+// Contains a success-bool and the Website's details.
 type DetailedWebsiteResponse struct {
 	Success               bool                `json:"requestSuccess"`
 	WebsiteData           WebsiteData         `json:"websiteData"`
@@ -34,12 +35,14 @@ type DetailedWebsiteResponse struct {
 	LastFailedCheckResult WebsiteCheckResult  `json:"lastFailedCheckResult"`
 }
 
+// Contains the Website's basic data such as id, name and url.
 type WebsiteData struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
 	Url  string `json:"url"`
 }
 
+// Contains the Website's availability data like the amount of ups / downs, total checks and the average availability.
 type WebsiteAvailability struct {
 	Ups     int    `json:"ups"`
 	Downs   int    `json:"downs"`
@@ -47,17 +50,19 @@ type WebsiteAvailability struct {
 	Average string `json:"average"`
 }
 
+// Contains the Website's latest check result.
 type WebsiteCheckResult struct {
 	Status string `json:"status"`
 	Time   string `json:"time"`
 }
 
-// Admin Website Response
+// Contains a success-bool and an array of AdminWebsites.
 type AdminWebsiteResponse struct {
 	Success  bool           `json:"requestSuccess"`
 	Websites []AdminWebsite `json:"websites"`
 }
 
+// Contains the Website's data, which will be shown inside the admin-backend.
 type AdminWebsite struct {
 	Id       int    `json:"id"`
 	Name     string `json:"name"`
@@ -70,11 +75,12 @@ type AdminWebsite struct {
 	Average  string `json:"avgAvail"`
 }
 
-// Site-Data
+// Contains the application's data, which will be used on publicly visible pages.
 type SiteData struct {
 	Title string
 }
 
+// Contains the application's data, which will be used on admin-pages.
 type AdminSiteData struct {
 	Title      string
 	Interval   int
@@ -84,7 +90,8 @@ type AdminSiteData struct {
 	GoArch     string
 }
 
-// Functions
+// Sends a simple Json-message.
+// It contains a success-bool and a message, which may be empty.
 func SendJsonMessage(w http.ResponseWriter, code int, success bool, message string) {
 	responseBytes, err := json.Marshal(BasicResponse{success, message})
 	if err != nil {

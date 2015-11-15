@@ -16,6 +16,7 @@ const VERSION = "2.0.0"
 var goVersion = runtime.Version()
 var goArch = runtime.GOOS + "_" + runtime.GOARCH
 
+// UpAndRunnin Main - The application's entrance-point
 func main() {
 	// Logger
 	lib.SetupLogger()
@@ -51,6 +52,7 @@ func main() {
 	lib.GetDatabase().Close()
 }
 
+// Create all routes and start the HTTP-server
 func serveRequests() {
 	router := httprouter.New()
 
@@ -100,6 +102,7 @@ func serveRequests() {
 	logging.MustGetLogger("logger").Fatal(http.ListenAndServe(":"+strconv.Itoa(lib.GetConfiguration().Port), router))
 }
 
+// Creates a timer to regularly check all Websites
 func startCheckTimer() {
 	timer := time.NewTimer(time.Second * time.Duration(lib.GetConfiguration().Dynamic.Interval))
 	go func() {
@@ -109,6 +112,7 @@ func startCheckTimer() {
 	}()
 }
 
+// Creates a timer to check all Websites when triggered through the API
 func startCheckNowTimer() {
 	timer := time.NewTimer(time.Second * 1)
 	go func() {
@@ -121,6 +125,7 @@ func startCheckNowTimer() {
 	}()
 }
 
+// Checks all enabled Websites
 func checkAllSites() {
 	// Query the Database
 	db := lib.GetDatabase()

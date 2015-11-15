@@ -9,10 +9,12 @@ import (
 	"strconv"
 )
 
+// Sends a simple welcome-message to the user.
 func ApiAdminIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	SendJsonMessage(w, http.StatusOK, true, "Welcome to UpAndRunning's Admin-API! Please be aware that most operations need an incoming POST-request.")
 }
 
+// Returns a AdminWebsiteResponse containing all Websites as AdminWebsite.
 func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
 		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
@@ -71,12 +73,14 @@ func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	w.Write(responseBytes)
 }
 
+// Inserts a new Website into the database.
 func ApiAdminWebsiteAdd(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
 		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
 		return
 	}
 
+	// Get data from Request
 	r.ParseForm()
 	name := r.Form.Get("name")
 	protocol := r.Form.Get("protocol")
@@ -90,13 +94,7 @@ func ApiAdminWebsiteAdd(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 
 	// Insert into Database
 	db := lib.GetDatabase()
-	stmt, err := db.Prepare("INSERT INTO website (name, protocol, url) VALUES (?, ?, ?);")
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to add Website: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
-		return
-	}
-	_, err = stmt.Exec(name, protocol, url)
+	_, err := db.Exec("INSERT INTO website (name, protocol, url) VALUES (?, ?, ?);", name, protocol, url)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to add Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
@@ -106,12 +104,14 @@ func ApiAdminWebsiteAdd(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
+// Enables an existing Website in the database.
 func ApiAdminWebsiteEnable(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
 		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
 		return
 	}
 
+	// Get data from Request
 	r.ParseForm()
 	value := r.Form.Get("url")
 
@@ -123,13 +123,7 @@ func ApiAdminWebsiteEnable(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	// Update Database-Row
 	db := lib.GetDatabase()
-	stmt, err := db.Prepare("UPDATE website SET enabled = 1 WHERE url = ?;")
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to enable Website: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
-		return
-	}
-	res, err := stmt.Exec(value)
+	res, err := db.Exec("UPDATE website SET enabled = 1 WHERE url = ?;", value)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to enable Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
@@ -145,12 +139,14 @@ func ApiAdminWebsiteEnable(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 }
 
+// Disables an existing Website in the database.
 func ApiAdminWebsiteDisable(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
 		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
 		return
 	}
 
+	// Get data from Request
 	r.ParseForm()
 	value := r.Form.Get("url")
 
@@ -162,13 +158,7 @@ func ApiAdminWebsiteDisable(w http.ResponseWriter, r *http.Request, ps httproute
 
 	// Update Database-Row
 	db := lib.GetDatabase()
-	stmt, err := db.Prepare("UPDATE website SET enabled = 0 WHERE url = ?;")
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to disable Website: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
-		return
-	}
-	res, err := stmt.Exec(value)
+	res, err := db.Exec("UPDATE website SET enabled = 0 WHERE url = ?;", value)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to disable Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
@@ -184,12 +174,14 @@ func ApiAdminWebsiteDisable(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 }
 
+// Sets an existing Website to visible in the database.
 func ApiAdminWebsiteVisible(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
 		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
 		return
 	}
 
+	// Get data from Request
 	r.ParseForm()
 	value := r.Form.Get("url")
 
@@ -201,13 +193,7 @@ func ApiAdminWebsiteVisible(w http.ResponseWriter, r *http.Request, ps httproute
 
 	// Update Database-Row
 	db := lib.GetDatabase()
-	stmt, err := db.Prepare("UPDATE website SET visible = 1 WHERE url = ?;")
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to set Website visible: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
-		return
-	}
-	res, err := stmt.Exec(value)
+	res, err := db.Exec("UPDATE website SET visible = 1 WHERE url = ?;", value)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to set Website visible: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
@@ -223,12 +209,14 @@ func ApiAdminWebsiteVisible(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 }
 
+// Sets an existing Website to invisible in the database.
 func ApiAdminWebsiteInvisible(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
 		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
 		return
 	}
 
+	// Get data from Request
 	r.ParseForm()
 	value := r.Form.Get("url")
 
@@ -240,13 +228,7 @@ func ApiAdminWebsiteInvisible(w http.ResponseWriter, r *http.Request, ps httprou
 
 	// Update Database-Row
 	db := lib.GetDatabase()
-	stmt, err := db.Prepare("UPDATE website SET visible = 0 WHERE url = ?;")
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to set Website invisible: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
-		return
-	}
-	res, err := stmt.Exec(value)
+	res, err := db.Exec("UPDATE website SET visible = 0 WHERE url = ?;", value)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to set Website invisible: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
@@ -262,12 +244,14 @@ func ApiAdminWebsiteInvisible(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 }
 
+// Edits an existing Website in the database.
 func ApiAdminWebsiteEdit(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
 		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
 		return
 	}
 
+	// Get data from Request
 	r.ParseForm()
 	oldUrl := r.Form.Get("oldUrl")
 	name := r.Form.Get("name")
@@ -282,13 +266,7 @@ func ApiAdminWebsiteEdit(w http.ResponseWriter, r *http.Request, ps httprouter.P
 
 	// Update Database
 	db := lib.GetDatabase()
-	stmt, err := db.Prepare("UPDATE website SET name = ?, protocol = ?, url = ? WHERE url = ?;")
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to edit Website: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
-		return
-	}
-	res, err := stmt.Exec(name, protocol, url, oldUrl)
+	res, err := db.Exec("UPDATE website SET name = ?, protocol = ?, url = ? WHERE url = ?;", name, protocol, url, oldUrl)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to edit Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
@@ -304,12 +282,14 @@ func ApiAdminWebsiteEdit(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 }
 
+// Removes an existing Website from the database.
 func ApiAdminWebsiteDelete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
 		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
 		return
 	}
 
+	// Get data from Request
 	r.ParseForm()
 	value := r.Form.Get("url")
 
@@ -321,13 +301,7 @@ func ApiAdminWebsiteDelete(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	// Remove from Database
 	db := lib.GetDatabase()
-	stmt, err := db.Prepare("DELETE FROM website WHERE url = ?;")
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to delete Website: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
-		return
-	}
-	res, err := stmt.Exec(value)
+	res, err := db.Exec("DELETE FROM website WHERE url = ?;", value)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to delete Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
@@ -343,12 +317,14 @@ func ApiAdminWebsiteDelete(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 }
 
+// Updates the application's title in the database.
 func ApiAdminSettingTitle(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
 		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
 		return
 	}
 
+	// Get data from Request
 	r.ParseForm()
 	value := r.Form.Get("title")
 
@@ -360,29 +336,26 @@ func ApiAdminSettingTitle(w http.ResponseWriter, r *http.Request, ps httprouter.
 
 	// Update Database-Row
 	db := lib.GetDatabase()
-	stmt, err := db.Prepare("UPDATE settings SET value = ? WHERE name = 'title';")
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to change Application-Title: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
-		return
-	}
-	_, err = stmt.Exec(value)
+	_, err := db.Exec("UPDATE settings SET value = ? WHERE name = 'title';", value)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to change Application-Title: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
 
+	// Update Configuration
 	lib.GetConfiguration().Dynamic.Title = value
 	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
+// Updates the application's check-interval in the database.
 func ApiAdminSettingInterval(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
 		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
 		return
 	}
 
+	// Get data from Request
 	r.ParseForm()
 	temp := r.Form.Get("interval")
 	value, err := strconv.Atoi(temp)
@@ -395,29 +368,26 @@ func ApiAdminSettingInterval(w http.ResponseWriter, r *http.Request, ps httprout
 
 	// Update Database-Row
 	db := lib.GetDatabase()
-	stmt, err := db.Prepare("UPDATE settings SET value = ? WHERE name = 'interval';")
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to change Interval: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
-		return
-	}
-	_, err = stmt.Exec(value)
+	_, err = db.Exec("UPDATE settings SET value = ? WHERE name = 'interval';", value)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to change Interval: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
 
+	// Update Configuration
 	lib.GetConfiguration().Dynamic.Interval = value
 	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
+// Updates the application's Pushbullet-key in the database.
 func ApiAdminSettingPushbulletKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
 		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
 		return
 	}
 
+	// Get data from Request
 	r.ParseForm()
 	value := r.Form.Get("key")
 
@@ -429,29 +399,26 @@ func ApiAdminSettingPushbulletKey(w http.ResponseWriter, r *http.Request, ps htt
 
 	// Update Database-Row
 	db := lib.GetDatabase()
-	stmt, err := db.Prepare("UPDATE settings SET value = ? WHERE name = 'pushbullet_key';")
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to change PushBullet-API-Key: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
-		return
-	}
-	_, err = stmt.Exec(value)
+	_, err := db.Exec("UPDATE settings SET value = ? WHERE name = 'pushbullet_key';", value)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to change PushBullet-API-Key: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
 
+	// Update Configuration
 	lib.GetConfiguration().Dynamic.PushbulletKey = value
 	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
+// Updates the user's password in the database.
 func ApiAdminSettingPassword(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
 		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
 		return
 	}
 
+	// Get data from Request
 	r.ParseForm()
 	value := r.Form.Get("password")
 
@@ -471,22 +438,26 @@ func ApiAdminSettingPassword(w http.ResponseWriter, r *http.Request, ps httprout
 	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
+// Triggers a check of all enabled Websites.
 func ApiAdminActionCheck(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
 		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
 		return
 	}
 
+	// Trigger a check
 	lib.GetConfiguration().Dynamic.CheckNow = true
 	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
+// Processes a login-request and sends an authentication-cookie to the browser.
 func ApiAdminActionLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if lib.IsLoggedIn(r) {
 		SendJsonMessage(w, http.StatusBadRequest, false, "Already logged in.")
 		return
 	}
 
+	// Get data from Request
 	r.ParseForm()
 	value := r.Form.Get("password")
 
@@ -501,12 +472,14 @@ func ApiAdminActionLogin(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 }
 
+// Processes a logout-request and sends a termination-cookie to the browser.
 func ApiAdminActionLogout(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
 		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
 		return
 	}
 
+	// Process logout
 	cookie := lib.LogoutAndDestroyCookie(r)
 	http.SetCookie(w, &cookie)
 	SendJsonMessage(w, http.StatusOK, true, "")
