@@ -372,8 +372,8 @@ func ApiAdminSettingInterval(w http.ResponseWriter, r *http.Request, ps httprout
 	value, err := strconv.Atoi(temp)
 
 	// Simple Validation
-	if err != nil || value < 1 || value > 600 {
-		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value between 1 and 600 seconds.")
+	if err != nil || value < 10 || value > 600 {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value between 10 and 600 seconds.")
 		return
 	}
 
