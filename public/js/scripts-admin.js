@@ -70,7 +70,7 @@ function loadWebsites() {
 					dataString += ' <span class="label label-warning" id="label-action" onclick="visibleWebsite(\'' + loadedWebsiteData[i].url + '\')">Invisible</span> ';
 				}
 
-				dataString += '</td><td>' + loadedWebsiteData[i].protocol + '</td><td>' + loadedWebsiteData[i].url + '</td><td>';
+				dataString += '</td><td>' + loadedWebsiteData[i].protocol + '</td><td>' + loadedWebsiteData[i].url + '</td><td><code>' + loadedWebsiteData[i].checkMethod + '</code></td><td>';
 
 				if (loadedWebsiteData[i].status.indexOf("2") == 0) {
 					dataString += ' <span class="label label-success">' + loadedWebsiteData[i].status + '</span> ';
@@ -94,7 +94,7 @@ function loadWebsites() {
 			$('#table-websites').html(dataString);
 		},
 		error: function(error) {
-			$('#table-websites').html('<tr><td colspan="10">An error occured. Please authenticate again or add a website.</td></tr>');
+			$('#table-websites').html('<tr><td colspan="11">An error occured. Please authenticate again or add a website.</td></tr>');
 		}
 	});
 }
