@@ -86,16 +86,17 @@ func ApiAdminWebsiteAdd(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	name := r.Form.Get("name")
 	protocol := r.Form.Get("protocol")
 	url := r.Form.Get("url")
+	method := r.Form.Get("checkMethod");
 
 	// Simple Validation
-	if name == "" || protocol == "" || url == "" {
+	if name == "" || protocol == "" || url == "" || method == "" {
 		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit valid values.")
 		return
 	}
 
 	// Insert into Database
 	db := lib.GetDatabase()
-	_, err := db.Exec("INSERT INTO website (name, protocol, url) VALUES (?, ?, ?);", name, protocol, url)
+	_, err := db.Exec("INSERT INTO website (name, protocol, url, checkMethod) VALUES (?, ?, ?, ?);", name, protocol, url, method)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to add Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
@@ -258,9 +259,10 @@ func ApiAdminWebsiteEdit(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	name := r.Form.Get("name")
 	protocol := r.Form.Get("protocol")
 	url := r.Form.Get("url")
+	method := r.Form.Get("checkMethod")
 
 	// Simple Validation
-	if oldUrl == "" || name == "" || protocol == "" || url == "" {
+	if oldUrl == "" || name == "" || protocol == "" || url == "" || method == "" {
 		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit valid values.")
 		return
 	}
@@ -268,10 +270,14 @@ func ApiAdminWebsiteEdit(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid protocol.")
 		return
 	}
+	if method != "HEAD" && method != "GET" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid check method.")
+		return
+	}
 
 	// Update Database
 	db := lib.GetDatabase()
-	res, err := db.Exec("UPDATE website SET name = ?, protocol = ?, url = ? WHERE url = ?;", name, protocol, url, oldUrl)
+	res, err := db.Exec("UPDATE website SET name = ?, protocol = ?, url = ?, checkMethod = ? WHERE url = ?;", name, protocol, url, method, oldUrl)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to edit Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())

@@ -1,5 +1,5 @@
 var loadedWebsiteData;
-var editName, editProtocol, editUrl;
+var editName, editProtocol, editUrl, editMethod;
 var allowCheck = true;
 
 $(document).ready(function() {
@@ -112,16 +112,18 @@ function addWebsite() {
 	var name = $('#input-add-name').val();
 	var protocol = $('#input-add-protocol').val();
 	var url = $('#input-add-url').val();
+	var method = $('#input-add-method').val();
 
-	if (name.trim() && protocol.trim() && url.trim()) {
+	if (name.trim() && protocol.trim() && url.trim() && method.trim()) {
 		$.ajax({
 			url: "/api/admin/websites/add",
 			type: "POST",
-			data: {name: name, protocol: protocol, url: url},
+			data: {name: name, protocol: protocol, url: url, checkMethod: method},
 			success: function() {
 				$('#input-add-name').val('');
 				$('#input-add-protocol').val('https');
 				$('#input-add-url').val('');
+				$('#input-add-method').val('HEAD');
 				loadWebsites();
 
 				$('.bottom-right').notify({
@@ -227,10 +229,12 @@ function editWebsite(url) {
 		if (url === loadedWebsiteData[i].url) {
 			editName = loadedWebsiteData[i].name;
 			editProtocol = loadedWebsiteData[i].protocol;
+			editMethod = loadedWebsiteData[i].checkMethod;
 
 			$('#input-edit-name').val(loadedWebsiteData[i].name);
 			$('#input-edit-protocol').val(loadedWebsiteData[i].protocol);
 			$('#input-edit-url').val(loadedWebsiteData[i].url);
+			$('#input-edit-method').val(loadedWebsiteData[i].checkMethod);
 		}
 	}
 }
@@ -239,17 +243,18 @@ function saveWebsite() {
 	var name = $('#input-edit-name').val();
 	var protocol = $('#input-edit-protocol').val();
 	var url = $('#input-edit-url').val();
+	var method = $('#input-edit-method').val();
 
-	if (name == editName && protocol == editProtocol && editUrl == url) {
+	if (name == editName && protocol == editProtocol && editUrl == url && editMethod == method) {
 		cancleSaveWebsite();
 		return;
 	}
 
-	if (name.trim() && protocol.trim() && url.trim()) {
+	if (name.trim() && protocol.trim() && url.trim() && method.trim()) {
 		$.ajax({
 			url: "/api/admin/websites/edit",
 			type: "POST",
-			data: {oldUrl: editUrl, name: name, protocol: protocol, url: url},
+			data: {oldUrl: editUrl, name: name, protocol: protocol, url: url, checkMethod: method},
 			success: function() {
 				cancleSaveWebsite();
 				loadWebsites();

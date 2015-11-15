@@ -117,7 +117,7 @@ Notice: You have to login before you are able to use those APIs.
 `POST` `/api/admin/websites/add`:
 
 ```json
-POST-parameters: name, protocol, url
+POST-parameters: name, protocol, url, checkMethod
 ```
 
 #### Enable a Website
@@ -152,7 +152,7 @@ POST-parameters: url
 `POST` `/api/admin/websites/edit`:
 
 ```json
-POST-parameters: oldUrl, name, protocol, url
+POST-parameters: oldUrl, name, protocol, url, checkMethod
 ```
 
 #### Delete a Website
