@@ -6,7 +6,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/op/go-logging"
 	"net/http"
-	"os"
 	"runtime"
 	"strconv"
 	"time"
@@ -26,11 +25,7 @@ func main() {
 	logging.MustGetLogger("logger").Info("Welcome to UpAndRunning2 v%s [%s@%s]!", VERSION, goVersion, goArch)
 
 	// Config
-	dir, err := os.Getwd()
-	if err != nil {
-		logging.MustGetLogger("logger").Fatal("Unable to get current directory: ", err)
-	}
-	lib.ReadConfigurationFromFile(dir + "/" + "config/local.json")
+	lib.ReadConfigurationFromFile("config/local.json")
 	lib.SetStaticConfiguration(lib.StaticConfiguration{VERSION, goVersion, goArch})
 
 	// Database
