@@ -86,7 +86,7 @@ func ApiAdminWebsiteAdd(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	name := r.Form.Get("name")
 	protocol := r.Form.Get("protocol")
 	url := r.Form.Get("url")
-	method := r.Form.Get("checkMethod");
+	method := r.Form.Get("checkMethod")
 
 	// Simple Validation
 	if name == "" || protocol == "" || url == "" || method == "" {
