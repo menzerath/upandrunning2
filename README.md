@@ -22,6 +22,20 @@ DELETE FROM settings WHERE name = 'password';
 
 Also you should notice that some of the APIs changed and you may need to adjust your applications.
 
+## Some Details on the Check-Algorithm
+UpAndRunning2 checks the response it gets from a simple HTTP-HEAD-request to the specified url.  
+This table shows how the different responses are handled:
+
+| Response Code | Category |
+|---------------|----------|
+| 1xx           | OK       |
+| 2xx           | OK       |
+| 3xx           | Warning  |
+| 4xx           | Error    |
+| 5xx           | Error    |
+
+**Notice**: Some websites or applications may not respond correctly to a HEAD-request.
+
 ## API
 
 ### User

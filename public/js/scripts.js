@@ -76,9 +76,9 @@ function loadWebsiteData() {
 
 				newEntry += '<tr><td>' + (i + 1) + '</td><td><a href="' + loadedWebsiteData[i].protocol + '://' + loadedWebsiteData[i].url + '" target="_blank">' + loadedWebsiteData[i].name + '</a></td><td>';
 
-				if (loadedWebsiteData[i].status.indexOf("200") > -1) {
+				if (loadedWebsiteData[i].status.indexOf("2") == 0) {
 					newEntry += ' <span class="label label-success">' + loadedWebsiteData[i].status + '</span> ';
-				} else if (loadedWebsiteData[i].status.indexOf("301") > -1 || loadedWebsiteData[i].status.indexOf("302") > -1) {
+				} else if (loadedWebsiteData[i].status.indexOf("3") == 0) {
 					newEntry += ' <span class="label label-warning">' + loadedWebsiteData[i].status + '</span> ';
 				} else {
 					newEntry += ' <span class="label label-danger">' + loadedWebsiteData[i].status + '</span> ';
@@ -86,7 +86,7 @@ function loadWebsiteData() {
 
 				newEntry += '</td><td> <span class="label label-primary" id="label-action" onclick="showInformation(\'' + loadedWebsiteData[i].url + '\')">More</span> </td></tr>';
 
-				if (loadedWebsiteData[i].status.indexOf("200") > -1 || loadedWebsiteData[i].status.indexOf("301") > -1 || loadedWebsiteData[i].status.indexOf("302") > -1) {
+				if (loadedWebsiteData[i].status.indexOf("2") == 0 || loadedWebsiteData[i].status.indexOf("3") == 0) {
 					dataStringUp += newEntry;
 				} else {
 					dataStringDown += newEntry;

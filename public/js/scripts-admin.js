@@ -72,9 +72,9 @@ function loadWebsites() {
 
 				dataString += '</td><td>' + loadedWebsiteData[i].protocol + '</td><td>' + loadedWebsiteData[i].url + '</td><td>';
 
-				if (loadedWebsiteData[i].status.indexOf("200") > -1) {
+				if (loadedWebsiteData[i].status.indexOf("2") == 0) {
 					dataString += ' <span class="label label-success">' + loadedWebsiteData[i].status + '</span> ';
-				} else if (loadedWebsiteData[i].status.indexOf("301") > -1 || loadedWebsiteData[i].status.indexOf("302") > -1) {
+				} else if (loadedWebsiteData[i].status.indexOf("3") == 0) {
 					dataString += ' <span class="label label-warning">' + loadedWebsiteData[i].status + '</span> ';
 				} else {
 					dataString += ' <span class="label label-danger">' + loadedWebsiteData[i].status + '</span> ';

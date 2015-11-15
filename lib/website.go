@@ -7,6 +7,7 @@ import (
 	"github.com/op/go-logging"
 	"strconv"
 	"time"
+	"strings"
 )
 
 // Represents a single Website-object.
@@ -57,8 +58,10 @@ func (w *Website) RunCheck() {
 		}
 	}
 
+	newStatusCodeString := strconv.Itoa(newStatusCode)
+
 	// Save the new Result
-	if newStatusCode == 200 || newStatusCode == 301 || newStatusCode == 302 {
+	if strings.HasPrefix(newStatusCodeString, "2") || strings.HasPrefix(newStatusCodeString, "3") {
 		// Success
 		stmt, err := db.Prepare("UPDATE website SET status = ?, time = NOW(), ups = ups + 1, totalChecks = totalChecks + 1 WHERE id = ?;")
 		if err != nil {
