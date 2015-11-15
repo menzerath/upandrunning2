@@ -36,6 +36,7 @@ func (w *Website) RunCheck(secondTry bool) {
 					newStatus = "Timeout"
 					newStatusCode = 0
 				} else {
+					time.Sleep(time.Millisecond * 500)
 					w.RunCheck(true)
 					return
 				}
