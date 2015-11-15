@@ -104,6 +104,7 @@ Notice: You have to login before you are able to use those APIs.
 			"visible": true,
 			"protocol": "https",
 			"url": "website.com",
+			"checkMethod": "HEAD",
 			"status": "200 - OK",
 			"time": "2015-01-01T00:00:00.000Z",
 			"avgAvail": "99.00%"
