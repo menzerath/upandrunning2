@@ -6,8 +6,8 @@ import (
 	"github.com/mitsuse/pushbullet-go/requests"
 	"github.com/op/go-logging"
 	"strconv"
-	"time"
 	"strings"
+	"time"
 )
 
 // Represents a single Website-object.
@@ -36,18 +36,13 @@ func (w *Website) RunCheck() {
 
 	// If Pushbullet-notifications are active: get old status and Website's name and send a Push
 	if GetConfiguration().Dynamic.PushbulletKey != "" {
-		db := GetDatabase()
-		stmt, err := db.Prepare("SELECT name, status FROM website WHERE id = ?")
-		if err != nil {
-			logging.MustGetLogger("logger").Error("Unable to get Website's data: ", err)
-			return
-		}
-
 		var (
 			name   string
 			status string
 		)
-		err = stmt.QueryRow(w.Id).Scan(&name, &status)
+
+		db := GetDatabase()
+		err = db.QueryRow("SELECT name, status FROM website WHERE id = ?", w.Id).Scan(&name, &status)
 		if err != nil {
 			logging.MustGetLogger("logger").Error("Unable to get Website's data: ", err)
 			return
@@ -63,26 +58,14 @@ func (w *Website) RunCheck() {
 	// Save the new Result
 	if strings.HasPrefix(newStatusCodeString, "2") || strings.HasPrefix(newStatusCodeString, "3") {
 		// Success
-		stmt, err := db.Prepare("UPDATE website SET status = ?, time = NOW(), ups = ups + 1, totalChecks = totalChecks + 1 WHERE id = ?;")
-		if err != nil {
-			logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
-			return
-		}
-
-		_, err = stmt.Exec(newStatus, w.Id)
+		_, err = db.Exec("UPDATE website SET status = ?, time = NOW(), ups = ups + 1, totalChecks = totalChecks + 1 WHERE id = ?;", newStatus, w.Id)
 		if err != nil {
 			logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
 			return
 		}
 	} else {
 		// Failure
-		stmt, err := db.Prepare("UPDATE website SET status = ?, time = NOW(), lastFailStatus = ?, lastFailTime = NOW(), downs = downs + 1, totalChecks = totalChecks + 1 WHERE id = ?;")
-		if err != nil {
-			logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
-			return
-		}
-
-		_, err = stmt.Exec(newStatus, newStatus, w.Id)
+		_, err = db.Exec("UPDATE website SET status = ?, time = NOW(), lastFailStatus = ?, lastFailTime = NOW(), downs = downs + 1, totalChecks = totalChecks + 1 WHERE id = ?;", newStatus, newStatus, w.Id)
 		if err != nil {
 			logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
 			return
@@ -94,17 +77,10 @@ func (w *Website) RunCheck() {
 
 // Calculates the average Website availability and stores it inside the database.
 func (w *Website) calcAvgAvailability() {
-	// Query the Database
+	// Query the Database and format the returned value
 	db := GetDatabase()
-	stmt, err := db.Prepare("SELECT ((SELECT ups FROM website WHERE id = ?) / (SELECT totalChecks FROM website WHERE id = ?))*100 AS avg")
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to calculate Website-Availability: ", err)
-		return
-	}
-
-	// Format the returned value
 	var avg float64
-	err = stmt.QueryRow(w.Id, w.Id).Scan(&avg)
+	err := db.QueryRow("SELECT ((SELECT ups FROM website WHERE id = ?) / (SELECT totalChecks FROM website WHERE id = ?))*100 AS avg", w.Id, w.Id).Scan(&avg)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to calculate Website-Availability: ", err)
 		return
@@ -112,13 +88,7 @@ func (w *Website) calcAvgAvailability() {
 	strconv.FormatFloat(avg, 'f', 2, 64)
 
 	// Save the new value
-	stmt, err = db.Prepare("UPDATE website SET avgAvail = ? WHERE id = ?;")
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to calculate Website-Availability: ", err)
-		return
-	}
-
-	_, err = stmt.Exec(avg, w.Id)
+	_, err = db.Exec("UPDATE website SET avgAvail = ? WHERE id = ?;", avg, w.Id)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to save Website-Availability: ", err)
 		return
