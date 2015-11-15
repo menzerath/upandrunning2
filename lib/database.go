@@ -5,6 +5,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/op/go-logging"
 	"strconv"
+	"github.com/go-sql-driver/mysql"
 )
 
 // This is the one and only Database-object.
@@ -41,8 +42,10 @@ func prepareDatabase() {
 
 	// v2.0.0 Beta
 	_, err = db.Exec("ALTER TABLE `website` ADD `checkMethod` VARCHAR(10) NOT NULL DEFAULT 'HEAD' AFTER `url`;")
-	if err != nil {
-		logging.MustGetLogger("logger").Debug("Unable to add 'checkMethod'-column: ", err)
+	if mysqlError, ok := err.(*mysql.MySQLError); !ok {
+		if mysqlError.Number != 1060 {
+			logging.MustGetLogger("logger").Fatal("Unable to add 'checkMethod'-column: ", err)
+		}
 	}
 
 	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `settings` (`id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(20) NOT NULL, `value` varchar(1024) NOT NULL, PRIMARY KEY (`id`), UNIQUE KEY `name` (`name`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
