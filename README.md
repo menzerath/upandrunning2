@@ -34,7 +34,8 @@ This table shows how the different responses are handled:
 | 4xx           | Error    |
 | 5xx           | Error    |
 
-**Notice**: Some websites or applications may not respond correctly to a HEAD-request.
+**Notice**: Some websites or applications may not respond correctly to a HEAD-request.  
+In this case you need to adjust the used Check-Method to a GET-request.
 
 ## API
 
