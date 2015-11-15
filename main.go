@@ -129,7 +129,7 @@ func startCheckNowTimer() {
 func checkAllSites() {
 	// Query the Database
 	db := lib.GetDatabase()
-	rows, err := db.Query("SELECT id, protocol, url FROM website WHERE enabled = 1;")
+	rows, err := db.Query("SELECT id, protocol, url, checkMethod FROM website WHERE enabled = 1;")
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
 		return
@@ -140,7 +140,7 @@ func checkAllSites() {
 	count := 0
 	for rows.Next() {
 		var website lib.Website
-		err = rows.Scan(&website.Id, &website.Protocol, &website.Url)
+		err = rows.Scan(&website.Id, &website.Protocol, &website.Url, &website.CheckMethod)
 		if err != nil {
 			logging.MustGetLogger("logger").Error("Unable to read Website-Row: ", err)
 			return
