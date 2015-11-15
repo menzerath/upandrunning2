@@ -34,6 +34,8 @@ This table shows how the different responses are handled:
 | 4xx           | Error    |
 | 5xx           | Error    |
 
+Next to those HTTP status codes the application is also able to recognize a request timeout (allows a second check) or unknown hosts.
+
 **Notice**: Some websites or applications may not respond correctly to a HEAD-request.  
 In this case you need to adjust the used Check-Method to a GET-request.
 
