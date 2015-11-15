@@ -16,7 +16,7 @@ const VERSION = "2.0.0"
 var goVersion = runtime.Version()
 var goArch = runtime.GOOS + "_" + runtime.GOARCH
 
-// UpAndRunnin Main - The application's entrance-point
+// UpAndRunning2 Main - The application's entrance-point
 func main() {
 	// Logger
 	lib.SetupLogger()

@@ -11,6 +11,12 @@ $(document).ready(function() {
 function login() {
 	var password = $('#input-password').val();
 
+	$('.bottom-right').notify({
+		type: 'warning',
+		message: {text: "Processing..."},
+		fadeOut: {enabled: true, delay: 3000}
+	}).show();
+
 	if (password.trim()) {
 		$.ajax({
 			url: "/api/admin/login",
