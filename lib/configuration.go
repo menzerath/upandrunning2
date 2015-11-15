@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/op/go-logging"
 	"os"
-	"path/filepath"
 )
 
 // This the one and only Configuration-object.
@@ -47,7 +46,7 @@ type StaticConfiguration struct {
 }
 
 // Reads a configuration-file from a specified path.
-func ReadConfigurationFromFile(filePath string, secondTry bool) {
+func ReadConfigurationFromFile(filePath string) {
 	logging.MustGetLogger("logger").Info("Reading Configuration from File...")
 
 	file, _ := os.Open(filePath)
@@ -56,16 +55,7 @@ func ReadConfigurationFromFile(filePath string, secondTry bool) {
 	err := decoder.Decode(&config)
 
 	if err != nil {
-		if secondTry {
-			logging.MustGetLogger("logger").Fatal("Unable to read Configuration: ", err)
-		} else {
-			// Try again with full path to file
-			dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-			if err != nil {
-				logging.MustGetLogger("logger").Fatal("Unable to get current directory: ", err)
-			}
-			ReadConfigurationFromFile(dir+"/"+filePath, true)
-		}
+		logging.MustGetLogger("logger").Fatal("Unable to read Configuration: ", err)
 	}
 }
 
