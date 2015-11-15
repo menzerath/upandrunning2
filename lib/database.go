@@ -42,7 +42,7 @@ func prepareDatabase() {
 
 	// v2.0.0 Beta
 	_, err = db.Exec("ALTER TABLE `website` ADD `checkMethod` VARCHAR(10) NOT NULL DEFAULT 'HEAD' AFTER `url`;")
-	if mysqlError, ok := err.(*mysql.MySQLError); !ok {
+	if mysqlError, ok := err.(*mysql.MySQLError); ok {
 		if mysqlError.Number != 1060 {
 			logging.MustGetLogger("logger").Fatal("Unable to add 'checkMethod'-column: ", err)
 		}
