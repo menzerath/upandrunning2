@@ -64,7 +64,7 @@ func ReadConfigurationFromFile(filePath string, secondTry bool) {
 			if err != nil {
 				logging.MustGetLogger("logger").Fatal("Unable to get current directory: ", err)
 			}
-			ReadConfigurationFromFile(dir + "/" + filePath, true)
+			ReadConfigurationFromFile(dir+"/"+filePath, true)
 		}
 	}
 }
