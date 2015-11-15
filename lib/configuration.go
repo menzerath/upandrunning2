@@ -84,7 +84,7 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	// Interval
 	err = db.QueryRow("SELECT value FROM settings where name = 'interval';").Scan(&interval)
 	if err != nil {
-		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('interval', 5);")
+		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('interval', 30);")
 		if err != nil {
 			logging.MustGetLogger("logger").Fatal("Unable to insert 'interval'-setting: ", err)
 		}
