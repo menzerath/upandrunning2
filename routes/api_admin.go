@@ -263,6 +263,10 @@ func ApiAdminWebsiteEdit(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit valid values.")
 		return
 	}
+	if protocol != "http" && protocol != "https" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid protocol.")
+		return
+	}
 
 	// Update Database
 	db := lib.GetDatabase()
