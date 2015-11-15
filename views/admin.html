@@ -40,6 +40,7 @@
 										<th>Visible</th>
 										<th>Protocol</th>
 										<th>URL</th>
+										<th>Method</th>
 										<th>Status</th>
 										<th>Last Check</th>
 										<th>Availability</th>
@@ -48,7 +49,7 @@
 								</thead>
 								<tbody id="table-websites">
 									<tr>
-										<td colspan="10">Loading data...</td>
+										<td colspan="11">Loading data...</td>
 									</tr>
 								</tbody>
 							</table>
@@ -61,21 +62,27 @@
 							<legend>Edit Website</legend>
 							<fieldset>
 								<div class="form-group">
-									<label class="col-lg-2 control-label">Name</label>
-									<div class="col-lg-10"><input type="text" class="form-control" id="input-edit-name" placeholder="My Website"></div>
+									<label class="col-lg-1 control-label">Name:</label>
+									<div class="col-lg-11"><input type="text" class="form-control" id="input-edit-name" placeholder="My Website"></div>
 								</div>
 								<div class="form-group">
-									<label class="col-lg-2 control-label">Protocol</label>
-									<div class="col-lg-10">
+									<label class="col-lg-1 control-label">URL:</label>
+									<div class="col-lg-2">
 										<select class="form-control" id="input-edit-protocol">
 											<option value="http">http</option>
 											<option value="https" selected>https</option>
 										</select>
 									</div>
+									<div class="col-lg-9"><input type="text" class="form-control" id="input-edit-url" placeholder="google.com"></div>
 								</div>
 								<div class="form-group">
-									<label class="col-lg-2 control-label">URL</label>
-									<div class="col-lg-10"><input type="text" class="form-control" id="input-edit-url" placeholder="google.com"></div>
+									<label class="col-lg-1 control-label">Method:</label>
+									<div class="col-lg-2">
+										<select class="form-control" id="input-edit-method">
+											<option value="HEAD" selected>HEAD</option>
+											<option value="GET">GET</option>
+										</select>
+									</div>
 								</div>
 								<div class="form-group">
 									<div class="col-lg-12">
@@ -93,21 +100,27 @@
 							<legend>Add Website</legend>
 							<fieldset>
 								<div class="form-group">
-									<label class="col-lg-2 control-label">Name</label>
+									<label class="col-lg-2 control-label">Name:</label>
 									<div class="col-lg-10"><input type="text" class="form-control" id="input-add-name" placeholder="My Website"></div>
 								</div>
 								<div class="form-group">
-									<label class="col-lg-2 control-label">Protocol</label>
-									<div class="col-lg-10">
+									<label class="col-lg-2 control-label">URL:</label>
+									<div class="col-lg-3">
 										<select class="form-control" id="input-add-protocol">
 											<option value="http">http</option>
 											<option value="https" selected>https</option>
 										</select>
 									</div>
+									<div class="col-lg-7"><input type="text" class="form-control" id="input-add-url" placeholder="google.com"></div>
 								</div>
 								<div class="form-group">
-									<label class="col-lg-2 control-label">URL</label>
-									<div class="col-lg-10"><input type="text" class="form-control" id="input-add-url" placeholder="google.com"></div>
+									<label class="col-lg-2 control-label">Method:</label>
+									<div class="col-lg-3">
+										<select class="form-control" id="input-add-method">
+											<option value="HEAD" selected>HEAD</option>
+											<option value="GET">GET</option>
+										</select>
+									</div>
 								</div>
 								<div class="form-group">
 									<div class="col-lg-12"><button type="button" class="btn btn-primary" id="button-add-website" onclick="addWebsite()">Add Website</button></div>
@@ -146,9 +159,9 @@
 										<div class="form-group">
 											<label class="col-lg-2 control-label">Interval:</label>
 											<div class="col-lg-4">
-												<input type="number" class="form-control" id="input-new-interval" min="1" max="60" placeholder="5" value="{{ .Interval }}">
+												<input type="number" class="form-control" id="input-new-interval" min="10" max="600" placeholder="30" value="{{ .Interval }}">
 											</div>
-											<label class="col-lg-3 control-label">Minutes</label>
+											<label class="col-lg-3 control-label">Seconds</label>
 											<div class="col-lg-3">
 												<button type="button" class="btn btn-primary pull-right" id="button-change-interval" onclick="changeInterval()">Save</button>
 											</div>

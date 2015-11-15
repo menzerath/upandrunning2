@@ -34,7 +34,8 @@ This table shows how the different responses are handled:
 | 4xx           | Error    |
 | 5xx           | Error    |
 
-**Notice**: Some websites or applications may not respond correctly to a HEAD-request.
+**Notice**: Some websites or applications may not respond correctly to a HEAD-request.  
+In this case you need to adjust the used Check-Method to a GET-request.
 
 ## API
 
@@ -103,6 +104,7 @@ Notice: You have to login before you are able to use those APIs.
 			"visible": true,
 			"protocol": "https",
 			"url": "website.com",
+			"checkMethod": "HEAD",
 			"status": "200 - OK",
 			"time": "2015-01-01T00:00:00.000Z",
 			"avgAvail": "99.00%"
@@ -115,7 +117,7 @@ Notice: You have to login before you are able to use those APIs.
 `POST` `/api/admin/websites/add`:
 
 ```json
-POST-parameters: name, protocol, url
+POST-parameters: name, protocol, url, checkMethod
 ```
 
 #### Enable a Website
@@ -150,7 +152,7 @@ POST-parameters: url
 `POST` `/api/admin/websites/edit`:
 
 ```json
-POST-parameters: oldUrl, name, protocol, url
+POST-parameters: oldUrl, name, protocol, url, checkMethod
 ```
 
 #### Delete a Website

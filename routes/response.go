@@ -64,15 +64,16 @@ type AdminWebsiteResponse struct {
 
 // Contains the Website's data, which will be shown inside the admin-backend.
 type AdminWebsite struct {
-	Id       int    `json:"id"`
-	Name     string `json:"name"`
-	Enabled  bool   `json:"enabled"`
-	Visible  bool   `json:"visible"`
-	Protocol string `json:"protocol"`
-	Url      string `json:"url"`
-	Status   string `json:"status"`
-	Time     string `json:"time"`
-	Average  string `json:"avgAvail"`
+	Id          int    `json:"id"`
+	Name        string `json:"name"`
+	Enabled     bool   `json:"enabled"`
+	Visible     bool   `json:"visible"`
+	Protocol    string `json:"protocol"`
+	Url         string `json:"url"`
+	CheckMethod string `json:"checkMethod"`
+	Status      string `json:"status"`
+	Time        string `json:"time"`
+	Average     string `json:"avgAvail"`
 }
 
 // Contains the application's data, which will be used on publicly visible pages.

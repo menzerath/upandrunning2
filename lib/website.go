@@ -12,15 +12,16 @@ import (
 
 // Represents a single Website-object.
 type Website struct {
-	Id       int
-	Protocol string
-	Url      string
+	Id          int
+	Protocol    string
+	Url         string
+	CheckMethod string
 }
 
 // Runs a check and saves the result inside the database.
 func (w *Website) RunCheck() {
 	// Request new Status
-	res, err := goreq.Request{Uri: w.Protocol + "://" + w.Url, Method: "HEAD", UserAgent: "UpAndRunning2 (https://github.com/MarvinMenzerath/UpAndRunning2)", MaxRedirects: 10, Timeout: 10 * time.Second}.Do()
+	res, err := goreq.Request{Uri: w.Protocol + "://" + w.Url, Method: w.CheckMethod, UserAgent: "UpAndRunning2 (https://github.com/MarvinMenzerath/UpAndRunning2)", MaxRedirects: 10, Timeout: 10 * time.Second}.Do()
 
 	var newStatus string
 	var newStatusCode int

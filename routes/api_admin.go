@@ -23,7 +23,7 @@ func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 	// Query the Database
 	db := lib.GetDatabase()
-	rows, err := db.Query("SELECT id, name, enabled, visible, protocol, url, status, time, avgAvail FROM website;")
+	rows, err := db.Query("SELECT id, name, enabled, visible, protocol, url, checkMethod, status, time, avgAvail FROM website;")
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
@@ -32,27 +32,28 @@ func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	defer rows.Close()
 
 	var (
-		id       int
-		name     string
-		enabled  bool
-		visible  bool
-		protocol string
-		url      string
-		status   string
-		time     string
-		average  float64
+		id          int
+		name        string
+		enabled     bool
+		visible     bool
+		protocol    string
+		url         string
+		checkMethod string
+		status      string
+		time        string
+		average     float64
 	)
 
 	// Add every Website
 	websites := []AdminWebsite{}
 	for rows.Next() {
-		err = rows.Scan(&id, &name, &enabled, &visible, &protocol, &url, &status, &time, &average)
+		err = rows.Scan(&id, &name, &enabled, &visible, &protocol, &url, &checkMethod, &status, &time, &average)
 		if err != nil {
 			logging.MustGetLogger("logger").Error("Unable to read Website-Row: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 			return
 		}
-		websites = append(websites, AdminWebsite{id, name, enabled, visible, protocol, url, status, time, strconv.FormatFloat(average, 'f', 2, 64) + "%"})
+		websites = append(websites, AdminWebsite{id, name, enabled, visible, protocol, url, checkMethod, status, time, strconv.FormatFloat(average, 'f', 2, 64) + "%"})
 	}
 
 	// Check for Errors
@@ -85,16 +86,17 @@ func ApiAdminWebsiteAdd(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	name := r.Form.Get("name")
 	protocol := r.Form.Get("protocol")
 	url := r.Form.Get("url")
+	method := r.Form.Get("checkMethod")
 
 	// Simple Validation
-	if name == "" || protocol == "" || url == "" {
+	if name == "" || protocol == "" || url == "" || method == "" {
 		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit valid values.")
 		return
 	}
 
 	// Insert into Database
 	db := lib.GetDatabase()
-	_, err := db.Exec("INSERT INTO website (name, protocol, url) VALUES (?, ?, ?);", name, protocol, url)
+	_, err := db.Exec("INSERT INTO website (name, protocol, url, checkMethod) VALUES (?, ?, ?, ?);", name, protocol, url, method)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to add Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
@@ -257,16 +259,25 @@ func ApiAdminWebsiteEdit(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	name := r.Form.Get("name")
 	protocol := r.Form.Get("protocol")
 	url := r.Form.Get("url")
+	method := r.Form.Get("checkMethod")
 
 	// Simple Validation
-	if oldUrl == "" || name == "" || protocol == "" || url == "" {
+	if oldUrl == "" || name == "" || protocol == "" || url == "" || method == "" {
 		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit valid values.")
+		return
+	}
+	if protocol != "http" && protocol != "https" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid protocol.")
+		return
+	}
+	if method != "HEAD" && method != "GET" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid check method.")
 		return
 	}
 
 	// Update Database
 	db := lib.GetDatabase()
-	res, err := db.Exec("UPDATE website SET name = ?, protocol = ?, url = ? WHERE url = ?;", name, protocol, url, oldUrl)
+	res, err := db.Exec("UPDATE website SET name = ?, protocol = ?, url = ?, checkMethod = ? WHERE url = ?;", name, protocol, url, method, oldUrl)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to edit Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
@@ -361,8 +372,8 @@ func ApiAdminSettingInterval(w http.ResponseWriter, r *http.Request, ps httprout
 	value, err := strconv.Atoi(temp)
 
 	// Simple Validation
-	if err != nil || value < 1 || value > 600 {
-		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value between 1 and 600 seconds.")
+	if err != nil || value < 10 || value > 600 {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value between 10 and 600 seconds.")
 		return
 	}
 
