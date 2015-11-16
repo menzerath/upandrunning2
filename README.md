@@ -1,6 +1,5 @@
 # UpAndRunning2 [![Build Status](https://drone.io/github.com/MarvinMenzerath/UpAndRunning2/status.png)](https://drone.io/github.com/MarvinMenzerath/UpAndRunning2/latest)
-UpAndRunning2 is a lightweight Go application which monitors all of your websites for availability and offers a simple JSON-API.  
-You can also enter your PushBullet-API-Key to get a Push each time the status of one of your websites changes.
+UpAndRunning2 is a lightweight Go application which **monitors all of your websites**, offers a simple **JSON-REST-API** and user-defined **notifications**.
 
 ## Features
 * Easy [Installation](#installation) and Configuration
