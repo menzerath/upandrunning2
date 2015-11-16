@@ -42,7 +42,6 @@ func (w *Website) RunCheck(secondTry bool) {
 				}
 			}
 		}
-		logging.MustGetLogger("logger").Warning("Error while requesting Status: ", err)
 	} else {
 		newStatus = strconv.Itoa(res.StatusCode) + " - " + GetHttpStatus(res.StatusCode)
 		newStatusCode = res.StatusCode
