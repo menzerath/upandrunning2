@@ -2,6 +2,36 @@
 UpAndRunning2 is a lightweight Go application which monitors all of your websites for availability and offers a simple JSON-API.  
 You can also enter your PushBullet-API-Key to get a Push each time the status of one of your websites changes.
 
+## Features
+* Easy [Installation](#installation) and Configuration
+* Checks all of your websites regularly
+	* Use `HEAD` or `GET` requests
+	* Set an interval of 10 seconds up to 10 minutes
+	* Detects nearly all HTTP-status-codes, timeouts and unknown hosts
+* Simple, but powerful [JSON-REST-API](#api)
+* Build your own client or use the fully-featured web-interface
+* bcrypt ensures your password is stored safely
+* Get notifications via
+	* Pushbullet
+	* More coming soon!
+
+### Some Details on the Check-Algorithm
+UpAndRunning2 checks the response it gets from a simple HTTP-HEAD-request to the specified url.  
+This table shows how the different responses are handled:
+
+| Response Code | Category |
+|---------------|----------|
+| 1xx           | OK       |
+| 2xx           | OK       |
+| 3xx           | Warning  |
+| 4xx           | Error    |
+| 5xx           | Error    |
+
+Next to those HTTP status codes the application is also able to recognize a request timeout (allows a second check) or unknown hosts.
+
+**Notice**: Some websites or applications may not respond correctly to a HEAD-request.  
+In this case you need to adjust the used Check-Method to a GET-request.
+
 ## Installation
 * Download and extract all the files in a directory
 * Prepare your MySQL-Server: create a new user and a new database
@@ -21,23 +51,6 @@ DELETE FROM settings WHERE name = 'password';
 ```
 
 Also you should notice that some of the APIs changed and you may need to adjust your applications.
-
-## Some Details on the Check-Algorithm
-UpAndRunning2 checks the response it gets from a simple HTTP-HEAD-request to the specified url.  
-This table shows how the different responses are handled:
-
-| Response Code | Category |
-|---------------|----------|
-| 1xx           | OK       |
-| 2xx           | OK       |
-| 3xx           | Warning  |
-| 4xx           | Error    |
-| 5xx           | Error    |
-
-Next to those HTTP status codes the application is also able to recognize a request timeout (allows a second check) or unknown hosts.
-
-**Notice**: Some websites or applications may not respond correctly to a HEAD-request.  
-In this case you need to adjust the used Check-Method to a GET-request.
 
 ## API
 
