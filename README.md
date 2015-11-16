@@ -1,6 +1,35 @@
 # UpAndRunning2 [![Build Status](https://drone.io/github.com/MarvinMenzerath/UpAndRunning2/status.png)](https://drone.io/github.com/MarvinMenzerath/UpAndRunning2/latest)
-UpAndRunning2 is a lightweight Go application which monitors all of your websites for availability and offers a simple JSON-API.  
-You can also enter your PushBullet-API-Key to get a Push each time the status of one of your websites changes.
+UpAndRunning2 is a lightweight Go application which **monitors all of your websites**, offers a simple **JSON-REST-API** and user-defined **notifications**.
+
+## Features
+* Easy [Installation](#installation) and Configuration
+* Checks all of your websites regularly
+	* Use `HEAD` or `GET` requests
+	* Set an interval of 10 seconds up to 10 minutes
+	* Detects nearly all HTTP-status-codes, timeouts and unknown hosts
+* Simple, but powerful [JSON-REST-API](#api)
+* Build your own client or use the fully-featured web-interface
+* bcrypt ensures your password is stored safely
+* Get notifications via
+	* Pushbullet
+	* More coming soon!
+
+### Some Details on the Check-Algorithm
+UpAndRunning2 checks the response it gets from a simple HTTP-HEAD-request to the specified url.  
+This table shows how the different responses are handled:
+
+| Response Code | Category |
+|---------------|----------|
+| 1xx           | OK       |
+| 2xx           | OK       |
+| 3xx           | Warning  |
+| 4xx           | Error    |
+| 5xx           | Error    |
+
+Next to those HTTP status codes the application is also able to recognize a request timeout (allows a second check) or unknown hosts.
+
+**Notice**: Some websites or applications may not respond correctly to a HEAD-request.  
+In this case you need to adjust the used Check-Method to a GET-request.
 
 ## Installation
 * Download and extract all the files in a directory
@@ -21,21 +50,6 @@ DELETE FROM settings WHERE name = 'password';
 ```
 
 Also you should notice that some of the APIs changed and you may need to adjust your applications.
-
-## Some Details on the Check-Algorithm
-UpAndRunning2 checks the response it gets from a simple HTTP-HEAD-request to the specified url.  
-This table shows how the different responses are handled:
-
-| Response Code | Category |
-|---------------|----------|
-| 1xx           | OK       |
-| 2xx           | OK       |
-| 3xx           | Warning  |
-| 4xx           | Error    |
-| 5xx           | Error    |
-
-**Notice**: Some websites or applications may not respond correctly to a HEAD-request.  
-In this case you need to adjust the used Check-Method to a GET-request.
 
 ## API
 
@@ -212,9 +226,9 @@ POST-parameters: - none -
 ```
 
 ## Screenshots
-![User-Interface](doc/Screenshot1.png)
-![API](doc/Screenshot2.png)
-![Admin-Backend](doc/Screenshot3.png)
+![User-Interface](doc/Screenshot1.jpg)
+![API](doc/Screenshot2.jpg)
+![Admin-Backend](doc/Screenshot3.jpg)
 
 ## Credits
 

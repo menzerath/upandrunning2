@@ -40,7 +40,7 @@ func prepareDatabase() {
 		logging.MustGetLogger("logger").Fatal("Unable to create table 'website': ", err)
 	}
 
-	// v2.0.0 Beta
+	// v2.0.0
 	_, err = db.Exec("ALTER TABLE `website` ADD `checkMethod` VARCHAR(10) NOT NULL DEFAULT 'HEAD' AFTER `url`;")
 	if mysqlError, ok := err.(*mysql.MySQLError); ok {
 		if mysqlError.Number != 1060 {

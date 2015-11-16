@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const VERSION = "2.0.0"
+const VERSION = "2.0.1"
 
 var goVersion = runtime.Version()
 var goArch = runtime.GOOS + "_" + runtime.GOARCH
@@ -145,8 +145,9 @@ func checkAllSites() {
 			logging.MustGetLogger("logger").Error("Unable to read Website-Row: ", err)
 			return
 		}
-		go website.RunCheck()
+		go website.RunCheck(false)
 		count++
+		time.Sleep(time.Millisecond * 200)
 	}
 
 	// Check for Errors
@@ -156,5 +157,5 @@ func checkAllSites() {
 		return
 	}
 
-	logging.MustGetLogger("logger").Info("Checking " + strconv.Itoa(count) + " active Websites...")
+	logging.MustGetLogger("logger").Info("Checked " + strconv.Itoa(count) + " active Websites.")
 }

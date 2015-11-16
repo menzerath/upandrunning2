@@ -12,7 +12,7 @@ import (
 
 // Sends a simple welcome-message to the user.
 func ApiIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	SendJsonMessage(w, http.StatusOK, true, "Welcome to UpAndRunning's API!")
+	SendJsonMessage(w, http.StatusOK, true, "Welcome to UpAndRunning2's API!")
 }
 
 // Returns a DetailedWebsiteResponse containing all the Website's important data if the Website is enabled.

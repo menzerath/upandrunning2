@@ -11,7 +11,7 @@ import (
 
 // Sends a simple welcome-message to the user.
 func ApiAdminIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	SendJsonMessage(w, http.StatusOK, true, "Welcome to UpAndRunning's Admin-API! Please be aware that most operations need an incoming POST-request.")
+	SendJsonMessage(w, http.StatusOK, true, "Welcome to UpAndRunning2's Admin-API! Please be aware that most operations need an incoming POST-request.")
 }
 
 // Returns a AdminWebsiteResponse containing all Websites as AdminWebsite.
