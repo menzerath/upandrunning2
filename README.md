@@ -226,9 +226,9 @@ POST-parameters: - none -
 ```
 
 ## Screenshots
-![User-Interface](doc/Screenshot1.png)
-![API](doc/Screenshot2.png)
-![Admin-Backend](doc/Screenshot3.png)
+![User-Interface](doc/Screenshot1.jpg)
+![API](doc/Screenshot2.jpg)
+![Admin-Backend](doc/Screenshot3.jpg)
 
 ## Credits
 
