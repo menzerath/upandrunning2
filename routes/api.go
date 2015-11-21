@@ -34,7 +34,7 @@ func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	// Query the Database
 	db := lib.GetDatabase()
-	err := db.QueryRow("SELECT id, name, protocol, url, status, time, lastFailStatus, lastFailTime, ups, downs, totalChecks, avgAvail FROM website WHERE url = ? AND enabled = 1;", ps.ByName("url")).Scan(&id, &name, &protocol, &url, &status, &time, &lastFailStatus, &lastFailTime, &ups, &downs, &totalChecks, &avgAvail)
+	err := db.QueryRow("SELECT id, name, protocol, url, status, time, lastFailStatus, lastFailTime, ups, downs, totalChecks, avgAvail FROM websites WHERE url = ? AND enabled = 1;", ps.ByName("url")).Scan(&id, &name, &protocol, &url, &status, &time, &lastFailStatus, &lastFailTime, &ups, &downs, &totalChecks, &avgAvail)
 	switch {
 	case err == sql.ErrNoRows:
 		SendJsonMessage(w, http.StatusNotFound, false, "Unable to find any data matching the given url.")
@@ -62,7 +62,7 @@ func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Query the Database
 	db := lib.GetDatabase()
-	rows, err := db.Query("SELECT name, protocol, url, status FROM website WHERE enabled = 1 AND visible = 1;")
+	rows, err := db.Query("SELECT name, protocol, url, status FROM websites WHERE enabled = 1 AND visible = 1;")
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")

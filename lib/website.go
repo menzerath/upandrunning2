@@ -56,7 +56,7 @@ func (w *Website) RunCheck(secondTry bool) {
 		)
 
 		db := GetDatabase()
-		err = db.QueryRow("SELECT name, status FROM website WHERE id = ?", w.Id).Scan(&name, &status)
+		err = db.QueryRow("SELECT name, status FROM websites WHERE id = ?", w.Id).Scan(&name, &status)
 		if err != nil {
 			logging.MustGetLogger("logger").Error("Unable to get Website's data: ", err)
 			return
@@ -72,14 +72,14 @@ func (w *Website) RunCheck(secondTry bool) {
 	// Save the new Result
 	if strings.HasPrefix(newStatusCodeString, "2") || strings.HasPrefix(newStatusCodeString, "3") {
 		// Success
-		_, err = db.Exec("UPDATE website SET status = ?, time = NOW(), ups = ups + 1, totalChecks = totalChecks + 1 WHERE id = ?;", newStatus, w.Id)
+		_, err = db.Exec("UPDATE websites SET status = ?, time = NOW(), ups = ups + 1, totalChecks = totalChecks + 1 WHERE id = ?;", newStatus, w.Id)
 		if err != nil {
 			logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
 			return
 		}
 	} else {
 		// Failure
-		_, err = db.Exec("UPDATE website SET status = ?, time = NOW(), lastFailStatus = ?, lastFailTime = NOW(), downs = downs + 1, totalChecks = totalChecks + 1 WHERE id = ?;", newStatus, newStatus, w.Id)
+		_, err = db.Exec("UPDATE websites SET status = ?, time = NOW(), lastFailStatus = ?, lastFailTime = NOW(), downs = downs + 1, totalChecks = totalChecks + 1 WHERE id = ?;", newStatus, newStatus, w.Id)
 		if err != nil {
 			logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
 			return
@@ -94,7 +94,7 @@ func (w *Website) calcAvgAvailability() {
 	// Query the Database and format the returned value
 	db := GetDatabase()
 	var avg float64
-	err := db.QueryRow("SELECT ((SELECT ups FROM website WHERE id = ?) / (SELECT totalChecks FROM website WHERE id = ?))*100 AS avg", w.Id, w.Id).Scan(&avg)
+	err := db.QueryRow("SELECT ((SELECT ups FROM websites WHERE id = ?) / (SELECT totalChecks FROM websites WHERE id = ?))*100 AS avg", w.Id, w.Id).Scan(&avg)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to calculate Website-Availability: ", err)
 		return
@@ -102,7 +102,7 @@ func (w *Website) calcAvgAvailability() {
 	strconv.FormatFloat(avg, 'f', 2, 64)
 
 	// Save the new value
-	_, err = db.Exec("UPDATE website SET avgAvail = ? WHERE id = ?;", avg, w.Id)
+	_, err = db.Exec("UPDATE websites SET avgAvail = ? WHERE id = ?;", avg, w.Id)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to save Website-Availability: ", err)
 		return

@@ -129,7 +129,7 @@ func startCheckNowTimer() {
 func checkAllSites() {
 	// Query the Database
 	db := lib.GetDatabase()
-	rows, err := db.Query("SELECT id, protocol, url, checkMethod FROM website WHERE enabled = 1;")
+	rows, err := db.Query("SELECT id, protocol, url, checkMethod FROM websites WHERE enabled = 1;")
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
 		return

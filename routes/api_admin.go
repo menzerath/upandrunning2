@@ -23,7 +23,7 @@ func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 	// Query the Database
 	db := lib.GetDatabase()
-	rows, err := db.Query("SELECT id, name, enabled, visible, protocol, url, checkMethod, status, time, avgAvail FROM website;")
+	rows, err := db.Query("SELECT id, name, enabled, visible, protocol, url, checkMethod, status, time, avgAvail FROM websites;")
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
@@ -96,7 +96,7 @@ func ApiAdminWebsiteAdd(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 
 	// Insert into Database
 	db := lib.GetDatabase()
-	_, err := db.Exec("INSERT INTO website (name, protocol, url, checkMethod) VALUES (?, ?, ?, ?);", name, protocol, url, method)
+	_, err := db.Exec("INSERT INTO websites (name, protocol, url, checkMethod) VALUES (?, ?, ?, ?);", name, protocol, url, method)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to add Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
@@ -125,7 +125,7 @@ func ApiAdminWebsiteEnable(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	// Update Database-Row
 	db := lib.GetDatabase()
-	res, err := db.Exec("UPDATE website SET enabled = 1 WHERE url = ?;", value)
+	res, err := db.Exec("UPDATE websites SET enabled = 1 WHERE url = ?;", value)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to enable Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
@@ -160,7 +160,7 @@ func ApiAdminWebsiteDisable(w http.ResponseWriter, r *http.Request, ps httproute
 
 	// Update Database-Row
 	db := lib.GetDatabase()
-	res, err := db.Exec("UPDATE website SET enabled = 0 WHERE url = ?;", value)
+	res, err := db.Exec("UPDATE websites SET enabled = 0 WHERE url = ?;", value)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to disable Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
@@ -195,7 +195,7 @@ func ApiAdminWebsiteVisible(w http.ResponseWriter, r *http.Request, ps httproute
 
 	// Update Database-Row
 	db := lib.GetDatabase()
-	res, err := db.Exec("UPDATE website SET visible = 1 WHERE url = ?;", value)
+	res, err := db.Exec("UPDATE websites SET visible = 1 WHERE url = ?;", value)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to set Website visible: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
@@ -230,7 +230,7 @@ func ApiAdminWebsiteInvisible(w http.ResponseWriter, r *http.Request, ps httprou
 
 	// Update Database-Row
 	db := lib.GetDatabase()
-	res, err := db.Exec("UPDATE website SET visible = 0 WHERE url = ?;", value)
+	res, err := db.Exec("UPDATE websites SET visible = 0 WHERE url = ?;", value)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to set Website invisible: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
@@ -277,7 +277,7 @@ func ApiAdminWebsiteEdit(w http.ResponseWriter, r *http.Request, ps httprouter.P
 
 	// Update Database
 	db := lib.GetDatabase()
-	res, err := db.Exec("UPDATE website SET name = ?, protocol = ?, url = ?, checkMethod = ? WHERE url = ?;", name, protocol, url, method, oldUrl)
+	res, err := db.Exec("UPDATE websites SET name = ?, protocol = ?, url = ?, checkMethod = ? WHERE url = ?;", name, protocol, url, method, oldUrl)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to edit Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
@@ -312,7 +312,7 @@ func ApiAdminWebsiteDelete(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	// Remove from Database
 	db := lib.GetDatabase()
-	res, err := db.Exec("DELETE FROM website WHERE url = ?;", value)
+	res, err := db.Exec("DELETE FROM websites WHERE url = ?;", value)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to delete Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
