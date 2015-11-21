@@ -21,26 +21,26 @@ type Website struct {
 // Runs a check and saves the result inside the database.
 func (w *Website) RunCheck(secondTry bool) {
 	// Request new Status
-	res, err := goreq.Request{Uri: w.Protocol + "://" + w.Url, Method: w.CheckMethod, UserAgent: "UpAndRunning2 (https://github.com/MarvinMenzerath/UpAndRunning2)", MaxRedirects: 10, Timeout: 10 * time.Second}.Do()
+	res, err := goreq.Request{Uri: w.Protocol + "://" + w.Url, Method: w.CheckMethod, UserAgent: "UpAndRunning2 (https://github.com/MarvinMenzerath/UpAndRunning2)", MaxRedirects: 10, Timeout: 5 * time.Second}.Do()
 
 	var newStatus string
 	var newStatusCode int
 	if err != nil {
-		newStatus = "Server not found"
-		newStatusCode = 0
+		if secondTry {
+			newStatus = "Host not found"
+			newStatusCode = 0
 
-		// On Timeout: allow second try
-		if serr, ok := err.(*goreq.Error); ok {
-			if serr.Timeout() {
-				if secondTry {
+			// On Timeout: allow second try
+			if serr, ok := err.(*goreq.Error); ok {
+				if serr.Timeout() {
 					newStatus = "Timeout"
 					newStatusCode = 0
-				} else {
-					time.Sleep(time.Millisecond * 500)
-					w.RunCheck(true)
-					return
 				}
 			}
+		} else {
+			time.Sleep(time.Millisecond * 1000)
+			w.RunCheck(true)
+			return
 		}
 	} else {
 		newStatus = strconv.Itoa(res.StatusCode) + " - " + GetHttpStatus(res.StatusCode)
