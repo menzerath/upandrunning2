@@ -8,6 +8,8 @@ $(document).ready(function() {
 	}
 
 	loadWebsiteData();
+
+	setInterval(loadWebsiteData, 5 * 60 * 1000);
 });
 
 function showInformation(website) {

@@ -46,6 +46,8 @@ $(document).ready(function() {
 	});
 
 	loadWebsites();
+
+	setInterval(loadWebsites, 60 * 1000);
 });
 
 function loadWebsites() {
