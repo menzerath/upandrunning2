@@ -95,8 +95,6 @@ function loadWebsites() {
 					dataString += '</td><td>' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString() + '</td>';
 				}
 
-				dataString += '<td>' + loadedWebsiteData[i].avgAvail + '</td>';
-
 				dataString += '<td><span class="label label-primary label-action" onclick="editWebsite(\'' + loadedWebsiteData[i].url + '\')">Edit</span> <span class="label label-danger label-action" onclick="deleteWebsite(\'' + loadedWebsiteData[i].url + '\')">Delete</span></td></tr>';
 			}
 			$('#table-websites').html(dataString);

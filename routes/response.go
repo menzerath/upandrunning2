@@ -73,7 +73,6 @@ type AdminWebsite struct {
 	CheckMethod string `json:"checkMethod"`
 	Status      string `json:"status"`
 	Time        string `json:"time"`
-	Average     string `json:"avgAvail"`
 }
 
 // Contains the application's data, which will be used on publicly visible pages.

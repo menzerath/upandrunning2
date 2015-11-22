@@ -23,7 +23,7 @@ func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 	// Query the Database
 	db := lib.GetDatabase()
-	rows, err := db.Query("SELECT id, name, enabled, visible, protocol, url, checkMethod, status, time, avgAvail FROM websites;")
+	rows, err := db.Query("SELECT id, name, enabled, visible, protocol, url, checkMethod, status, time FROM websites;")
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
@@ -41,19 +41,18 @@ func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 		checkMethod string
 		status      string
 		time        string
-		average     float64
 	)
 
 	// Add every Website
 	websites := []AdminWebsite{}
 	for rows.Next() {
-		err = rows.Scan(&id, &name, &enabled, &visible, &protocol, &url, &checkMethod, &status, &time, &average)
+		err = rows.Scan(&id, &name, &enabled, &visible, &protocol, &url, &checkMethod, &status, &time)
 		if err != nil {
 			logging.MustGetLogger("logger").Error("Unable to read Website-Row: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 			return
 		}
-		websites = append(websites, AdminWebsite{id, name, enabled, visible, protocol, url, checkMethod, status, time, strconv.FormatFloat(average, 'f', 2, 64) + "%"})
+		websites = append(websites, AdminWebsite{id, name, enabled, visible, protocol, url, checkMethod, status, time})
 	}
 
 	// Check for Errors
