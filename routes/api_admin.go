@@ -391,6 +391,38 @@ func ApiAdminSettingInterval(w http.ResponseWriter, r *http.Request, ps httprout
 	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
+// Updates the application's maximum amount of redirects in the database.
+func ApiAdminSettingRedirects(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
+
+	// Get data from Request
+	r.ParseForm()
+	temp := r.Form.Get("redirects")
+	value, err := strconv.Atoi(temp)
+
+	// Simple Validation
+	if err != nil || value < 0 || value > 10 {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value between 0 and 10 redirects.")
+		return
+	}
+
+	// Update Database-Row
+	db := lib.GetDatabase()
+	_, err = db.Exec("UPDATE settings SET value = ? WHERE name = 'redirects';", value)
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to change Redirects: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
+	}
+
+	// Update Configuration
+	lib.GetConfiguration().Dynamic.Redirects = value
+	SendJsonMessage(w, http.StatusOK, true, "")
+}
+
 // Updates the application's Pushbullet-key in the database.
 func ApiAdminSettingPushbulletKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {

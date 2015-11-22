@@ -168,6 +168,17 @@
 										</div>
 									</fieldset>
 									<fieldset>
+										<div class="form-group">
+											<label class="col-lg-2 control-label">Redirects:</label>
+											<div class="col-lg-7">
+												<input type="number" class="form-control" id="input-new-redirects" min="0" max="10" placeholder="0" value="{{ .Redirects }}">
+											</div>
+											<div class="col-lg-3">
+												<button type="button" class="btn btn-primary pull-right" id="button-change-redirects" onclick="changeRedirects()">Save</button>
+											</div>
+										</div>
+									</fieldset>
+									<fieldset>
                                     	<div class="form-group">
                                     		<label class="col-lg-2 control-label">Pushbullet:</label>
                                     		<div class="col-lg-7">

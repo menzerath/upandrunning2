@@ -21,7 +21,7 @@ type Website struct {
 // Runs a check and saves the result inside the database.
 func (w *Website) RunCheck(secondTry bool) {
 	// Request new Status
-	res, err := goreq.Request{Uri: w.Protocol + "://" + w.Url, Method: w.CheckMethod, UserAgent: "UpAndRunning2 (https://github.com/MarvinMenzerath/UpAndRunning2)", MaxRedirects: 10, Timeout: 5 * time.Second}.Do()
+	res, err := goreq.Request{Uri: w.Protocol + "://" + w.Url, Method: w.CheckMethod, UserAgent: "UpAndRunning2 (https://github.com/MarvinMenzerath/UpAndRunning2)", MaxRedirects: GetConfiguration().Dynamic.Redirects, Timeout: 5 * time.Second}.Do()
 
 	var newStatus string
 	var newStatusCode int

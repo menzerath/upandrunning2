@@ -85,6 +85,7 @@ type SiteData struct {
 type AdminSiteData struct {
 	Title      string
 	Interval   int
+	Redirects  int
 	PbKey      string
 	AppVersion string
 	GoVersion  string

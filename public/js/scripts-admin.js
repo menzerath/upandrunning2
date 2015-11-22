@@ -45,6 +45,12 @@ $(document).ready(function() {
 		}
 	});
 
+	$('#input-new-redirects').keypress(function(event) {
+		if (event.keyCode == 13) {
+			changeRedirects();
+		}
+	});
+
 	loadWebsites();
 
 	setInterval(loadWebsites, 60 * 1000);
@@ -410,6 +416,38 @@ function changeInterval() {
 		$('.bottom-right').notify({
 			type: 'danger',
 			message: {text: "Please enter a valid interval (numbers between 1 and 600) to change it."},
+			fadeOut: {enabled: true, delay: 3000}
+		}).show();
+	}
+}
+
+function changeRedirects() {
+	var newRedirects = $('#input-new-redirects').val();
+
+	if (newRedirects.trim() && !(isNaN(newRedirects) || newRedirects < 0 || newRedirects > 10)) {
+		$.ajax({
+			url: "/api/admin/settings/redirects",
+			type: "POST",
+			data: {redirects: newRedirects},
+			success: function() {
+				$('.bottom-right').notify({
+					type: 'success',
+					message: {text: "Amount of redirects successfully changed."},
+					fadeOut: {enabled: true, delay: 3000}
+				}).show();
+			},
+			error: function(error) {
+				$('.bottom-right').notify({
+					type: 'danger',
+					message: {text: JSON.parse(error.responseText).message},
+					fadeOut: {enabled: true, delay: 3000}
+				}).show();
+			}
+		});
+	} else {
+		$('.bottom-right').notify({
+			type: 'danger',
+			message: {text: "Please enter a valid amount of redirects (number between 0 and 10) to change it."},
 			fadeOut: {enabled: true, delay: 3000}
 		}).show();
 	}
