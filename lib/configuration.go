@@ -74,11 +74,7 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	// Title
 	err := db.QueryRow("SELECT value FROM settings where name = 'title';").Scan(&title)
 	if err != nil {
-		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('title', 'UpAndRunning2');")
-		if err != nil {
-			logging.MustGetLogger("logger").Fatal("Unable to insert 'title'-setting: ", err)
-		}
-		_, err = stmt.Exec()
+		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('title', 'UpAndRunning2');")
 		if err != nil {
 			logging.MustGetLogger("logger").Fatal("Unable to insert 'title'-setting: ", err)
 		}
@@ -88,11 +84,7 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	// Interval
 	err = db.QueryRow("SELECT value FROM settings where name = 'interval';").Scan(&interval)
 	if err != nil {
-		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('interval', 30);")
-		if err != nil {
-			logging.MustGetLogger("logger").Fatal("Unable to insert 'interval'-setting: ", err)
-		}
-		_, err = stmt.Exec()
+		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('interval', 30);")
 		if err != nil {
 			logging.MustGetLogger("logger").Fatal("Unable to insert 'interval'-setting: ", err)
 		}
@@ -102,11 +94,7 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	// Redirects
 	err = db.QueryRow("SELECT value FROM settings where name = 'redirects';").Scan(&redirects)
 	if err != nil {
-		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('redirects', 0);")
-		if err != nil {
-			logging.MustGetLogger("logger").Fatal("Unable to insert 'redirects'-setting: ", err)
-		}
-		_, err = stmt.Exec()
+		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('redirects', 0);")
 		if err != nil {
 			logging.MustGetLogger("logger").Fatal("Unable to insert 'redirects'-setting: ", err)
 		}
@@ -116,11 +104,7 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	// Pushbullet-Key
 	err = db.QueryRow("SELECT value FROM settings where name = 'pushbullet_key';").Scan(&pushbulletKey)
 	if err != nil {
-		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('pushbullet_key', '');")
-		if err != nil {
-			logging.MustGetLogger("logger").Fatal("Unable to insert 'pushbullet_key'-setting: ", err)
-		}
-		_, err = stmt.Exec()
+		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('pushbullet_key', '');")
 		if err != nil {
 			logging.MustGetLogger("logger").Fatal("Unable to insert 'pushbullet_key'-setting: ", err)
 		}
