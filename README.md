@@ -6,6 +6,7 @@ UpAndRunning2 is a lightweight Go application which **monitors all of your websi
 * Checks all of your websites regularly
 	* Use `HEAD` or `GET` requests
 	* Set an interval of 10 seconds up to 10 minutes
+	* Set a maximum amount of redirects to follow
 	* Detects nearly all HTTP-status-codes, timeouts and unknown hosts
 * Simple, but powerful [JSON-REST-API](#api)
 * Build your own client or use the fully-featured web-interface
