@@ -67,15 +67,15 @@ function loadWebsites() {
 				dataString += '<tr><td>' + (i + 1) + '</td><td>' + loadedWebsiteData[i].name + '</td><td>';
 
 				if (loadedWebsiteData[i].enabled) {
-					dataString += ' <span class="label label-success" id="label-action" onclick="disableWebsite(\'' + loadedWebsiteData[i].url + '\')">Enabled</span> </td><td>';
+					dataString += ' <span class="label label-success label-action" onclick="disableWebsite(\'' + loadedWebsiteData[i].url + '\')">Enabled</span> </td><td>';
 				} else {
-					dataString += ' <span class="label label-warning" id="label-action" onclick="enableWebsite(\'' + loadedWebsiteData[i].url + '\')">Disabled</span> </td><td>';
+					dataString += ' <span class="label label-warning label-action" onclick="enableWebsite(\'' + loadedWebsiteData[i].url + '\')">Disabled</span> </td><td>';
 				}
 
 				if (loadedWebsiteData[i].visible) {
-					dataString += ' <span class="label label-success" id="label-action" onclick="invisibleWebsite(\'' + loadedWebsiteData[i].url + '\')">Visbile</span> ';
+					dataString += ' <span class="label label-success label-action" onclick="invisibleWebsite(\'' + loadedWebsiteData[i].url + '\')">Visbile</span> ';
 				} else {
-					dataString += ' <span class="label label-warning" id="label-action" onclick="visibleWebsite(\'' + loadedWebsiteData[i].url + '\')">Invisible</span> ';
+					dataString += ' <span class="label label-warning label-action" onclick="visibleWebsite(\'' + loadedWebsiteData[i].url + '\')">Invisible</span> ';
 				}
 
 				dataString += '</td><td>' + loadedWebsiteData[i].protocol + '</td><td>' + loadedWebsiteData[i].url + '</td><td><code>' + loadedWebsiteData[i].checkMethod + '</code></td><td>';
