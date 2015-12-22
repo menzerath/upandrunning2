@@ -76,10 +76,12 @@ Notice: Everyone is able to access those APIs.
 	},
 	"lastCheckResult": {
 		"status": "200 - OK",
+		"responseTime": "150.0001ms",
 		"time": "2015-01-01T00:00:00.000Z"
 	},
 	"lastFailedCheckResult": {
 		"status": "500 - Internal Server Error",
+		"responseTime": "unmeasured",
 		"time": "2014-12-31T20:15:00.000Z"
 	}
 }
@@ -121,8 +123,7 @@ Notice: You have to login before you are able to use those APIs.
 			"url": "website.com",
 			"checkMethod": "HEAD",
 			"status": "200 - OK",
-			"time": "2015-01-01T00:00:00.000Z",
-			"avgAvail": "99.00%"
+			"time": "2015-01-01T00:00:00.000Z"
 		}
 	]
 }
