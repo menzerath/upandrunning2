@@ -125,6 +125,8 @@ function showWebsiteDetails(website) {
 		url: "/api/status/" + website,
 		type: "GET",
 		success: function(data) {
+			delete data['requestSuccess'];
+
 			var dataString = '<div class="well"><legend>Public Data about ' + website + '</legend>';
 			dataString += '<pre>' + JSON.stringify(data, null, '\t') + '</pre>';
 			dataString += '<button class="btn btn-primary" onclick="hideWebsiteDetails()">Close</button></div>';
