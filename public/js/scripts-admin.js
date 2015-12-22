@@ -126,6 +126,7 @@ function showWebsiteDetails(website) {
 		type: "GET",
 		success: function(data) {
 			delete data['requestSuccess'];
+			delete data['websiteData'];
 
 			var dataString = '<div class="well"><legend>Public Data about ' + website + '</legend>';
 			dataString += '<pre>' + JSON.stringify(data, null, '\t') + '</pre>';
