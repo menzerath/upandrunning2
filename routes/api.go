@@ -23,6 +23,7 @@ func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		protocol       string
 		url            string
 		status         string
+		responseTime   string
 		time           string
 		lastFailStatus string
 		lastFailTime   string
@@ -34,7 +35,7 @@ func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	// Query the Database
 	db := lib.GetDatabase()
-	err := db.QueryRow("SELECT id, name, protocol, url, status, time, lastFailStatus, lastFailTime, ups, downs, totalChecks, avgAvail FROM websites WHERE url = ? AND enabled = 1;", ps.ByName("url")).Scan(&id, &name, &protocol, &url, &status, &time, &lastFailStatus, &lastFailTime, &ups, &downs, &totalChecks, &avgAvail)
+	err := db.QueryRow("SELECT id, name, protocol, url, status, responseTime, time, lastFailStatus, lastFailTime, ups, downs, totalChecks, avgAvail FROM websites WHERE url = ? AND enabled = 1;", ps.ByName("url")).Scan(&id, &name, &protocol, &url, &status, &responseTime, &time, &lastFailStatus, &lastFailTime, &ups, &downs, &totalChecks, &avgAvail)
 	switch {
 	case err == sql.ErrNoRows:
 		SendJsonMessage(w, http.StatusNotFound, false, "Unable to find any data matching the given url.")
@@ -46,7 +47,7 @@ func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 
 	// Build Response
-	responseJson := DetailedWebsiteResponse{true, WebsiteData{id, name, protocol + "://" + url}, WebsiteAvailability{ups, downs, totalChecks, strconv.FormatFloat(avgAvail, 'f', 2, 64) + "%"}, WebsiteCheckResult{status, time}, WebsiteCheckResult{lastFailStatus, lastFailTime}}
+	responseJson := DetailedWebsiteResponse{true, WebsiteData{id, name, protocol + "://" + url}, WebsiteAvailability{ups, downs, totalChecks, strconv.FormatFloat(avgAvail, 'f', 2, 64) + "%"}, WebsiteCheckResult{status, responseTime, time}, WebsiteCheckResult{lastFailStatus, "unmeasured", lastFailTime}}
 
 	// Send Response
 	responseBytes, err := json.Marshal(responseJson)

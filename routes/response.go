@@ -52,8 +52,9 @@ type WebsiteAvailability struct {
 
 // Contains the Website's latest check result.
 type WebsiteCheckResult struct {
-	Status string `json:"status"`
-	Time   string `json:"time"`
+	Status       string `json:"status"`
+	ResponseTime string `json:"responseTime"`
+	Time         string `json:"time"`
 }
 
 // Contains a success-bool and an array of AdminWebsites.
