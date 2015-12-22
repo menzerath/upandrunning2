@@ -21,7 +21,9 @@ type Website struct {
 // Runs a check and saves the result inside the database.
 func (w *Website) RunCheck(secondTry bool) {
 	// Request new Status
+	var requestStartTime = time.Now();
 	res, err := goreq.Request{Uri: w.Protocol + "://" + w.Url, Method: w.CheckMethod, UserAgent: "UpAndRunning2 (https://github.com/MarvinMenzerath/UpAndRunning2)", MaxRedirects: GetConfiguration().Dynamic.Redirects, Timeout: 5 * time.Second}.Do()
+	var requestDuration = time.Now().Sub(requestStartTime).String();
 
 	var newStatus string
 	var newStatusCode int
@@ -72,14 +74,14 @@ func (w *Website) RunCheck(secondTry bool) {
 	// Save the new Result
 	if strings.HasPrefix(newStatusCodeString, "2") || strings.HasPrefix(newStatusCodeString, "3") {
 		// Success
-		_, err = db.Exec("UPDATE websites SET status = ?, time = NOW(), ups = ups + 1, totalChecks = totalChecks + 1 WHERE id = ?;", newStatus, w.Id)
+		_, err = db.Exec("UPDATE websites SET status = ?, responseTime = ?, time = NOW(), ups = ups + 1, totalChecks = totalChecks + 1 WHERE id = ?;", newStatus, requestDuration, w.Id)
 		if err != nil {
 			logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
 			return
 		}
 	} else {
 		// Failure
-		_, err = db.Exec("UPDATE websites SET status = ?, time = NOW(), lastFailStatus = ?, lastFailTime = NOW(), downs = downs + 1, totalChecks = totalChecks + 1 WHERE id = ?;", newStatus, newStatus, w.Id)
+		_, err = db.Exec("UPDATE websites SET status = ?, responseTime = ?, time = NOW(), lastFailStatus = ?, lastFailTime = NOW(), downs = downs + 1, totalChecks = totalChecks + 1 WHERE id = ?;", newStatus, requestDuration, newStatus, w.Id)
 		if err != nil {
 			logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
 			return
