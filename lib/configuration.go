@@ -34,6 +34,7 @@ type databaseConfiguration struct {
 type dynamicConfiguration struct {
 	Title         string
 	Interval      int
+	Redirects     int
 	PushbulletKey string
 	CheckNow      bool
 }
@@ -63,18 +64,17 @@ func ReadConfigurationFromFile(filePath string) {
 func ReadConfigurationFromDatabase(db *sql.DB) {
 	logging.MustGetLogger("logger").Info("Reading Configuration from Database...")
 
-	var title string
-	var interval int
-	var pushbulletKey string
+	var (
+		title         string
+		interval      int
+		redirects     int
+		pushbulletKey string
+	)
 
 	// Title
 	err := db.QueryRow("SELECT value FROM settings where name = 'title';").Scan(&title)
 	if err != nil {
-		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('title', 'UpAndRunning2');")
-		if err != nil {
-			logging.MustGetLogger("logger").Fatal("Unable to insert 'title'-setting: ", err)
-		}
-		_, err = stmt.Exec()
+		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('title', 'UpAndRunning2');")
 		if err != nil {
 			logging.MustGetLogger("logger").Fatal("Unable to insert 'title'-setting: ", err)
 		}
@@ -84,25 +84,27 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	// Interval
 	err = db.QueryRow("SELECT value FROM settings where name = 'interval';").Scan(&interval)
 	if err != nil {
-		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('interval', 30);")
-		if err != nil {
-			logging.MustGetLogger("logger").Fatal("Unable to insert 'interval'-setting: ", err)
-		}
-		_, err = stmt.Exec()
+		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('interval', 30);")
 		if err != nil {
 			logging.MustGetLogger("logger").Fatal("Unable to insert 'interval'-setting: ", err)
 		}
 		interval = 5
 	}
 
+	// Redirects
+	err = db.QueryRow("SELECT value FROM settings where name = 'redirects';").Scan(&redirects)
+	if err != nil {
+		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('redirects', 0);")
+		if err != nil {
+			logging.MustGetLogger("logger").Fatal("Unable to insert 'redirects'-setting: ", err)
+		}
+		redirects = 0
+	}
+
 	// Pushbullet-Key
 	err = db.QueryRow("SELECT value FROM settings where name = 'pushbullet_key';").Scan(&pushbulletKey)
 	if err != nil {
-		stmt, err := db.Prepare("INSERT INTO settings (name, value) VALUES ('pushbullet_key', '');")
-		if err != nil {
-			logging.MustGetLogger("logger").Fatal("Unable to insert 'pushbullet_key'-setting: ", err)
-		}
-		_, err = stmt.Exec()
+		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('pushbullet_key', '');")
 		if err != nil {
 			logging.MustGetLogger("logger").Fatal("Unable to insert 'pushbullet_key'-setting: ", err)
 		}
@@ -111,6 +113,7 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 
 	config.Dynamic.Title = title
 	config.Dynamic.Interval = interval
+	config.Dynamic.Redirects = redirects
 	config.Dynamic.PushbulletKey = pushbulletKey
 
 	config.Dynamic.CheckNow = true

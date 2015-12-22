@@ -37,7 +37,11 @@ body > .container {
 	display: none;
 }
 
-#form-edit-website {
+#row-details {
+	display: none;
+}
+
+#row-edit-website {
 	display: none;
 }
 
@@ -92,7 +96,7 @@ body > .container {
 	margin: 5px 0;
 }
 
-@media (min-width: 1280px) {
+@media (min-width: 1260px) {
 	.container {
 		width: 1250px;
 	}

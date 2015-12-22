@@ -45,7 +45,15 @@ $(document).ready(function() {
 		}
 	});
 
+	$('#input-new-redirects').keypress(function(event) {
+		if (event.keyCode == 13) {
+			changeRedirects();
+		}
+	});
+
 	loadWebsites();
+
+	setInterval(loadWebsites, 60 * 1000);
 });
 
 function loadWebsites() {
@@ -59,15 +67,15 @@ function loadWebsites() {
 				dataString += '<tr><td>' + (i + 1) + '</td><td>' + loadedWebsiteData[i].name + '</td><td>';
 
 				if (loadedWebsiteData[i].enabled) {
-					dataString += ' <span class="label label-success" id="label-action" onclick="disableWebsite(\'' + loadedWebsiteData[i].url + '\')">Enabled</span> </td><td>';
+					dataString += ' <span class="label label-success label-action" onclick="disableWebsite(\'' + loadedWebsiteData[i].url + '\')">Enabled</span> </td><td>';
 				} else {
-					dataString += ' <span class="label label-warning" id="label-action" onclick="enableWebsite(\'' + loadedWebsiteData[i].url + '\')">Disabled</span> </td><td>';
+					dataString += ' <span class="label label-warning label-action" onclick="enableWebsite(\'' + loadedWebsiteData[i].url + '\')">Disabled</span> </td><td>';
 				}
 
 				if (loadedWebsiteData[i].visible) {
-					dataString += ' <span class="label label-success" id="label-action" onclick="invisibleWebsite(\'' + loadedWebsiteData[i].url + '\')">Visbile</span> ';
+					dataString += ' <span class="label label-success label-action" onclick="invisibleWebsite(\'' + loadedWebsiteData[i].url + '\')">Visbile</span> ';
 				} else {
-					dataString += ' <span class="label label-warning" id="label-action" onclick="visibleWebsite(\'' + loadedWebsiteData[i].url + '\')">Invisible</span> ';
+					dataString += ' <span class="label label-warning label-action" onclick="visibleWebsite(\'' + loadedWebsiteData[i].url + '\')">Invisible</span> ';
 				}
 
 				dataString += '</td><td>' + loadedWebsiteData[i].protocol + '</td><td>' + loadedWebsiteData[i].url + '</td><td><code>' + loadedWebsiteData[i].checkMethod + '</code></td><td>';
@@ -87,14 +95,14 @@ function loadWebsites() {
 					dataString += '</td><td>' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString() + '</td>';
 				}
 
-				dataString += '<td>' + loadedWebsiteData[i].avgAvail + '</td>';
-
-				dataString += '<td><span class="label label-primary label-action" onclick="editWebsite(\'' + loadedWebsiteData[i].url + '\')">Edit</span> <span class="label label-danger label-action" onclick="deleteWebsite(\'' + loadedWebsiteData[i].url + '\')">Delete</span></td></tr>';
+				dataString += '<td><span class="label label-default label-action" onclick="showWebsiteDetails(\'' + loadedWebsiteData[i].url + '\')">More</span> ' +
+					'<span class="label label-primary label-action" onclick="editWebsite(\'' + loadedWebsiteData[i].url + '\')">Edit</span> ' +
+					'<span class="label label-danger label-action" onclick="deleteWebsite(\'' + loadedWebsiteData[i].url + '\')">Delete</span></td></tr>';
 			}
 			$('#table-websites').html(dataString);
 		},
 		error: function(error) {
-			$('#table-websites').html('<tr><td colspan="11">An error occured. Please authenticate again or add a website.</td></tr>');
+			$('#table-websites').html('<tr><td colspan="11">An error occurred. Please authenticate again or add a website.</td></tr>');
 		}
 	});
 }
@@ -106,6 +114,40 @@ function reloadWebsites() {
 		fadeOut: {enabled: true, delay: 3000}
 	}).show();
 	loadWebsites();
+}
+
+function showWebsiteDetails(website) {
+	if (website == "") {
+		return;
+	}
+
+	$.ajax({
+		url: "/api/status/" + website,
+		type: "GET",
+		success: function(data) {
+			delete data['requestSuccess'];
+			delete data['websiteData'];
+
+			var dataString = '<div class="well"><legend>Public Data about ' + website + '</legend>';
+			dataString += '<pre>' + JSON.stringify(data, null, '\t') + '</pre>';
+			dataString += '<button class="btn btn-primary" onclick="hideWebsiteDetails()">Close</button></div>';
+			$('#col-website-details').html(dataString);
+
+			// show everything to the user
+			$('#row-details').fadeIn(200);
+		},
+		error: function(error) {
+			$('.bottom-right').notify({
+				type: 'danger',
+				message: {text: "Sorry, but I was unable to process your Request. Error: " + JSON.parse(error.responseText).message},
+				fadeOut: {enabled: true, delay: 3000}
+			}).show();
+		}
+	});
+}
+
+function hideWebsiteDetails() {
+	$('#row-details').fadeOut(200);
 }
 
 function addWebsite() {
@@ -223,7 +265,7 @@ function invisibleWebsite(url) {
 
 function editWebsite(url) {
 	editUrl = url;
-	$('#form-edit-website').fadeIn(200);
+	$('#row-edit-website').fadeIn(200);
 
 	for (var i = 0; i < loadedWebsiteData.length; i++) {
 		if (url === loadedWebsiteData[i].url) {
@@ -283,7 +325,7 @@ function saveWebsite() {
 }
 
 function cancleSaveWebsite() {
-	$('#form-edit-website').fadeOut(200);
+	$('#row-edit-website').fadeOut(200);
 }
 
 function deleteWebsite(url) {
@@ -408,6 +450,38 @@ function changeInterval() {
 		$('.bottom-right').notify({
 			type: 'danger',
 			message: {text: "Please enter a valid interval (numbers between 1 and 600) to change it."},
+			fadeOut: {enabled: true, delay: 3000}
+		}).show();
+	}
+}
+
+function changeRedirects() {
+	var newRedirects = $('#input-new-redirects').val();
+
+	if (newRedirects.trim() && !(isNaN(newRedirects) || newRedirects < 0 || newRedirects > 10)) {
+		$.ajax({
+			url: "/api/admin/settings/redirects",
+			type: "POST",
+			data: {redirects: newRedirects},
+			success: function() {
+				$('.bottom-right').notify({
+					type: 'success',
+					message: {text: "Amount of redirects successfully changed."},
+					fadeOut: {enabled: true, delay: 3000}
+				}).show();
+			},
+			error: function(error) {
+				$('.bottom-right').notify({
+					type: 'danger',
+					message: {text: JSON.parse(error.responseText).message},
+					fadeOut: {enabled: true, delay: 3000}
+				}).show();
+			}
+		});
+	} else {
+		$('.bottom-right').notify({
+			type: 'danger',
+			message: {text: "Please enter a valid amount of redirects (number between 0 and 10) to change it."},
 			fadeOut: {enabled: true, delay: 3000}
 		}).show();
 	}

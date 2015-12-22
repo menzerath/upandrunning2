@@ -52,8 +52,9 @@ type WebsiteAvailability struct {
 
 // Contains the Website's latest check result.
 type WebsiteCheckResult struct {
-	Status string `json:"status"`
-	Time   string `json:"time"`
+	Status       string `json:"status"`
+	ResponseTime string `json:"responseTime"`
+	Time         string `json:"time"`
 }
 
 // Contains a success-bool and an array of AdminWebsites.
@@ -73,7 +74,6 @@ type AdminWebsite struct {
 	CheckMethod string `json:"checkMethod"`
 	Status      string `json:"status"`
 	Time        string `json:"time"`
-	Average     string `json:"avgAvail"`
 }
 
 // Contains the application's data, which will be used on publicly visible pages.
@@ -85,6 +85,7 @@ type SiteData struct {
 type AdminSiteData struct {
 	Title      string
 	Interval   int
+	Redirects  int
 	PbKey      string
 	AppVersion string
 	GoVersion  string

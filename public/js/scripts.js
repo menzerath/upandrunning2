@@ -8,6 +8,8 @@ $(document).ready(function() {
 	}
 
 	loadWebsiteData();
+
+	setInterval(loadWebsiteData, 5 * 60 * 1000);
 });
 
 function showInformation(website) {
@@ -24,12 +26,12 @@ function showInformation(website) {
 
 			if (data.lastCheckResult.status !== 'unknown') {
 				var dateRecent = new Date(data.lastCheckResult.time.replace(' ', 'T'));
-				dataString += '<p>The most recent check on <b>' + dateRecent.toLocaleDateString() + '</b> at <b>' + dateRecent.toLocaleTimeString() + '</b> got the following response: <b>' + data.lastCheckResult.status + '</b></p>';
+				dataString += '<p>The most recent check on <b>' + dateRecent.toLocaleDateString() + '</b> at <b>' + dateRecent.toLocaleTimeString() + '</b> got the following response after <b>' + data.lastCheckResult.responseTime + '</b>: <b>' + data.lastCheckResult.status + '</b>.</p>';
 			}
 
 			if (data.lastFailedCheckResult.status !== 'unknown') {
 				var dateFail = new Date(data.lastFailedCheckResult.time.replace(' ', 'T'));
-				dataString += '<p>The last failed check on <b>' + dateFail.toLocaleDateString() + '</b> at <b>' + dateFail.toLocaleTimeString() + '</b> failed because of this response: <b>' + data.lastFailedCheckResult.status + '</b></p>';
+				dataString += '<p>The last failed check on <b>' + dateFail.toLocaleDateString() + '</b> at <b>' + dateFail.toLocaleTimeString() + '</b> failed because of this response: <b>' + data.lastFailedCheckResult.status + '</b>.</p>';
 			}
 
 			dataString += '<button class="btn btn-primary" onclick="hideInformation()">Close</button></div>';
@@ -42,7 +44,7 @@ function showInformation(website) {
 			$('#bc-site').css('display', 'inline-block').text(website).html('<a href="/status/' + website + '">' + website + '</a>');
 			history.replaceState('data', '', '/status/' + website + '/');
 
-			$('#row-information').show();
+			$('#row-information').fadeIn(200);
 		},
 		error: function(error) {
 			$('.bottom-right').notify({
@@ -55,7 +57,7 @@ function showInformation(website) {
 }
 
 function hideInformation() {
-	$('#row-information').hide();
+	$('#row-information').fadeOut(200);
 
 	$('#bc-feature').css('display', 'none').text('');
 	$('#bc-site').css('display', 'none').text('');
@@ -104,8 +106,8 @@ function loadWebsiteData() {
 			$('#table-websites-down').html(dataStringDown);
 		},
 		error: function(error) {
-			$('#table-websites-up').html('<tr><td colspan="4">An Error occured: ' + JSON.parse(error.responseText).message + '</td></tr>');
-			$('#table-websites-down').html('<tr><td colspan="4">An Error occured: ' + JSON.parse(error.responseText).message + '</td></tr>');
+			$('#table-websites-up').html('<tr><td colspan="4">An Error occurred: ' + JSON.parse(error.responseText).message + '</td></tr>');
+			$('#table-websites-down').html('<tr><td colspan="4">An Error occurred: ' + JSON.parse(error.responseText).message + '</td></tr>');
 		}
 	});
 }

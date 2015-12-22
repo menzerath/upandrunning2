@@ -24,7 +24,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="container" id="container-admin">
+	<div class="container">
 		<div class="row">
 			<div class="col-lg-12">
 				<div class="row">
@@ -43,21 +43,29 @@
 										<th>Method</th>
 										<th>Status</th>
 										<th>Last Check</th>
-										<th>Availability</th>
-										<th width="12%">Actions</th>
+										<th width="11.6%">Actions</th>
 									</tr>
 								</thead>
 								<tbody id="table-websites">
 									<tr>
-										<td colspan="11">Loading data...</td>
+										<td colspan="10">Loading data...</td>
 									</tr>
 								</tbody>
 							</table>
 						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-lg-12" id="form-edit-website">
+				<div class="row" id="row-details">
+					<div class="col-lg-12" id="col-website-details">
+						<div class="well form-horizontal">
+							<legend>Information about...</legend>
+							<p>You know nothing, Jon Snow!</p>
+							<button type="button" class="btn btn-primary" onclick="closeWebsiteDetails()">Close</button>
+						</div>
+					</div>
+				</div>
+				<div class="row" id="row-edit-website">
+					<div class="col-lg-12">
 						<div class="well form-horizontal">
 							<legend>Edit Website</legend>
 							<fieldset>
@@ -86,8 +94,8 @@
 								</div>
 								<div class="form-group">
 									<div class="col-lg-12">
-										<button type="button" class="btn btn-primary" id="button-edit-website-save" onclick="saveWebsite()">Save</button>
-										<button type="button" class="btn btn-danger" id="button-edit-website-cancle" onclick="cancleSaveWebsite()">Cancle</button>
+										<button type="button" class="btn btn-primary" onclick="saveWebsite()">Save</button>
+										<button type="button" class="btn btn-danger" onclick="cancleSaveWebsite()">Cancle</button>
 									</div>
 								</div>
 							</fieldset>
@@ -123,7 +131,7 @@
 									</div>
 								</div>
 								<div class="form-group">
-									<div class="col-lg-12"><button type="button" class="btn btn-primary" id="button-add-website" onclick="addWebsite()">Add Website</button></div>
+									<div class="col-lg-12"><button type="button" class="btn btn-primary" onclick="addWebsite()">Add Website</button></div>
 								</div>
 							</fieldset>
 						</div>
@@ -140,7 +148,7 @@
 												<input class="form-control" id="input-new-title" placeholder="UpAndRunning2" value="{{ .Title }}">
 											</div>
 											<div class="col-lg-3">
-												<button type="button" class="btn btn-primary pull-right" id="button-change-title" onclick="changeTitle()">Save</button>
+												<button type="button" class="btn btn-primary pull-right" onclick="changeTitle()">Save</button>
 											</div>
 										</div>
 									</fieldset>
@@ -151,7 +159,7 @@
 												<input type="password" class="form-control" id="input-new-password" placeholder="P4sSW0rD">
 											</div>
 											<div class="col-lg-3">
-												<button type="button" class="btn btn-primary pull-right" id="button-change-password" onclick="changePassword()">Save</button>
+												<button type="button" class="btn btn-primary pull-right" onclick="changePassword()">Save</button>
 											</div>
 										</div>
 									</fieldset>
@@ -163,7 +171,18 @@
 											</div>
 											<label class="col-lg-3 control-label">Seconds</label>
 											<div class="col-lg-3">
-												<button type="button" class="btn btn-primary pull-right" id="button-change-interval" onclick="changeInterval()">Save</button>
+												<button type="button" class="btn btn-primary pull-right" onclick="changeInterval()">Save</button>
+											</div>
+										</div>
+									</fieldset>
+									<fieldset>
+										<div class="form-group">
+											<label class="col-lg-2 control-label">Redirects:</label>
+											<div class="col-lg-7">
+												<input type="number" class="form-control" id="input-new-redirects" min="0" max="10" placeholder="0" value="{{ .Redirects }}">
+											</div>
+											<div class="col-lg-3">
+												<button type="button" class="btn btn-primary pull-right" onclick="changeRedirects()">Save</button>
 											</div>
 										</div>
 									</fieldset>
@@ -174,7 +193,7 @@
                                     			<input class="form-control" id="input-new-pb_key" placeholder="API-Key" value="{{ .PbKey }}">
                                     		</div>
                                     		<div class="col-lg-3">
-                                    			<button type="button" class="btn btn-primary pull-right" id="button-change-pb_key" onclick="changePBKey()">Save</button>
+                                    			<button type="button" class="btn btn-primary pull-right" onclick="changePBKey()">Save</button>
                                     		</div>
                                     	</div>
                                     </fieldset>

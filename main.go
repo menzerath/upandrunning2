@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const VERSION = "2.0.1"
+const VERSION = "2.0.2"
 
 var goVersion = runtime.Version()
 var goArch = runtime.GOOS + "_" + runtime.GOARCH
@@ -75,6 +75,7 @@ func serveRequests() {
 	router.POST("/api/admin/settings/title", routes.ApiAdminSettingTitle)
 	router.POST("/api/admin/settings/password", routes.ApiAdminSettingPassword)
 	router.POST("/api/admin/settings/interval", routes.ApiAdminSettingInterval)
+	router.POST("/api/admin/settings/redirects", routes.ApiAdminSettingRedirects)
 	router.POST("/api/admin/settings/pbkey", routes.ApiAdminSettingPushbulletKey)
 
 	router.GET("/api/admin/websites", routes.ApiAdminWebsites)
@@ -129,7 +130,7 @@ func startCheckNowTimer() {
 func checkAllSites() {
 	// Query the Database
 	db := lib.GetDatabase()
-	rows, err := db.Query("SELECT id, protocol, url, checkMethod FROM website WHERE enabled = 1;")
+	rows, err := db.Query("SELECT id, protocol, url, checkMethod FROM websites WHERE enabled = 1;")
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
 		return
