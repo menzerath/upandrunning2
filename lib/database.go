@@ -38,7 +38,7 @@ func prepareDatabase() {
 	// v2.0.2
 	_, err := db.Exec("ALTER TABLE `website` RENAME `websites`;")
 	if mysqlError, ok := err.(*mysql.MySQLError); ok {
-		if mysqlError.Number != 1051 && mysqlError.Number != 1146 { // Table does not exist: no need to change it
+		if mysqlError.Number != 1051 && mysqlError.Number != 1146 && mysqlError.Number != 1050 { // Table does not exist: no need to change it
 			logging.MustGetLogger("logger").Fatal("Unable to rename 'website'-table to 'websites': ", err)
 		}
 	}
