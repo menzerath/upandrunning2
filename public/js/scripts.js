@@ -44,7 +44,7 @@ function showInformation(website) {
 			$('#bc-site').css('display', 'inline-block').text(website).html('<a href="/status/' + website + '">' + website + '</a>');
 			history.replaceState('data', '', '/status/' + website + '/');
 
-			$('#row-information').show();
+			$('#row-information').fadeIn(200);
 		},
 		error: function(error) {
 			$('.bottom-right').notify({
@@ -57,7 +57,7 @@ function showInformation(website) {
 }
 
 function hideInformation() {
-	$('#row-information').hide();
+	$('#row-information').fadeOut(200);
 
 	$('#bc-feature').css('display', 'none').text('');
 	$('#bc-site').css('display', 'none').text('');

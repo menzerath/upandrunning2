@@ -131,7 +131,7 @@ function showWebsiteDetails(website) {
 			$('#col-website-details').html(dataString);
 
 			// show everything to the user
-			$('#row-details').show();
+			$('#row-details').fadeIn(200);
 		},
 		error: function(error) {
 			$('.bottom-right').notify({
@@ -144,7 +144,7 @@ function showWebsiteDetails(website) {
 }
 
 function hideWebsiteDetails() {
-	$('#row-details').hide();
+	$('#row-details').fadeOut(200);
 }
 
 function addWebsite() {
@@ -262,7 +262,7 @@ function invisibleWebsite(url) {
 
 function editWebsite(url) {
 	editUrl = url;
-	$('#form-edit-website').fadeIn(200);
+	$('#row-edit-website').fadeIn(200);
 
 	for (var i = 0; i < loadedWebsiteData.length; i++) {
 		if (url === loadedWebsiteData[i].url) {
@@ -322,7 +322,7 @@ function saveWebsite() {
 }
 
 function cancleSaveWebsite() {
-	$('#form-edit-website').fadeOut(200);
+	$('#row-edit-website').fadeOut(200);
 }
 
 function deleteWebsite(url) {
