@@ -37,6 +37,10 @@ body > .container {
 	display: none;
 }
 
+#row-details {
+	display: none;
+}
+
 #form-edit-website {
 	display: none;
 }

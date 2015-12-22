@@ -95,7 +95,9 @@ function loadWebsites() {
 					dataString += '</td><td>' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString() + '</td>';
 				}
 
-				dataString += '<td><span class="label label-primary label-action" onclick="editWebsite(\'' + loadedWebsiteData[i].url + '\')">Edit</span> <span class="label label-danger label-action" onclick="deleteWebsite(\'' + loadedWebsiteData[i].url + '\')">Delete</span></td></tr>';
+				dataString += '<td><span class="label label-default label-action" onclick="showWebsiteDetails(\'' + loadedWebsiteData[i].url + '\')">More</span> ' +
+					'<span class="label label-primary label-action" onclick="editWebsite(\'' + loadedWebsiteData[i].url + '\')">Edit</span> ' +
+					'<span class="label label-danger label-action" onclick="deleteWebsite(\'' + loadedWebsiteData[i].url + '\')">Delete</span></td></tr>';
 			}
 			$('#table-websites').html(dataString);
 		},
@@ -112,6 +114,37 @@ function reloadWebsites() {
 		fadeOut: {enabled: true, delay: 3000}
 	}).show();
 	loadWebsites();
+}
+
+function showWebsiteDetails(website) {
+	if (website == "") {
+		return;
+	}
+
+	$.ajax({
+		url: "/api/status/" + website,
+		type: "GET",
+		success: function(data) {
+			var dataString = '<div class="well"><legend>Public Data about ' + website + '</legend>';
+			dataString += '<pre>' + JSON.stringify(data, null, '\t') + '</pre>';
+			dataString += '<button class="btn btn-primary" onclick="hideWebsiteDetails()">Close</button></div>';
+			$('#col-website-details').html(dataString);
+
+			// show everything to the user
+			$('#row-details').show();
+		},
+		error: function(error) {
+			$('.bottom-right').notify({
+				type: 'danger',
+				message: {text: "Sorry, but I was unable to process your Request. Error: " + JSON.parse(error.responseText).message},
+				fadeOut: {enabled: true, delay: 3000}
+			}).show();
+		}
+	});
+}
+
+function hideWebsiteDetails() {
+	$('#row-details').hide();
 }
 
 function addWebsite() {
