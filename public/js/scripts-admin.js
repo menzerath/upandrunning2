@@ -102,7 +102,7 @@ function loadWebsites() {
 			$('#table-websites').html(dataString);
 		},
 		error: function(error) {
-			$('#table-websites').html('<tr><td colspan="11">An error occured. Please authenticate again or add a website.</td></tr>');
+			$('#table-websites').html('<tr><td colspan="11">An error occurred. Please authenticate again or add a website.</td></tr>');
 		}
 	});
 }

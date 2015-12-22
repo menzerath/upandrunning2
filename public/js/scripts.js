@@ -106,8 +106,8 @@ function loadWebsiteData() {
 			$('#table-websites-down').html(dataStringDown);
 		},
 		error: function(error) {
-			$('#table-websites-up').html('<tr><td colspan="4">An Error occured: ' + JSON.parse(error.responseText).message + '</td></tr>');
-			$('#table-websites-down').html('<tr><td colspan="4">An Error occured: ' + JSON.parse(error.responseText).message + '</td></tr>');
+			$('#table-websites-up').html('<tr><td colspan="4">An Error occurred: ' + JSON.parse(error.responseText).message + '</td></tr>');
+			$('#table-websites-down').html('<tr><td colspan="4">An Error occurred: ' + JSON.parse(error.responseText).message + '</td></tr>');
 		}
 	});
 }
