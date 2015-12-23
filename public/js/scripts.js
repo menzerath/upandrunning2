@@ -31,7 +31,7 @@ function showInformation(website) {
 
 			if (data.lastFailedCheckResult.status !== '0 - unknown') {
 				var dateFail = new Date(data.lastFailedCheckResult.time.replace(' ', 'T'));
-				dataString += '<p>The last failed check on <b>' + dateFail.toLocaleDateString() + '</b> at <b>' + dateFail.toLocaleTimeString() + '</b> failed because of this response: <b>' + data.lastFailedCheckResult.status + '</b>.</p>';
+				dataString += '<p>The last failed check on <b>' + dateFail.toLocaleDateString() + '</b> at <b>' + dateFail.toLocaleTimeString() + '</b> failed after <b>' + data.lastFailedCheckResult.responseTime + '</b> because of this response: <b>' + data.lastFailedCheckResult.status + '</b>.</p>';
 			}
 
 			dataString += '<button class="btn btn-primary" onclick="hideInformation()">Close</button></div>';
