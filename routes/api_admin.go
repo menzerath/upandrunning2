@@ -21,9 +21,9 @@ func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 		return
 	}
 
-	// Query the Database
+	// Query the Database for basic data and the last check
 	db := lib.GetDatabase()
-	rows, err := db.Query("SELECT id, name, enabled, visible, protocol, url, checkMethod, status, time FROM websites;")
+	rows, err := db.Query("SELECT websites.id, websites.name, websites.enabled, websites.visible, websites.protocol, websites.url, websites.checkMethod, checks.statusCode, checks.statusText, checks.time FROM checks, websites WHERE checks.websiteId = websites.id AND NOT EXISTS (SELECT id FROM checks c2 WHERE checks.websiteId = c2.websiteId AND checks.id < c2.id) ORDER BY websites.id;")
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
@@ -39,20 +39,21 @@ func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 		protocol    string
 		url         string
 		checkMethod string
-		status      string
+		statusCode  string
+		statusText  string
 		time        string
 	)
 
 	// Add every Website
 	websites := []AdminWebsite{}
 	for rows.Next() {
-		err = rows.Scan(&id, &name, &enabled, &visible, &protocol, &url, &checkMethod, &status, &time)
+		err = rows.Scan(&id, &name, &enabled, &visible, &protocol, &url, &checkMethod, &statusCode, &statusText, &time)
 		if err != nil {
 			logging.MustGetLogger("logger").Error("Unable to read Website-Row: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 			return
 		}
-		websites = append(websites, AdminWebsite{id, name, enabled, visible, protocol, url, checkMethod, status, time})
+		websites = append(websites, AdminWebsite{id, name, enabled, visible, protocol, url, checkMethod, statusCode + " - " + statusText, time})
 	}
 
 	// Check for Errors
@@ -309,9 +310,18 @@ func ApiAdminWebsiteDelete(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	// Remove from Database
+	// Remove Check-Results from Database
 	db := lib.GetDatabase()
-	res, err := db.Exec("DELETE FROM websites WHERE url = ?;", value)
+	res, err := db.Exec("DELETE c FROM checks c INNER JOIN websites w ON c.websiteId = w.id WHERE w.url = ?;", value)
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to delete Check-Results: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
+	}
+
+	// Remove Website from Database
+	db = lib.GetDatabase()
+	res, err = db.Exec("DELETE FROM websites WHERE url = ?;", value)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to delete Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())

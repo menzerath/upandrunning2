@@ -35,35 +35,27 @@ func OpenDatabase(config databaseConfiguration) {
 func prepareDatabase() {
 	logging.MustGetLogger("logger").Debug("Preparing Database...")
 
-	// v2.0.2
-	_, err := db.Exec("ALTER TABLE `website` RENAME `websites`;")
+	// v2.1.0
+	_, err := db.Exec("CREATE TABLE IF NOT EXISTS `checks` (`id` INT(11) NOT NULL AUTO_INCREMENT, `websiteId` INT(11) NOT NULL, `statusCode` INT(3) NOT NULL, `statusText` VARCHAR(50) NOT NULL, `responseTime` VARCHAR(50) NOT NULL DEFAULT 'unmeasured', `time` DATETIME NOT NULL, PRIMARY KEY (`id`), FOREIGN KEY (`websiteId`) REFERENCES websites(`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
+	if err != nil {
+		logging.MustGetLogger("logger").Fatal("Unable to create table 'checks': ", err)
+	}
+
+	// v2.1.0
+	_, err = db.Exec("ALTER TABLE `websites` DROP `status`, DROP `responseTime`, DROP `time`, DROP `lastFailStatus`, DROP `lastFailTime`, DROP `ups`, DROP `downs`, DROP `totalChecks`, DROP `avgAvail`;")
 	if mysqlError, ok := err.(*mysql.MySQLError); ok {
-		if mysqlError.Number != 1051 && mysqlError.Number != 1146 && mysqlError.Number != 1050 { // Table does not exist: no need to change it
-			logging.MustGetLogger("logger").Fatal("Unable to rename 'website'-table to 'websites': ", err)
+		if mysqlError.Number != 1091 { // Columns do not exists: no need to remove them
+			logging.MustGetLogger("logger").Fatal("Unable to drop unneccessary columns: ", err)
 		}
 	}
 
-	// v2.0.2
-	_, err = db.Exec("ALTER TABLE `websites` ADD `responseTime` VARCHAR(50) NOT NULL DEFAULT 'unknown' AFTER `status`;")
-	if mysqlError, ok := err.(*mysql.MySQLError); ok {
-		if mysqlError.Number != 1060 { // Column exists: no need to add it
-			logging.MustGetLogger("logger").Fatal("Unable to add 'responseTime'-column: ", err)
-		}
-	}
-
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `websites` (`id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(50) NOT NULL, `enabled` int(1) NOT NULL DEFAULT '1', `visible` int(1) NOT NULL DEFAULT '1', `protocol` varchar(8) NOT NULL DEFAULT 'https', `url` varchar(100) NOT NULL, `checkMethod` VARCHAR(10) NOT NULL DEFAULT 'HEAD', `status` varchar(50) NOT NULL DEFAULT 'unknown', `responseTime` VARCHAR(50) NOT NULL DEFAULT 'unknown', `time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00', `lastFailStatus` varchar(50) NOT NULL DEFAULT 'unknown', `lastFailTime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00', `ups` int(11) NOT NULL DEFAULT '0', `downs` int(11) NOT NULL DEFAULT '0', `totalChecks` int(11) NOT NULL DEFAULT '0', `avgAvail` float NOT NULL DEFAULT '100', PRIMARY KEY (`id`), UNIQUE KEY `url` (`url`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
+	// Default Setup
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `websites` (`id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(50) NOT NULL, `enabled` INT(1) NOT NULL DEFAULT '1', `visible` INT(1) NOT NULL DEFAULT '1', `protocol` VARCHAR(8) NOT NULL DEFAULT 'https', `url` VARCHAR(100) NOT NULL, `checkMethod` VARCHAR(10) NOT NULL DEFAULT 'HEAD', PRIMARY KEY (`id`), UNIQUE KEY `url` (`url`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
 	if err != nil {
 		logging.MustGetLogger("logger").Fatal("Unable to create table 'websites': ", err)
 	}
 
-	// v2.0.0
-	_, err = db.Exec("ALTER TABLE `websites` ADD `checkMethod` VARCHAR(10) NOT NULL DEFAULT 'HEAD' AFTER `url`;")
-	if mysqlError, ok := err.(*mysql.MySQLError); ok {
-		if mysqlError.Number != 1060 { // Column exists: no need to add it
-			logging.MustGetLogger("logger").Fatal("Unable to add 'checkMethod'-column: ", err)
-		}
-	}
-
+	// Default Setup
 	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `settings` (`id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(20) NOT NULL, `value` varchar(1024) NOT NULL, PRIMARY KEY (`id`), UNIQUE KEY `name` (`name`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
 	if err != nil {
 		logging.MustGetLogger("logger").Fatal("Unable to create table 'settings': ", err)

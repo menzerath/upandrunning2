@@ -24,12 +24,12 @@ function showInformation(website) {
 			var dataString = '<div class="well"><legend>Information about ' + website + '</legend>';
 			dataString += '<p>The website at <a href="' + data.websiteData.url + '">' + data.websiteData.url + '</a> is called <b>"' + data.websiteData.name + '"</b>, was checked <b>' + data.availability.total + ' times</b> and has an average availability of <b>' + data.availability.average + '</b>.</p>';
 
-			if (data.lastCheckResult.status !== 'unknown') {
+			if (data.lastCheckResult.status !== '0 - unknown') {
 				var dateRecent = new Date(data.lastCheckResult.time.replace(' ', 'T'));
 				dataString += '<p>The most recent check on <b>' + dateRecent.toLocaleDateString() + '</b> at <b>' + dateRecent.toLocaleTimeString() + '</b> got the following response after <b>' + data.lastCheckResult.responseTime + '</b>: <b>' + data.lastCheckResult.status + '</b>.</p>';
 			}
 
-			if (data.lastFailedCheckResult.status !== 'unknown') {
+			if (data.lastFailedCheckResult.status !== '0 - unknown') {
 				var dateFail = new Date(data.lastFailedCheckResult.time.replace(' ', 'T'));
 				dataString += '<p>The last failed check on <b>' + dateFail.toLocaleDateString() + '</b> at <b>' + dateFail.toLocaleTimeString() + '</b> failed because of this response: <b>' + data.lastFailedCheckResult.status + '</b>.</p>';
 			}

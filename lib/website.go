@@ -6,7 +6,6 @@ import (
 	"github.com/mitsuse/pushbullet-go/requests"
 	"github.com/op/go-logging"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -25,17 +24,17 @@ func (w *Website) RunCheck(secondTry bool) {
 	res, err := goreq.Request{Uri: w.Protocol + "://" + w.Url, Method: w.CheckMethod, UserAgent: "UpAndRunning2 (https://github.com/MarvinMenzerath/UpAndRunning2)", MaxRedirects: GetConfiguration().Dynamic.Redirects, Timeout: 5 * time.Second}.Do()
 	var requestDuration = time.Now().Sub(requestStartTime).String()
 
-	var newStatus string
+	var newStatusText string
 	var newStatusCode int
 	if err != nil {
 		if secondTry {
-			newStatus = "Host not found"
+			newStatusText = "Host not found"
 			newStatusCode = 0
 
 			// On Timeout: allow second try
 			if serr, ok := err.(*goreq.Error); ok {
 				if serr.Timeout() {
-					newStatus = "Timeout"
+					newStatusText = "Timeout"
 					newStatusCode = 0
 				}
 			}
@@ -45,7 +44,7 @@ func (w *Website) RunCheck(secondTry bool) {
 			return
 		}
 	} else {
-		newStatus = strconv.Itoa(res.StatusCode) + " - " + GetHttpStatus(res.StatusCode)
+		newStatusText = GetHttpStatus(res.StatusCode)
 		newStatusCode = res.StatusCode
 		defer res.Body.Close()
 	}
@@ -53,60 +52,36 @@ func (w *Website) RunCheck(secondTry bool) {
 	// If Pushbullet-notifications are active: get old status and Website's name and send a Push
 	if GetConfiguration().Dynamic.PushbulletKey != "" {
 		var (
-			name   string
-			status string
+			name          string
+			oldStatusCode string
+			oldStatusText string
 		)
 
 		db := GetDatabase()
-		err = db.QueryRow("SELECT name, status FROM websites WHERE id = ?", w.Id).Scan(&name, &status)
+		noError := true
+		err = db.QueryRow("SELECT name FROM websites WHERE id = ?", w.Id).Scan(&name)
 		if err != nil {
 			logging.MustGetLogger("logger").Error("Unable to get Website's data: ", err)
-			return
+			noError = false
+		}
+		err = db.QueryRow("SELECT statusCode, statusText FROM checks WHERE websiteId = ? ORDER BY id DESC LIMIT 1", w.Id).Scan(&oldStatusCode, &oldStatusText)
+		if err != nil {
+			logging.MustGetLogger("logger").Warning("Unable to get Website's data: ", err)
+			logging.MustGetLogger("logger").Warning("This is totally normal if this is the first result inserted into the database.")
+			noError = false
 		}
 
-		if newStatus != status {
-			sendPush(name, w.Url, newStatus, status)
+		oldStatus := oldStatusCode + " - " + oldStatusText
+		newStatus := strconv.Itoa(newStatusCode) + " - " + newStatusText
+		if oldStatus != newStatus && noError {
+			sendPush(name, w.Url, newStatus, oldStatus)
 		}
 	}
-
-	newStatusCodeString := strconv.Itoa(newStatusCode)
 
 	// Save the new Result
-	if strings.HasPrefix(newStatusCodeString, "2") || strings.HasPrefix(newStatusCodeString, "3") {
-		// Success
-		_, err = db.Exec("UPDATE websites SET status = ?, responseTime = ?, time = NOW(), ups = ups + 1, totalChecks = totalChecks + 1 WHERE id = ?;", newStatus, requestDuration, w.Id)
-		if err != nil {
-			logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
-			return
-		}
-	} else {
-		// Failure
-		_, err = db.Exec("UPDATE websites SET status = ?, responseTime = ?, time = NOW(), lastFailStatus = ?, lastFailTime = NOW(), downs = downs + 1, totalChecks = totalChecks + 1 WHERE id = ?;", newStatus, requestDuration, newStatus, w.Id)
-		if err != nil {
-			logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
-			return
-		}
-	}
-
-	w.calcAvgAvailability()
-}
-
-// Calculates the average Website availability and stores it inside the database.
-func (w *Website) calcAvgAvailability() {
-	// Query the Database and format the returned value
-	db := GetDatabase()
-	var avg float64
-	err := db.QueryRow("SELECT ((SELECT ups FROM websites WHERE id = ?) / (SELECT totalChecks FROM websites WHERE id = ?))*100 AS avg", w.Id, w.Id).Scan(&avg)
+	_, err = db.Exec("INSERT INTO checks (websiteId, statusCode, statusText, responseTime, time) VALUES (?, ?, ?, ?, NOW());", w.Id, newStatusCode, newStatusText, requestDuration)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to calculate Website-Availability: ", err)
-		return
-	}
-	strconv.FormatFloat(avg, 'f', 2, 64)
-
-	// Save the new value
-	_, err = db.Exec("UPDATE websites SET avgAvail = ? WHERE id = ?;", avg, w.Id)
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to save Website-Availability: ", err)
+		logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
 		return
 	}
 }
