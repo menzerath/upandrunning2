@@ -337,6 +337,14 @@ func ApiAdminWebsiteDelete(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
+	// Remove Notifications from Database
+	res, err = db.Exec("DELETE n FROM notifications n INNER JOIN websites w ON n.websiteId = w.id WHERE w.url = ?;", value)
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to delete Notifications: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
+	}
+
 	// Remove Website from Database
 	db = lib.GetDatabase()
 	res, err = db.Exec("DELETE FROM websites WHERE url = ?;", value)
