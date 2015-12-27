@@ -36,27 +36,39 @@ func prepareDatabase() {
 	logging.MustGetLogger("logger").Debug("Preparing Database...")
 
 	// v2.1.0
-	_, err := db.Exec("CREATE TABLE IF NOT EXISTS `checks` (`id` INT(11) NOT NULL AUTO_INCREMENT, `websiteId` INT(11) NOT NULL, `statusCode` INT(3) NOT NULL, `statusText` VARCHAR(50) NOT NULL, `responseTime` VARCHAR(50) NOT NULL, `time` DATETIME NOT NULL, PRIMARY KEY (`id`), FOREIGN KEY (`websiteId`) REFERENCES websites(`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
-	if err != nil {
-		logging.MustGetLogger("logger").Fatal("Unable to create table 'checks': ", err)
-	}
-
-	// v2.1.0
-	_, err = db.Exec("ALTER TABLE `websites` DROP `status`, DROP `responseTime`, DROP `time`, DROP `lastFailStatus`, DROP `lastFailTime`, DROP `ups`, DROP `downs`, DROP `totalChecks`, DROP `avgAvail`;")
+	_, err := db.Exec("ALTER TABLE `websites` DROP `status`, DROP `responseTime`, DROP `time`, DROP `lastFailStatus`, DROP `lastFailTime`, DROP `ups`, DROP `downs`, DROP `totalChecks`, DROP `avgAvail`;")
 	if mysqlError, ok := err.(*mysql.MySQLError); ok {
 		if mysqlError.Number != 1091 { // Columns do not exists: no need to remove them
 			logging.MustGetLogger("logger").Fatal("Unable to drop unneccessary columns: ", err)
 		}
 	}
 
+	// v2.1.0
+	_, err = db.Exec("DELETE FROM settings WHERE name = 'pushbullet_key';")
+	if err != nil {
+		logging.MustGetLogger("logger").Fatal("Unable to delete unneccessary row: ", err)
+	}
+
+	// v2.1.0; Default Setup with v2.2.0
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `notifications` (`websiteId` int(11) NOT NULL, `pushbulletKey` varchar(300) DEFAULT NULL, `email` varchar(300) DEFAULT NULL, PRIMARY KEY (`websiteId`), UNIQUE KEY (`websiteId`), FOREIGN KEY (`websiteId`) REFERENCES websites(`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;")
+	if err != nil {
+		logging.MustGetLogger("logger").Fatal("Unable to create table 'notifications': ", err)
+	}
+
+	// v2.1.0; Default Setup with v2.2.0
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `checks` (`id` INT(11) NOT NULL AUTO_INCREMENT, `websiteId` INT(11) NOT NULL, `statusCode` INT(3) NOT NULL, `statusText` VARCHAR(50) NOT NULL, `responseTime` VARCHAR(50) NOT NULL, `time` DATETIME NOT NULL, PRIMARY KEY (`id`), FOREIGN KEY (`websiteId`) REFERENCES websites(`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
+	if err != nil {
+		logging.MustGetLogger("logger").Fatal("Unable to create table 'checks': ", err)
+	}
+
 	// Default Setup
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `websites` (`id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(50) NOT NULL, `enabled` INT(1) NOT NULL DEFAULT '1', `visible` INT(1) NOT NULL DEFAULT '1', `protocol` VARCHAR(8) NOT NULL DEFAULT 'https', `url` VARCHAR(100) NOT NULL, `checkMethod` VARCHAR(10) NOT NULL DEFAULT 'HEAD', PRIMARY KEY (`id`), UNIQUE KEY `url` (`url`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `websites` (`id` INT(11) NOT NULL AUTO_INCREMENT, `name` VARCHAR(50) NOT NULL, `enabled` INT(1) NOT NULL DEFAULT '1', `visible` INT(1) NOT NULL DEFAULT '1', `protocol` VARCHAR(8) NOT NULL DEFAULT 'https', `url` VARCHAR(100) NOT NULL, `checkMethod` VARCHAR(10) NOT NULL DEFAULT 'HEAD', PRIMARY KEY (`id`), UNIQUE KEY (`url`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
 	if err != nil {
 		logging.MustGetLogger("logger").Fatal("Unable to create table 'websites': ", err)
 	}
 
 	// Default Setup
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `settings` (`id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(20) NOT NULL, `value` varchar(1024) NOT NULL, PRIMARY KEY (`id`), UNIQUE KEY `name` (`name`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `settings` (`id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(20) NOT NULL, `value` varchar(1024) NOT NULL, PRIMARY KEY (`id`), UNIQUE KEY (`name`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
 	if err != nil {
 		logging.MustGetLogger("logger").Fatal("Unable to create table 'settings': ", err)
 	}

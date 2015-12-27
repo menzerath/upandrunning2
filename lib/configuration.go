@@ -35,7 +35,6 @@ type dynamicConfiguration struct {
 	Title         string
 	Interval      int
 	Redirects     int
-	PushbulletKey string
 	CheckNow      bool
 }
 
@@ -68,7 +67,6 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 		title         string
 		interval      int
 		redirects     int
-		pushbulletKey string
 	)
 
 	// Title
@@ -101,20 +99,9 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 		redirects = 0
 	}
 
-	// Pushbullet-Key
-	err = db.QueryRow("SELECT value FROM settings where name = 'pushbullet_key';").Scan(&pushbulletKey)
-	if err != nil {
-		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('pushbullet_key', '');")
-		if err != nil {
-			logging.MustGetLogger("logger").Fatal("Unable to insert 'pushbullet_key'-setting: ", err)
-		}
-		pushbulletKey = ""
-	}
-
 	config.Dynamic.Title = title
 	config.Dynamic.Interval = interval
 	config.Dynamic.Redirects = redirects
-	config.Dynamic.PushbulletKey = pushbulletKey
 
 	config.Dynamic.CheckNow = true
 }

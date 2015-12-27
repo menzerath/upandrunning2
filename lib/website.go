@@ -49,6 +49,7 @@ func (w *Website) RunCheck(secondTry bool) {
 		defer res.Body.Close()
 	}
 
+	/*
 	// If Pushbullet-notifications are active: get old status and Website's name and send a Push
 	if GetConfiguration().Dynamic.PushbulletKey != "" {
 		var (
@@ -77,6 +78,7 @@ func (w *Website) RunCheck(secondTry bool) {
 			sendPush(name, w.Url, newStatus, oldStatus)
 		}
 	}
+	*/
 
 	// Save the new Result
 	_, err = db.Exec("INSERT INTO checks (websiteId, statusCode, statusText, responseTime, time) VALUES (?, ?, ?, ?, NOW());", w.Id, newStatusCode, newStatusText, requestDuration)
@@ -86,6 +88,7 @@ func (w *Website) RunCheck(secondTry bool) {
 	}
 }
 
+/*
 // Sends a Pushbullet-Push containing the given data to the saved API-key.
 func sendPush(name string, url string, newStatus string, oldStatus string) {
 	if GetConfiguration().Dynamic.PushbulletKey == "" {
@@ -105,3 +108,4 @@ func sendPush(name string, url string, newStatus string, oldStatus string) {
 		logging.MustGetLogger("logger").Error("Unable to send Push: ", err)
 	}
 }
+*/
