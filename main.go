@@ -77,7 +77,6 @@ func serveRequests() {
 	router.POST("/api/admin/settings/password", routes.ApiAdminSettingPassword)
 	router.POST("/api/admin/settings/interval", routes.ApiAdminSettingInterval)
 	router.POST("/api/admin/settings/redirects", routes.ApiAdminSettingRedirects)
-	router.POST("/api/admin/settings/pbkey", routes.ApiAdminSettingPushbulletKey)
 
 	router.GET("/api/admin/websites", routes.ApiAdminWebsites)
 	router.POST("/api/admin/websites/add", routes.ApiAdminWebsiteAdd)

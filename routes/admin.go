@@ -19,7 +19,7 @@ func AdminIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	// Parse template-files
 	c := lib.GetConfiguration()
-	data := AdminSiteData{c.Dynamic.Title, c.Dynamic.Interval, c.Dynamic.Redirects, c.Dynamic.PushbulletKey, c.Static.Version, runtime.Version(), runtime.GOOS + "_" + runtime.GOARCH}
+	data := AdminSiteData{c.Dynamic.Title, c.Dynamic.Interval, c.Dynamic.Redirects, c.Static.Version, runtime.Version(), runtime.GOOS + "_" + runtime.GOARCH}
 	t, err := template.ParseFiles("views/admin.html", "views/partials/styles.html", "views/partials/footer.html", "views/partials/scripts.html")
 
 	if t != nil {

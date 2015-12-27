@@ -487,30 +487,6 @@ function changeRedirects() {
 	}
 }
 
-function changePBKey() {
-	var newKey = $('#input-new-pb_key').val();
-
-	$.ajax({
-		url: "/api/admin/settings/pbkey",
-		type: "POST",
-		data: {key: newKey},
-		success: function() {
-			$('.bottom-right').notify({
-				type: 'success',
-				message: {text: "API-Key successfully changed."},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
-		},
-		error: function(error) {
-			$('.bottom-right').notify({
-				type: 'danger',
-				message: {text: JSON.parse(error.responseText).message},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
-		}
-	});
-}
-
 function checkNow() {
 	if (!allowCheck) {
 		$('.bottom-right').notify({

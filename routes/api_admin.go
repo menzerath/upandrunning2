@@ -450,37 +450,6 @@ func ApiAdminSettingRedirects(w http.ResponseWriter, r *http.Request, ps httprou
 	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
-// Updates the application's Pushbullet-key in the database.
-func ApiAdminSettingPushbulletKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	if !lib.IsLoggedIn(r) {
-		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
-		return
-	}
-
-	// Get data from Request
-	r.ParseForm()
-	value := r.Form.Get("key")
-
-	// Simple Validation
-	if value == "" {
-		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value.")
-		return
-	}
-
-	// Update Database-Row
-	db := lib.GetDatabase()
-	_, err := db.Exec("UPDATE settings SET value = ? WHERE name = 'pushbullet_key';", value)
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to change PushBullet-API-Key: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
-		return
-	}
-
-	// Update Configuration
-	lib.GetConfiguration().Dynamic.PushbulletKey = value
-	SendJsonMessage(w, http.StatusOK, true, "")
-}
-
 // Updates the user's password in the database.
 func ApiAdminSettingPassword(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
