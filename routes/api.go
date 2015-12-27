@@ -134,10 +134,10 @@ func ApiResults(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Add every Result
 	results := []WebsiteCheckResult{}
 	var (
-		statusCode string
-		statusText string
+		statusCode   string
+		statusText   string
 		responseTime string
-		time string
+		time         string
 	)
 	for rows.Next() {
 		err = rows.Scan(&statusCode, &statusText, &responseTime, &time)

@@ -24,7 +24,7 @@ type WebsiteResponse struct {
 
 // Contains a success-bool and an array of WebsiteCheckResults.
 type ResultsResponse struct {
-	Success  bool           `json:"requestSuccess"`
+	Success  bool                 `json:"requestSuccess"`
 	Websites []WebsiteCheckResult `json:"results"`
 }
 

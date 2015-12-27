@@ -32,10 +32,10 @@ type databaseConfiguration struct {
 // A dynamic Configuration.
 // Used to store data, which may be changed through the API.
 type dynamicConfiguration struct {
-	Title         string
-	Interval      int
-	Redirects     int
-	CheckNow      bool
+	Title     string
+	Interval  int
+	Redirects int
+	CheckNow  bool
 }
 
 // Static data about (e.g.) the application's version.
@@ -64,9 +64,9 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	logging.MustGetLogger("logger").Info("Reading Configuration from Database...")
 
 	var (
-		title         string
-		interval      int
-		redirects     int
+		title     string
+		interval  int
+		redirects int
 	)
 
 	// Title

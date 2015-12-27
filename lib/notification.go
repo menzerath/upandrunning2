@@ -1,8 +1,9 @@
 package lib
+
 import (
-	"github.com/op/go-logging"
 	"github.com/mitsuse/pushbullet-go"
 	"github.com/mitsuse/pushbullet-go/requests"
+	"github.com/op/go-logging"
 )
 
 // Sends a Pushbullet-Push containing the given data to the saved API-key.

@@ -211,13 +211,6 @@ POST-parameters: title
 POST-parameters: interval
 ```
 
-#### Change PushBullet-API-Key
-`POST` `/api/admin/settings/pbkey`:
-
-```json
-POST-parameters: key
-```
-
 #### Change Admin-Password
 `POST` `/api/admin/settings/password`:
 
