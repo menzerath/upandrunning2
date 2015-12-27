@@ -128,7 +128,12 @@ function showWebsiteDetails(website) {
 		success: function(data) {
 			delete data['requestSuccess'];
 			delete data['websiteData'];
-			swal({title: website, text: '<pre>' + JSON.stringify(data, null, '\t') + '</pre>', html: true, confirmButtonText: "Close"});
+			swal({
+				title: website,
+				text: '<pre>' + JSON.stringify(data, null, '\t') + '</pre>',
+				html: true,
+				confirmButtonText: "Close"
+			});
 		},
 		error: function(error) {
 			$('.bottom-right').notify({
@@ -319,29 +324,28 @@ function cancleSaveWebsite() {
 }
 
 function deleteWebsite(url) {
-	if (window.confirm("Are you sure?")) {
+	swal({
+		title: "Are you sure?",
+		text: "The website's settings and check-results will be lost forever. You can not undo this operation.",
+		type: "warning",
+		showCancelButton: true,
+		confirmButtonColor: "#DD6B55",
+		confirmButtonText: "Yes",
+		closeOnConfirm: false
+	}, function() {
 		$.ajax({
 			url: "/api/admin/websites/delete",
 			type: "POST",
 			data: {url: url},
 			success: function() {
 				loadWebsites();
-
-				$('.bottom-right').notify({
-					type: 'success',
-					message: {text: "Website successfully deleted."},
-					fadeOut: {enabled: true, delay: 3000}
-				}).show();
+				swal("Deleted!", "This website has been deleted.", "success");
 			},
 			error: function(error) {
-				$('.bottom-right').notify({
-					type: 'danger',
-					message: {text: JSON.parse(error.responseText).message},
-					fadeOut: {enabled: true, delay: 3000}
-				}).show();
+				swal("Oops!", JSON.parse(error.responseText).message, "error");
 			}
 		});
-	}
+	});
 }
 
 function changeTitle() {
