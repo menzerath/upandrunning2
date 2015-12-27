@@ -48,7 +48,7 @@ func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 
 	// Query the Database for the last unsuccessful check
-	err = db.QueryRow("SELECT checks.statusCode, checks.statusText, checks.responseTime, checks.time FROM checks, websites WHERE checks.websiteId = websites.id AND (statusCode NOT LIKE '2%' AND statusCode NOT LIKE '3%') AND websites.url = ? AND websites.enabled = 1 ORDER BY checks.id DESC LIMIT 1;", ps.ByName("url")).Scan(&lastFailStatusCode, &lastFailStatusText, &lastFailResponseTime, &lastFailTime)
+	err = db.QueryRow("SELECT checks.statusCode, checks.statusText, checks.responseTime, checks.time FROM checks, websites WHERE checks.websiteId = websites.id AND (checks.statusCode NOT LIKE '2%' AND checks.statusCode NOT LIKE '3%') AND websites.url = ? AND websites.enabled = 1 ORDER BY checks.id DESC LIMIT 1;", ps.ByName("url")).Scan(&lastFailStatusCode, &lastFailStatusText, &lastFailResponseTime, &lastFailTime)
 	switch {
 	case err == sql.ErrNoRows:
 		lastFailStatusCode = "0"
@@ -62,7 +62,7 @@ func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 
 	// Query the Database for the amount of (successful / total) checks
-	err = db.QueryRow("SELECT (SELECT COUNT(checks.id) FROM checks, websites WHERE checks.websiteId = websites.id AND (statusCode LIKE '2%' OR statusCode LIKE '3%') AND websites.url = ?) AS ups, (SELECT COUNT(checks.id) FROM checks, websites WHERE checks.websiteId = websites.id AND websites.url = ?) AS total FROM checks LIMIT 1;", ps.ByName("url"), ps.ByName("url")).Scan(&ups, &totalChecks)
+	err = db.QueryRow("SELECT (SELECT COUNT(checks.id) FROM checks, websites WHERE checks.websiteId = websites.id AND (checks.statusCode LIKE '2%' OR checks.statusCode LIKE '3%') AND websites.url = ?) AS ups, (SELECT COUNT(checks.id) FROM checks, websites WHERE checks.websiteId = websites.id AND websites.url = ?) AS total FROM checks LIMIT 1;", ps.ByName("url"), ps.ByName("url")).Scan(&ups, &totalChecks)
 	switch {
 	case err == sql.ErrNoRows:
 		logging.MustGetLogger("logger").Error("Unable to fetch Website-Status: ", err)
@@ -89,6 +89,7 @@ func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 // Returns a ResultsResponse containing an array of WebsiteCheckResults.
 func ApiResults(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	// Get limit-parameter from Request
 	limit := 100
 	limitString := r.URL.Query().Get("limit")
 	if len(limitString) != 0 {
@@ -104,6 +105,7 @@ func ApiResults(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		limit = parsedLimit
 	}
 
+	// Get offset-parameter from Request
 	offset := 0
 	offsetString := r.URL.Query().Get("offset")
 	if len(offsetString) != 0 {
@@ -121,7 +123,7 @@ func ApiResults(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	// Query the Database
 	db := lib.GetDatabase()
-	rows, err := db.Query("SELECT statusCode, statusText, responseTime, time FROM checks, websites WHERE checks.websiteId = websites.id AND websites.url = ? AND websites.enabled = 1 AND websites.visible = 1 ORDER BY time DESC LIMIT ? OFFSET ?;", ps.ByName("url"), limit, offset)
+	rows, err := db.Query("SELECT statusCode, statusText, responseTime, time FROM checks, websites WHERE checks.websiteId = websites.id AND websites.url = ? AND websites.enabled = 1 ORDER BY time DESC LIMIT ? OFFSET ?;", ps.ByName("url"), limit, offset)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to fetch Results: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
@@ -129,7 +131,7 @@ func ApiResults(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 	defer rows.Close()
 
-	// Add every Website
+	// Add every Result
 	results := []WebsiteCheckResult{}
 	var (
 		statusCode string
@@ -168,9 +170,9 @@ func ApiResults(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 // Returns a WebsiteResponse containing all publicly visible Websites as BasicWebsite.
 func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	// Query the Database
+	// Query the Database for basic data
 	db := lib.GetDatabase()
-	rows, err := db.Query("SELECT websites.name, websites.protocol, websites.url, checks.statusCode, checks.statusText FROM checks, websites WHERE checks.websiteId = websites.id AND NOT EXISTS (SELECT id FROM checks c2 WHERE checks.websiteId = c2.websiteId AND checks.id < c2.id) AND websites.enabled = 1 AND websites.visible = 1 ORDER BY websites.id;")
+	rows, err := db.Query("SELECT name, protocol, url FROM websites WHERE enabled = 1 AND visible = 1 ORDER BY name;")
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
@@ -187,23 +189,40 @@ func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		statusCode string
 		statusText string
 	)
+
+	totalRows := 0
 	for rows.Next() {
-		err = rows.Scan(&name, &protocol, &url, &statusCode, &statusText)
+		err = rows.Scan(&name, &protocol, &url)
 		if err != nil {
-			logging.MustGetLogger("logger").Error("Unable to read Website-Row: ", err)
+			logging.MustGetLogger("logger").Error("Unable to read Website-Data-Row: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 			return
 		}
 
-		websites = append(websites, BasicWebsite{name, protocol, url, statusCode + " - " + statusText})
+		websites = append(websites, BasicWebsite{name, protocol, url, ""})
+		totalRows++
 	}
 
-	// Check for Errors
-	err = rows.Err()
+	// Query the database for status data
+	rows, err = db.Query("SELECT statusCode, statusText FROM (SELECT name, statusCode, statusText FROM checks, websites WHERE checks.websiteId = websites.id AND enabled = 1 AND visible = 1 ORDER BY checks.id DESC LIMIT ?) AS t ORDER BY name;", totalRows)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to read Website-Rows: ", err)
+		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 		return
+	}
+	defer rows.Close()
+
+	i := 0
+	for rows.Next() {
+		err = rows.Scan(&statusCode, &statusText)
+		if err != nil {
+			logging.MustGetLogger("logger").Error("Unable to read Website-Status-Row: ", err)
+			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
+			return
+		}
+
+		websites[i].Status = statusCode + " - " + statusText
+		i++
 	}
 
 	// Send Response

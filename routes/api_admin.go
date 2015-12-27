@@ -21,9 +21,9 @@ func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 		return
 	}
 
-	// Query the Database for basic data and the last check
+	// Query the Database for basic data
 	db := lib.GetDatabase()
-	rows, err := db.Query("SELECT websites.id, websites.name, websites.enabled, websites.visible, websites.protocol, websites.url, websites.checkMethod, checks.statusCode, checks.statusText, checks.time FROM checks, websites WHERE checks.websiteId = websites.id AND NOT EXISTS (SELECT id FROM checks c2 WHERE checks.websiteId = c2.websiteId AND checks.id < c2.id) ORDER BY websites.id;")
+	rows, err := db.Query("SELECT id, name, enabled, visible, protocol, url, checkMethod FROM websites ORDER BY name;")
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
@@ -31,6 +31,8 @@ func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	}
 	defer rows.Close()
 
+	// Add every Website
+	websites := []AdminWebsite{}
 	var (
 		id          int
 		name        string
@@ -44,24 +46,40 @@ func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 		time        string
 	)
 
-	// Add every Website
-	websites := []AdminWebsite{}
+	totalRows := 0
 	for rows.Next() {
-		err = rows.Scan(&id, &name, &enabled, &visible, &protocol, &url, &checkMethod, &statusCode, &statusText, &time)
+		err = rows.Scan(&id, &name, &enabled, &visible, &protocol, &url, &checkMethod)
 		if err != nil {
-			logging.MustGetLogger("logger").Error("Unable to read Website-Row: ", err)
+			logging.MustGetLogger("logger").Error("Unable to read Website-Data-Row: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 			return
 		}
-		websites = append(websites, AdminWebsite{id, name, enabled, visible, protocol, url, checkMethod, statusCode + " - " + statusText, time})
+
+		websites = append(websites, AdminWebsite{id, name, enabled, visible, protocol, url, checkMethod, "", ""})
+		totalRows++
 	}
 
-	// Check for Errors
-	err = rows.Err()
+	// Query the database for status data
+	rows, err = db.Query("SELECT statusCode, statusText, time FROM (SELECT name, statusCode, statusText, time FROM checks, websites WHERE checks.websiteId = websites.id ORDER BY checks.id DESC LIMIT ?) AS t ORDER BY name;", totalRows)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to read Website-Rows: ", err)
+		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 		return
+	}
+	defer rows.Close()
+
+	i := 0
+	for rows.Next() {
+		err = rows.Scan(&statusCode, &statusText, &time)
+		if err != nil {
+			logging.MustGetLogger("logger").Error("Unable to read Website-Status-Row: ", err)
+			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
+			return
+		}
+
+		websites[i].Status = statusCode + " - " + statusText
+		websites[i].Time = time
+		i++
 	}
 
 	// Send Response
