@@ -53,7 +53,7 @@ func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	case err == sql.ErrNoRows:
 		lastFailStatusCode = "0"
 		lastFailStatusText = "unknown"
-		lastFailResponseTime = "unmeasured"
+		lastFailResponseTime = "0"
 		lastFailTime = "0000-00-00 00:00:00"
 	case err != nil:
 		logging.MustGetLogger("logger").Error("Unable to fetch Website-Status: ", err)
@@ -75,7 +75,7 @@ func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 
 	// Build Response
-	responseJson := DetailedWebsiteResponse{true, WebsiteData{id, name, protocol + "://" + url}, WebsiteAvailability{ups, totalChecks - ups, totalChecks, strconv.FormatFloat((float64(ups)/float64(totalChecks))*100, 'f', 2, 64) + "%"}, WebsiteCheckResult{statusCode + " - " + statusText, responseTime, time}, WebsiteCheckResult{lastFailStatusCode + " - " + lastFailStatusText, lastFailResponseTime, lastFailTime}}
+	responseJson := DetailedWebsiteResponse{true, WebsiteData{id, name, protocol + "://" + url}, WebsiteAvailability{ups, totalChecks - ups, totalChecks, strconv.FormatFloat((float64(ups)/float64(totalChecks))*100, 'f', 2, 64) + "%"}, WebsiteCheckResult{statusCode + " - " + statusText, responseTime + " ms", time}, WebsiteCheckResult{lastFailStatusCode + " - " + lastFailStatusText, lastFailResponseTime + " ms", lastFailTime}}
 
 	// Send Response
 	responseBytes, err := json.Marshal(responseJson)

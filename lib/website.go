@@ -22,7 +22,7 @@ func (w *Website) RunCheck(secondTry bool) {
 	// Request new Status
 	var requestStartTime = time.Now()
 	res, err := goreq.Request{Uri: w.Protocol + "://" + w.Url, Method: w.CheckMethod, UserAgent: "UpAndRunning2 (https://github.com/MarvinMenzerath/UpAndRunning2)", MaxRedirects: GetConfiguration().Dynamic.Redirects, Timeout: 5 * time.Second}.Do()
-	var requestDuration = time.Now().Sub(requestStartTime).String()
+	var requestDuration = time.Now().Sub(requestStartTime).Nanoseconds() / 1000000
 
 	var newStatusText string
 	var newStatusCode int
