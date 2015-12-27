@@ -87,6 +87,85 @@ func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Write(responseBytes)
 }
 
+// Returns a ResultsResponse containing an array of WebsiteCheckResults.
+func ApiResults(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	limit := 100
+	limitString := r.URL.Query().Get("limit")
+	if len(limitString) != 0 {
+		parsedLimit, err := strconv.Atoi(limitString)
+		if err != nil {
+			SendJsonMessage(w, http.StatusBadRequest, false, "Unable to parse given limit-parameter.")
+			return
+		}
+		if parsedLimit > 9999 {
+			SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Limit has to be less than 10000.")
+			return
+		}
+		limit = parsedLimit
+	}
+
+	offset := 0
+	offsetString := r.URL.Query().Get("offset")
+	if len(offsetString) != 0 {
+		parsedOffset, err := strconv.Atoi(offsetString)
+		if err != nil {
+			SendJsonMessage(w, http.StatusBadRequest, false, "Unable to parse given offset-parameter.")
+			return
+		}
+		if parsedOffset > 9999 {
+			SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Offset has to be less than 10000.")
+			return
+		}
+		offset = parsedOffset
+	}
+
+	// Query the Database
+	db := lib.GetDatabase()
+	rows, err := db.Query("SELECT statusCode, statusText, responseTime, time FROM checks, websites WHERE checks.websiteId = websites.id AND websites.url = ? AND websites.enabled = 1 AND websites.visible = 1 ORDER BY time DESC LIMIT ? OFFSET ?;", ps.ByName("url"), limit, offset)
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to fetch Results: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
+		return
+	}
+	defer rows.Close()
+
+	// Add every Website
+	results := []WebsiteCheckResult{}
+	var (
+		statusCode string
+		statusText string
+		responseTime string
+		time string
+	)
+	for rows.Next() {
+		err = rows.Scan(&statusCode, &statusText, &responseTime, &time)
+		if err != nil {
+			logging.MustGetLogger("logger").Error("Unable to read Result-Row: ", err)
+			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
+			return
+		}
+
+		results = append(results, WebsiteCheckResult{statusCode + " - " + statusText, responseTime, time})
+	}
+
+	// Check for Errors
+	err = rows.Err()
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to read Result-Rows: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
+		return
+	}
+
+	// Send Response
+	responseBytes, err := json.Marshal(ResultsResponse{true, results})
+	if err != nil {
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBytes)
+}
+
 // Returns a WebsiteResponse containing all publicly visible Websites as BasicWebsite.
 func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Query the Database

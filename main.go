@@ -67,6 +67,7 @@ func serveRequests() {
 	// API
 	router.GET("/api", routes.ApiIndex)
 	router.GET("/api/status/:url", routes.ApiStatus)
+	router.GET("/api/results/:url", routes.ApiResults)
 	router.GET("/api/websites", routes.ApiWebsites)
 
 	// Admin-API

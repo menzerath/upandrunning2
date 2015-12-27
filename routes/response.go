@@ -6,6 +6,10 @@ import (
 	"net/http"
 )
 
+// ******************
+// * USER-RESPONSES *
+// ******************
+
 // Contains a success-bool and a message, which may be empty.
 type BasicResponse struct {
 	Success bool   `json:"requestSuccess"`
@@ -18,12 +22,10 @@ type WebsiteResponse struct {
 	Websites []BasicWebsite `json:"websites"`
 }
 
-// Contains the Website's basic data such as name, protocol, url and current status.
-type BasicWebsite struct {
-	Name     string `json:"name"`
-	Protocol string `json:"protocol"`
-	Url      string `json:"url"`
-	Status   string `json:"status"`
+// Contains a success-bool and an array of WebsiteCheckResults.
+type ResultsResponse struct {
+	Success  bool           `json:"requestSuccess"`
+	Websites []WebsiteCheckResult `json:"results"`
 }
 
 // Contains a success-bool and the Website's details.
@@ -33,6 +35,14 @@ type DetailedWebsiteResponse struct {
 	Availability          WebsiteAvailability `json:"availability"`
 	LastCheckResult       WebsiteCheckResult  `json:"lastCheckResult"`
 	LastFailedCheckResult WebsiteCheckResult  `json:"lastFailedCheckResult"`
+}
+
+// Contains the Website's basic data such as name, protocol, url and current status.
+type BasicWebsite struct {
+	Name     string `json:"name"`
+	Protocol string `json:"protocol"`
+	Url      string `json:"url"`
+	Status   string `json:"status"`
 }
 
 // Contains the Website's basic data such as id, name and url.
@@ -56,6 +66,10 @@ type WebsiteCheckResult struct {
 	ResponseTime string `json:"responseTime"`
 	Time         string `json:"time"`
 }
+
+// *******************
+// * ADMIN-RESPONSES *
+// *******************
 
 // Contains a success-bool and an array of AdminWebsites.
 type AdminWebsiteResponse struct {
@@ -91,6 +105,10 @@ type AdminSiteData struct {
 	GoVersion  string
 	GoArch     string
 }
+
+// *************
+// * FUNCTIONS *
+// *************
 
 // Sends a simple Json-message.
 // It contains a success-bool and a message, which may be empty.

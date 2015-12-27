@@ -76,14 +76,33 @@ Notice: Everyone is able to access those APIs.
 	},
 	"lastCheckResult": {
 		"status": "200 - OK",
-		"responseTime": "150.0001ms",
-		"time": "2015-01-01T00:00:00.000Z"
+		"responseTime": "150 ms",
+		"time": "2015-01-01 00:00:00"
 	},
 	"lastFailedCheckResult": {
 		"status": "500 - Internal Server Error",
-		"responseTime": "unmeasured",
-		"time": "2014-12-31T20:15:00.000Z"
+		"responseTime": "0 ms",
+		"time": "2014-12-31 20:15:00"
 	}
+}
+```
+
+#### Results
+`GET` `/api/results/website.com`:
+
+Optional parameter: `?limit=100`  
+Optional parameter: `?offset=50`
+
+```json
+{
+	"requestSuccess": true,
+	"results": [
+		{
+			"status": "200 - OK",
+            "responseTime": "150 ms",
+            "time": "2015-01-01 00:00:00"
+		}
+	]
 }
 ```
 
@@ -123,7 +142,7 @@ Notice: You have to login before you are able to use those APIs.
 			"url": "website.com",
 			"checkMethod": "HEAD",
 			"status": "200 - OK",
-			"time": "2015-01-01T00:00:00.000Z"
+			"time": "2015-01-01 00:00:00"
 		}
 	]
 }
