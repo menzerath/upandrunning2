@@ -8,6 +8,10 @@ body > .container {
 	padding-bottom: 60px;
 }
 
+pre {
+	text-align: left;
+}
+
 .footer {
 	background-color: #f5f5f5;
 	bottom: 0;
@@ -34,10 +38,6 @@ body > .container {
 }
 
 #row-information {
-	display: none;
-}
-
-#row-details {
 	display: none;
 }
 

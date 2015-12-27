@@ -96,6 +96,7 @@ function loadWebsites() {
 				}
 
 				dataString += '<td><span class="label label-default label-action" onclick="showWebsiteDetails(\'' + loadedWebsiteData[i].url + '\')" title="More"><span class="fa fa-info"></span></span> ' +
+					'<span class="label label-info label-action" onclick="" title="Notifications"><span class="fa fa-bell"></span></span> ' +
 					'<span class="label label-primary label-action" onclick="editWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Edit"><span class="fa fa-pencil"></span></span> ' +
 					'<span class="label label-danger label-action" onclick="deleteWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Delete"><span class="fa fa-trash"></span></span></td></tr>';
 			}
@@ -127,14 +128,7 @@ function showWebsiteDetails(website) {
 		success: function(data) {
 			delete data['requestSuccess'];
 			delete data['websiteData'];
-
-			var dataString = '<div class="well"><legend>Public Data about ' + website + '</legend>';
-			dataString += '<pre>' + JSON.stringify(data, null, '\t') + '</pre>';
-			dataString += '<button class="btn btn-primary" onclick="hideWebsiteDetails()">Close</button></div>';
-			$('#col-website-details').html(dataString);
-
-			// show everything to the user
-			$('#row-details').fadeIn(200);
+			swal({title: website, text: '<pre>' + JSON.stringify(data, null, '\t') + '</pre>', html: true, confirmButtonText: "Close"});
 		},
 		error: function(error) {
 			$('.bottom-right').notify({
@@ -144,10 +138,6 @@ function showWebsiteDetails(website) {
 			}).show();
 		}
 	});
-}
-
-function hideWebsiteDetails() {
-	$('#row-details').fadeOut(200);
 }
 
 function addWebsite() {
