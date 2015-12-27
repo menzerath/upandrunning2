@@ -283,7 +283,7 @@ function saveWebsite() {
 	var method = $('#input-edit-method').val();
 
 	if (name == editName && protocol == editProtocol && editUrl == url && editMethod == method) {
-		cancleSaveWebsite();
+		cancelSaveWebsite();
 		return;
 	}
 
@@ -293,7 +293,7 @@ function saveWebsite() {
 			type: "POST",
 			data: {oldUrl: editUrl, name: name, protocol: protocol, url: url, checkMethod: method},
 			success: function() {
-				cancleSaveWebsite();
+				cancelSaveWebsite();
 				loadWebsites();
 
 				$('.bottom-right').notify({
@@ -319,7 +319,7 @@ function saveWebsite() {
 	}
 }
 
-function cancleSaveWebsite() {
+function cancelSaveWebsite() {
 	$('#row-edit-website').fadeOut(200);
 }
 
