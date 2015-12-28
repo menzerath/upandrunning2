@@ -189,7 +189,7 @@ PUT-parameters: visible {true / false}
 `PUT` `/api/v1/admin/websites/:url/notifications`:
 
 ```
-PUT-parameters: pushbulletKey, email
+PUT-parameters: pushbulletKey, email {"" to disable}
 ```
 
 #### Change Application-Title

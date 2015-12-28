@@ -282,7 +282,7 @@ function editNotificationPushbullet(url) {
 				$.ajax({
 					url: "/api/v1/admin/websites/" + url + "/notifications",
 					type: "PUT",
-					data: {pushbulletKey: inputValue.trim()},
+					data: {pushbulletKey: inputValue.trim(), email: data.notifications.email},
 					success: function() {
 						swal({
 							title: "Done!",
@@ -335,7 +335,7 @@ function editNotificationEmail(url) {
 				$.ajax({
 					url: "/api/v1/admin/websites/" + url + "/notifications",
 					type: "PUT",
-					data: {email: inputValue.trim()},
+					data: {pushbulletKey: data.notifications.pushbulletKey, email: inputValue.trim()},
 					success: function() {
 						swal({
 							title: "Done!",
