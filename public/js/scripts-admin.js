@@ -95,8 +95,10 @@ function loadWebsites() {
 					dataString += '</td><td>' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString() + '</td>';
 				}
 
+				dataString += '<td><span class="label label-info label-action" onclick="editNotificationPushbullet(\'' + loadedWebsiteData[i].url + '\')" title="Notifications"><span class="fa fa-bell"></span></span> ' +
+					'<span class="label label-info label-info-inactive label-action" onclick="editNotificationEmail(\'' + loadedWebsiteData[i].url + '\')" title="Notifications"><span class="fa fa-envelope"></span></span></td>';
+
 				dataString += '<td><span class="label label-default label-action" onclick="showWebsiteDetails(\'' + loadedWebsiteData[i].url + '\')" title="More"><span class="fa fa-info"></span></span> ' +
-					'<span class="label label-info label-action" onclick="editNotifications(\'' + loadedWebsiteData[i].url + '\')" title="Notifications"><span class="fa fa-bell"></span></span> ' +
 					'<span class="label label-primary label-action" onclick="editWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Edit"><span class="fa fa-pencil"></span></span> ' +
 					'<span class="label label-danger label-action" onclick="deleteWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Delete"><span class="fa fa-trash"></span></span></td></tr>';
 			}
@@ -258,37 +260,50 @@ function invisibleWebsite(url) {
 	});
 }
 
-function editNotifications(url) {
+function editNotificationPushbullet(url) {
 	var pushbulletKey = "";
-	var email = "";
 
 	swal({
-		title: "Notifications",
+		title: "Pushbullet",
 		text: "Please enter a valid <b>Pushbullet-API Key</b> in order to recieve push-messages.<br />Leave this field blank if you do not want this kind of notification.",
 		html: true,
 		type: "input",
-		inputPlaceholder: "API Key",
+		inputPlaceholder: "API key",
 		inputValue: "",
 		showCancelButton: true,
-		confirmButtonText: "Next",
+		confirmButtonText: "Save",
 		closeOnConfirm: false
 	}, function(inputValue) {
 		pushbulletKey = inputValue;
-
 		swal({
-			title: "Notifications",
-			text: "Please enter a valid <b>email address</b> in order to recieve emails.<br />Leave this field blank if you do not want this kind of notification.",
-			html: true,
-			type: "input",
-			inputPlaceholder: "email address",
-			inputValue: "",
-			showCancelButton: true,
-			confirmButtonText: "Finish",
-			closeOnConfirm: false
-		}, function(inputValue) {
-			email = inputValue;
+			title: "Done!",
+			text: "Your settings have been saved.",
+			timer: 2000,
+			type: "success"
+		});
+	});
+}
 
-			swal("Done!", "Your settings have been saved.", "success");
+function editNotificationEmail(url) {
+	var email = "";
+
+	swal({
+		title: "Email",
+		text: "Please enter a valid <b>email address</b> in order to recieve email-notifications.<br />Leave this field blank if you do not want this kind of notification.",
+		html: true,
+		type: "input",
+		inputPlaceholder: "email address",
+		inputValue: "",
+		showCancelButton: true,
+		confirmButtonText: "Save",
+		closeOnConfirm: false
+	}, function(inputValue) {
+		email = inputValue;
+		swal({
+			title: "Done!",
+			text: "Your settings have been saved.",
+			timer: 2000,
+			type: "success"
 		});
 	});
 }
@@ -374,7 +389,12 @@ function deleteWebsite(url) {
 			data: {url: url},
 			success: function() {
 				loadWebsites();
-				swal("Deleted!", "This website has been deleted.", "success");
+				swal({
+					title: "Deleted!",
+					text: "This website has been deleted.",
+					timer: 2000,
+					type: "success"
+				});
 			},
 			error: function(error) {
 				swal("Oops!", JSON.parse(error.responseText).message, "error");
