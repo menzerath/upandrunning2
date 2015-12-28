@@ -4,6 +4,7 @@ import (
 	"github.com/mitsuse/pushbullet-go"
 	"github.com/mitsuse/pushbullet-go/requests"
 	"github.com/op/go-logging"
+	"gopkg.in/gomail.v2"
 )
 
 // Sends a Pushbullet-Push containing the given data to the saved API-key.
@@ -22,8 +23,22 @@ func sendPush(apiKey string, name string, url string, newStatus string, oldStatu
 	}
 }
 
-// Sends an e-mail containing the given data to the saved e-mail-address.
+// Sends an email containing the given data to the saved e-mail-address.
 // Needs a configured SMTP-server (in config-file).
-func sendMail() {
-	// TODO
+func sendMail(recipient string, name string, url string, newStatus string, oldStatus string) {
+	logging.MustGetLogger("logger").Debug("Sending email about \"" + url + "\"...")
+
+	mConf := GetConfiguration().Mailer
+
+	m := gomail.NewMessage()
+	m.SetAddressHeader("From", mConf.From, GetConfiguration().Dynamic.Title)
+	m.SetHeader("To", recipient)
+	m.SetHeader("Subject", "Status Change: "+name)
+	m.SetBody("text/html", "Hello,<br /><br /><b>"+name+"</b>"+" ("+url+") just went from \""+oldStatus+"\" to <b>\""+newStatus+"\"</b>.<br /><br />Sincerely,<br />"+GetConfiguration().Dynamic.Title+"<br /><br /><small>This email was sent automatically, please do not respond to it.</small>")
+
+	d := gomail.NewPlainDialer(mConf.Host, mConf.Port, mConf.User, mConf.Password)
+
+	if err := d.DialAndSend(m); err != nil {
+		logging.MustGetLogger("logger").Error("Unable to send email: ", err)
+	}
 }

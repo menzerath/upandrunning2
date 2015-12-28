@@ -15,6 +15,7 @@ var config *Configuration
 type Configuration struct {
 	Port     int
 	Database databaseConfiguration
+	Mailer   mailerConfiguration
 	Dynamic  dynamicConfiguration
 	Static   StaticConfiguration
 }
@@ -27,6 +28,15 @@ type databaseConfiguration struct {
 	Password        string
 	Database        string
 	ConnectionLimit int
+}
+
+// The mailer configuration.
+type mailerConfiguration struct {
+	Host     string
+	Port     int
+	User     string
+	Password string
+	From     string
 }
 
 // A dynamic Configuration.
@@ -53,7 +63,6 @@ func ReadConfigurationFromFile(filePath string) {
 	decoder := json.NewDecoder(file)
 
 	err := decoder.Decode(&config)
-
 	if err != nil {
 		logging.MustGetLogger("logger").Fatal("Unable to read Configuration: ", err)
 	}

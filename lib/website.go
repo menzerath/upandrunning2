@@ -74,6 +74,7 @@ func (w *Website) RunCheck(secondTry bool) {
 		newStatus := strconv.Itoa(newStatusCode) + " - " + newStatusText
 		if oldStatus != newStatus && noError {
 			sendPush("", name, w.Url, newStatus, oldStatus)
+			sendMail("", name, w.Url, newStatus, oldStatus)
 		}
 	}
 

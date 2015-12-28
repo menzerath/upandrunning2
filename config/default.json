@@ -7,5 +7,12 @@
 		"password": "mySecretPassword",
 		"database": "myDatabase",
 		"connectionLimit": 10
+	},
+	"mailer": {
+		"host": "smtp.mymail.com",
+		"port": 587,
+		"user": "myUser@mymail.com",
+		"password": "mySecretPassword",
+		"from": "upandrunning2@mymail.com"
 	}
 }
