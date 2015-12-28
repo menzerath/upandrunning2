@@ -12,8 +12,8 @@ UpAndRunning2 is a lightweight Go application which **monitors all of your websi
 * Build your own client or use the fully-featured web-interface
 * bcrypt ensures your password is stored safely
 * Get notifications via
+	* Email
 	* Pushbullet
-	* More coming soon!
 
 ### Some Details on the Check-Algorithm
 UpAndRunning2 checks the response it gets from a simple HTTP-HEAD-request to the specified url.  
@@ -39,18 +39,11 @@ In this case you need to adjust the used Check-Method to a GET-request.
 * Visit `http://localhost:8080/admin` and use `admin` to authenticate. You should change the password immediately.
 * Done!
 
-### Upgrading from UpAndRunning
-When upgrading from UpAndRunning (UpAndRunning v1.x.x) you need to manually delete two rows from your database:
-* `salt`@settings
-* `password`@settings
+### Upgrading
+When upgrading the application, you need to update to the latest release of your currently installed minor version (e.g. v2.0.2) before upgrading to the next minor or major version (e.g. v2.1).  
+Otherwise you may loose access to your data and need to wipe your database.
 
-You may use the following SQL-Query to remove those rows:
-```sql
-DELETE FROM settings WHERE name = 'salt';
-DELETE FROM settings WHERE name = 'password';
-```
-
-Also you should notice that some of the APIs changed and you may need to adjust your applications.
+Also make sure that your custom applications using UpAndRunning's API are up-to-date and are not using a deprecated API-version.
 
 ## API
 
@@ -151,14 +144,14 @@ Notice: You have to login before you are able to use those APIs.
 #### Add a Website
 `POST` `/api/v1/admin/websites/:url`:
 
-```json
+```
 POST-parameters: name, protocol, checkMethod
 ```
 
 #### Edit a Website
 `PUT` `/api/v1/admin/websites/:url`:
 
-```json
+```
 PUT-parameters: name, protocol, url, checkMethod
 ```
 
@@ -168,21 +161,21 @@ PUT-parameters: name, protocol, url, checkMethod
 #### Enable / Disable a Website
 `PUT` `/api/v1/admin/websites/:url/enabled`:
 
-```json
+```
 PUT-parameters: enabled {true / false}
 ```
 
 #### Set a Website's visibility
 `PUT` `/api/v1/admin/websites/:url/visibility`:
 
-```json
+```
 PUT-parameters: visible {true / false}
 ```
 
 #### Get a Website's notification settings
 `GET` `/api/v1/admin/websites/:url/notifications`:
 
-```json
+```
 {
 	"requestSuccess": true,
 	"notifications": {
@@ -195,35 +188,35 @@ PUT-parameters: visible {true / false}
 #### Set a Website's notification settings
 `PUT` `/api/v1/admin/websites/:url/notifications`:
 
-```json
+```
 PUT-parameters: pushbulletKey, email
 ```
 
 #### Change Application-Title
 `PUT` `/api/v1/settings/title`:
 
-```json
+```
 PUT-parameters: title
 ```
 
 #### Change Check-Interval
 `PUT` `/api/v1/settings/interval`:
 
-```json
+```
 PUT-parameters: interval
 ```
 
 #### Change Admin-Password
 `PUT` `/api/v1/settings/password`:
 
-```json
+```
 PUT-parameters: password
 ```
 
 #### Change amount of Redirects
 `PUT` `/api/v1/settings/redirects`:
 
-```json
+```
 PUT-parameters: redirects
 ```
 
@@ -233,7 +226,7 @@ PUT-parameters: redirects
 #### Login
 `POST` `/api/v1/auth/login`:
 
-```json
+```
 POST-parameters: password
 ```
 
