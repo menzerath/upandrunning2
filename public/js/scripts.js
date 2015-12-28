@@ -18,7 +18,7 @@ function showInformation(website) {
 	}
 
 	$.ajax({
-		url: "/api/status/" + website,
+		url: "/api/v1/websites/" + website + "/status",
 		type: "GET",
 		success: function(data) {
 			var dataString = '<div class="well"><legend>Information about ' + website + '</legend>';
@@ -66,7 +66,7 @@ function hideInformation() {
 
 function loadWebsiteData() {
 	$.ajax({
-		url: "/api/websites",
+		url: "/api/v1/websites",
 		type: "GET",
 		success: function(data) {
 			loadedWebsiteData = data.websites;

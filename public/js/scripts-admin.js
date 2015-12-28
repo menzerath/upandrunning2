@@ -58,7 +58,7 @@ $(document).ready(function() {
 
 function loadWebsites() {
 	$.ajax({
-		url: "/api/admin/websites",
+		url: "/api/v1/admin/websites",
 		type: "GET",
 		success: function(data) {
 			loadedWebsiteData = data.websites;
@@ -95,8 +95,8 @@ function loadWebsites() {
 					dataString += '</td><td>' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString() + '</td>';
 				}
 
-				dataString += '<td><span class="label label-info label-action" onclick="editNotificationPushbullet(\'' + loadedWebsiteData[i].url + '\')" title="Notifications"><span class="fa fa-bell"></span></span> ' +
-					'<span class="label label-info label-info-inactive label-action" onclick="editNotificationEmail(\'' + loadedWebsiteData[i].url + '\')" title="Notifications"><span class="fa fa-envelope"></span></span></td>';
+				dataString += '<td><span class="label label-info label-action" onclick="editNotificationPushbullet(\'' + loadedWebsiteData[i].url + '\')" title="Pushbullet"><span class="fa fa-bell"></span></span> ' +
+					'<span class="label label-info label-info label-action" onclick="editNotificationEmail(\'' + loadedWebsiteData[i].url + '\')" title="Email"><span class="fa fa-envelope"></span></span></td>';
 
 				dataString += '<td><span class="label label-default label-action" onclick="showWebsiteDetails(\'' + loadedWebsiteData[i].url + '\')" title="More"><span class="fa fa-info"></span></span> ' +
 					'<span class="label label-primary label-action" onclick="editWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Edit"><span class="fa fa-pencil"></span></span> ' +
@@ -125,7 +125,7 @@ function showWebsiteDetails(website) {
 	}
 
 	$.ajax({
-		url: "/api/status/" + website,
+		url: "/api/v1/websites/" + website + "/status",
 		type: "GET",
 		success: function(data) {
 			delete data['requestSuccess'];
@@ -155,13 +155,12 @@ function addWebsite() {
 
 	if (name.trim() && protocol.trim() && url.trim() && method.trim()) {
 		$.ajax({
-			url: "/api/admin/websites/add",
+			url: "/api/v1/admin/websites/" + url,
 			type: "POST",
 			data: {name: name, protocol: protocol, url: url, checkMethod: method},
 			success: function() {
 				$('#input-add-name').val('');
 				$('#input-add-protocol').val('https');
-				$('#input-add-url').val('');
 				$('#input-add-method').val('HEAD');
 				loadWebsites();
 
@@ -190,9 +189,9 @@ function addWebsite() {
 
 function enableWebsite(url) {
 	$.ajax({
-		url: "/api/admin/websites/enable",
-		type: "POST",
-		data: {url: url},
+		url: "/api/v1/admin/websites/" + url + "/enabled",
+		type: "PUT",
+		data: {enabled: true},
 		success: function() {
 			loadWebsites();
 		},
@@ -208,9 +207,9 @@ function enableWebsite(url) {
 
 function disableWebsite(url) {
 	$.ajax({
-		url: "/api/admin/websites/disable",
-		type: "POST",
-		data: {url: url},
+		url: "/api/v1/admin/websites/" + url + "/enabled",
+		type: "PUT",
+		data: {enabled: false},
 		success: function() {
 			loadWebsites();
 		},
@@ -226,9 +225,9 @@ function disableWebsite(url) {
 
 function visibleWebsite(url) {
 	$.ajax({
-		url: "/api/admin/websites/visible",
-		type: "POST",
-		data: {url: url},
+		url: "/api/v1/admin/websites/" + url + "/visibility",
+		type: "PUT",
+		data: {visible: true},
 		success: function() {
 			loadWebsites();
 		},
@@ -244,9 +243,9 @@ function visibleWebsite(url) {
 
 function invisibleWebsite(url) {
 	$.ajax({
-		url: "/api/admin/websites/invisible",
-		type: "POST",
-		data: {url: url},
+		url: "/api/v1/admin/websites/" + url + "/visibility",
+		type: "PUT",
+		data: {visible: false},
 		success: function() {
 			loadWebsites();
 		},
@@ -261,50 +260,108 @@ function invisibleWebsite(url) {
 }
 
 function editNotificationPushbullet(url) {
-	var pushbulletKey = "";
+	if (!url.trim()) return;
 
-	swal({
-		title: "Pushbullet",
-		text: "Please enter a valid <b>Pushbullet-API Key</b> in order to recieve push-messages.<br />Leave this field blank if you do not want this kind of notification.",
-		html: true,
-		type: "input",
-		inputPlaceholder: "API key",
-		inputValue: "",
-		showCancelButton: true,
-		confirmButtonText: "Save",
-		closeOnConfirm: false
-	}, function(inputValue) {
-		pushbulletKey = inputValue;
-		swal({
-			title: "Done!",
-			text: "Your settings have been saved.",
-			timer: 2000,
-			type: "success"
-		});
+	$.ajax({
+		url: "/api/v1/admin/websites/" + url + "/notifications",
+		type: "GET",
+		success: function(data) {
+			swal({
+				title: "Pushbullet",
+				text: "Please enter a valid <b>Pushbullet-API Key</b> in order to recieve push-messages.<br />Leave this field blank if you do not want this kind of notification.",
+				html: true,
+				type: "input",
+				inputPlaceholder: "API key",
+				inputValue: data.notifications.pushbulletKey,
+				showCancelButton: true,
+				confirmButtonText: "Save",
+				closeOnConfirm: false
+			}, function(inputValue) {
+				if (inputValue === false) return;
+
+				$.ajax({
+					url: "/api/v1/admin/websites/" + url + "/notifications",
+					type: "PUT",
+					data: {pushbulletKey: inputValue.trim()},
+					success: function() {
+						swal({
+							title: "Done!",
+							text: "Your settings have been saved.",
+							timer: 2000,
+							type: "success"
+						});
+					},
+					error: function(error) {
+						swal({
+							title: "Oops!",
+							text: JSON.parse(error.responseText).message,
+							timer: 2000,
+							type: "error"
+						});
+					}
+				});
+			});
+		},
+		error: function(error) {
+			$('.bottom-right').notify({
+				type: 'danger',
+				message: {text: JSON.parse(error.responseText).message},
+				fadeOut: {enabled: true, delay: 3000}
+			}).show();
+		}
 	});
 }
 
 function editNotificationEmail(url) {
-	var email = "";
+	if (!url.trim()) return;
 
-	swal({
-		title: "Email",
-		text: "Please enter a valid <b>email address</b> in order to recieve email-notifications.<br />Leave this field blank if you do not want this kind of notification.",
-		html: true,
-		type: "input",
-		inputPlaceholder: "email address",
-		inputValue: "",
-		showCancelButton: true,
-		confirmButtonText: "Save",
-		closeOnConfirm: false
-	}, function(inputValue) {
-		email = inputValue;
-		swal({
-			title: "Done!",
-			text: "Your settings have been saved.",
-			timer: 2000,
-			type: "success"
-		});
+	$.ajax({
+		url: "/api/v1/admin/websites/" + url + "/notifications",
+		type: "GET",
+		success: function(data) {
+			swal({
+				title: "Email",
+				text: "Please enter a valid <b>email address</b> in order to recieve email-notifications.<br />Leave this field blank if you do not want this kind of notification.",
+				html: true,
+				type: "input",
+				inputPlaceholder: "email address",
+				inputValue: data.notifications.email,
+				showCancelButton: true,
+				confirmButtonText: "Save",
+				closeOnConfirm: false
+			}, function(inputValue) {
+				if (inputValue === false) return;
+
+				$.ajax({
+					url: "/api/v1/admin/websites/" + url + "/notifications",
+					type: "PUT",
+					data: {email: inputValue.trim()},
+					success: function() {
+						swal({
+							title: "Done!",
+							text: "Your settings have been saved.",
+							timer: 2000,
+							type: "success"
+						});
+					},
+					error: function(error) {
+						swal({
+							title: "Oops!",
+							text: JSON.parse(error.responseText).message,
+							timer: 2000,
+							type: "error"
+						});
+					}
+				});
+			});
+		},
+		error: function(error) {
+			$('.bottom-right').notify({
+				type: 'danger',
+				message: {text: JSON.parse(error.responseText).message},
+				fadeOut: {enabled: true, delay: 3000}
+			}).show();
+		}
 	});
 }
 
@@ -339,9 +396,9 @@ function saveWebsite() {
 
 	if (name.trim() && protocol.trim() && url.trim() && method.trim()) {
 		$.ajax({
-			url: "/api/admin/websites/edit",
-			type: "POST",
-			data: {oldUrl: editUrl, name: name, protocol: protocol, url: url, checkMethod: method},
+			url: "/api/v1/admin/websites/" + editUrl,
+			type: "PUT",
+			data: {name: name, protocol: protocol, url: url, checkMethod: method},
 			success: function() {
 				cancelSaveWebsite();
 				loadWebsites();
@@ -374,6 +431,7 @@ function cancelSaveWebsite() {
 }
 
 function deleteWebsite(url) {
+	if (!url.trim()) return;
 	swal({
 		title: "Are you sure?",
 		text: "The website's settings and check-results will be lost forever. You can not undo this operation.",
@@ -384,9 +442,8 @@ function deleteWebsite(url) {
 		closeOnConfirm: false
 	}, function() {
 		$.ajax({
-			url: "/api/admin/websites/delete",
-			type: "POST",
-			data: {url: url},
+			url: "/api/v1/admin/websites/" + url,
+			type: "DELETE",
 			success: function() {
 				loadWebsites();
 				swal({
@@ -408,8 +465,8 @@ function changeTitle() {
 
 	if (newTitle.trim()) {
 		$.ajax({
-			url: "/api/admin/settings/title",
-			type: "POST",
+			url: "/api/v1/settings/title",
+			type: "PUT",
 			data: {title: newTitle},
 			success: function() {
 				$(document).attr("title", "Administration | " + newTitle);
@@ -443,8 +500,8 @@ function changePassword() {
 
 	if (newPassword.trim()) {
 		$.ajax({
-			url: "/api/admin/settings/password",
-			type: "POST",
+			url: "/api/v1/settings/password",
+			type: "PUT",
 			data: {password: newPassword},
 			success: function() {
 				$('#input-new-password').val('');
@@ -477,8 +534,8 @@ function changeInterval() {
 
 	if (newInterval.trim() && !(isNaN(newInterval) || newInterval < 1 || newInterval > 600)) {
 		$.ajax({
-			url: "/api/admin/settings/interval",
-			type: "POST",
+			url: "/api/v1/settings/interval",
+			type: "PUT",
 			data: {interval: newInterval},
 			success: function() {
 				$('.bottom-right').notify({
@@ -509,8 +566,8 @@ function changeRedirects() {
 
 	if (newRedirects.trim() && !(isNaN(newRedirects) || newRedirects < 0 || newRedirects > 10)) {
 		$.ajax({
-			url: "/api/admin/settings/redirects",
-			type: "POST",
+			url: "/api/v1/settings/redirects",
+			type: "PUT",
 			data: {redirects: newRedirects},
 			success: function() {
 				$('.bottom-right').notify({
@@ -548,8 +605,8 @@ function checkNow() {
 
 	allowCheck = false;
 	$.ajax({
-		url: "/api/admin/check",
-		type: "POST",
+		url: "/api/v1/check",
+		type: "GET",
 		success: function() {
 			$('.bottom-right').notify({
 				type: 'success',
@@ -576,8 +633,8 @@ function checkNow() {
 
 function logout() {
 	$.ajax({
-		url: "/api/admin/logout",
-		type: "POST",
+		url: "/api/v1/auth/logout",
+		type: "GET",
 		success: function() {
 			window.location.replace("/");
 		},
