@@ -96,7 +96,7 @@ function loadWebsites() {
 				}
 
 				dataString += '<td><span class="label label-default label-action" onclick="showWebsiteDetails(\'' + loadedWebsiteData[i].url + '\')" title="More"><span class="fa fa-info"></span></span> ' +
-					'<span class="label label-info label-action" onclick="" title="Notifications"><span class="fa fa-bell"></span></span> ' +
+					'<span class="label label-info label-action" onclick="editNotifications(\'' + loadedWebsiteData[i].url + '\')" title="Notifications"><span class="fa fa-bell"></span></span> ' +
 					'<span class="label label-primary label-action" onclick="editWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Edit"><span class="fa fa-pencil"></span></span> ' +
 					'<span class="label label-danger label-action" onclick="deleteWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Delete"><span class="fa fa-trash"></span></span></td></tr>';
 			}
@@ -255,6 +255,41 @@ function invisibleWebsite(url) {
 				fadeOut: {enabled: true, delay: 3000}
 			}).show();
 		}
+	});
+}
+
+function editNotifications(url) {
+	var pushbulletKey = "";
+	var email = "";
+
+	swal({
+		title: "Notifications",
+		text: "Please enter a valid <b>Pushbullet-API Key</b> in order to recieve push-messages.<br />Leave this field blank if you do not want this kind of notification.",
+		html: true,
+		type: "input",
+		inputPlaceholder: "API Key",
+		inputValue: "",
+		showCancelButton: true,
+		confirmButtonText: "Next",
+		closeOnConfirm: false
+	}, function(inputValue) {
+		pushbulletKey = inputValue;
+
+		swal({
+			title: "Notifications",
+			text: "Please enter a valid <b>email address</b> in order to recieve emails.<br />Leave this field blank if you do not want this kind of notification.",
+			html: true,
+			type: "input",
+			inputPlaceholder: "email address",
+			inputValue: "",
+			showCancelButton: true,
+			confirmButtonText: "Finish",
+			closeOnConfirm: false
+		}, function(inputValue) {
+			email = inputValue;
+
+			swal("Done!", "Your settings have been saved.", "success");
+		});
 	});
 }
 
