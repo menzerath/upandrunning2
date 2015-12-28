@@ -183,6 +183,30 @@ POST-parameters: url
 POST-parameters: url
 ```
 
+#### Get a Website's notification settings
+`GET` `/api/admin/websites/notifications`:
+
+```json
+POST-parameters: url
+```
+
+```json
+{
+	"requestSuccess": true,
+	"notifications": {
+		"pushbulletKey": "abcdef123456",
+		"email": "me@mymail.com"
+	}
+}
+```
+
+#### Set a Website's notification settings
+`POST` `/api/admin/websites/notifications`:
+
+```json
+POST-parameters: url, pushbulletKey, email
+```
+
 #### Edit a Website
 `POST` `/api/admin/websites/edit`:
 

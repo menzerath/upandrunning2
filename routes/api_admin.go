@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"database/sql"
 	"encoding/json"
 	"github.com/MarvinMenzerath/UpAndRunning2/lib"
 	"github.com/julienschmidt/httprouter"
@@ -245,6 +246,115 @@ func ApiAdminWebsiteInvisible(w http.ResponseWriter, r *http.Request, ps httprou
 	} else {
 		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Could not set Website to invisible.")
 	}
+}
+
+// Get an existing Website's notification-preferences.
+func ApiAdminWebsiteGetNotifications(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
+
+	// TODO
+	// Get data from Request
+	// value := ps.ByName("url")
+
+	// Simple Validation
+	if value == "" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value.")
+		return
+	}
+
+	// Check for existing settings
+	var (
+		cPushbulletKey string
+		cEmail         string
+	)
+
+	db := lib.GetDatabase()
+	var resp AdminWebsiteNotificationsResponse
+	err := db.QueryRow("SELECT pushbulletKey, email FROM notifications, websites WHERE notifications.websiteId = websites.id AND url = ?;", value).Scan(&cPushbulletKey, &cEmail)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			resp = AdminWebsiteNotificationsResponse{true, WebsiteNotifications{"", ""}}
+		} else {
+			logging.MustGetLogger("logger").Error("Unable to get Website's notification settings: ", err)
+			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+			return
+		}
+	} else {
+		resp = AdminWebsiteNotificationsResponse{true, WebsiteNotifications{cPushbulletKey, cEmail}}
+	}
+
+	// Send Response
+	responseBytes, err := json.Marshal(resp)
+	if err != nil {
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(responseBytes)
+}
+
+// Sets an existing Website's notification-preferences.
+func ApiAdminWebsiteUpdateNotifications(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
+
+	// Get data from Request
+	r.ParseForm()
+	url := r.Form.Get("url")
+	pushbulletKey := r.Form.Get("pushbulletKey")
+	email := r.Form.Get("email")
+
+	// Simple Validation
+	if url == "" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value.")
+		return
+	}
+
+	// Check for existing settings
+	var (
+		cPushbulletKey string
+		cEmail         string
+	)
+	db := lib.GetDatabase()
+	err := db.QueryRow("SELECT pushbulletKey, email FROM notifications, websites WHERE notifications.websiteId = websites.id AND url = ?;", url).Scan(&cPushbulletKey, &cEmail)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// no settings found --> Insert
+			var id int
+			err := db.QueryRow("SELECT id FROM websites WHERE url = ?;", url).Scan(&id)
+			if err != nil {
+				logging.MustGetLogger("logger").Error("Unable to get Website's id for notification-insertion: ", err)
+				SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+				return
+			}
+
+			_, err = db.Exec("INSERT INTO notifications (websiteId, pushbulletKey, email) VALUES (?, ?, ?);", id, pushbulletKey, email)
+			if err != nil {
+				logging.MustGetLogger("logger").Error("Unable to insert Website's notification settings: ", err)
+				SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+				return
+			}
+		} else {
+			logging.MustGetLogger("logger").Error("Unable to get Website's notification settings: ", err)
+			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+			return
+		}
+	} else {
+		// existing settings found --> Update
+		_, err = db.Exec("UPDATE notifications, websites SET pushbulletKey = ?, email = ? WHERE notifications.websiteId = websites.id AND url = ?;", pushbulletKey, email, url)
+		if err != nil {
+			logging.MustGetLogger("logger").Error("Unable to update Website's notification settings: ", err)
+			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+			return
+		}
+	}
+
+	SendJsonMessage(w, http.StatusOK, true, "")
 }
 
 // Edits an existing Website in the database.

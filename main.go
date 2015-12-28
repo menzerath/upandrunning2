@@ -84,6 +84,8 @@ func serveRequests() {
 	router.POST("/api/admin/websites/disable", routes.ApiAdminWebsiteDisable)
 	router.POST("/api/admin/websites/visible", routes.ApiAdminWebsiteVisible)
 	router.POST("/api/admin/websites/invisible", routes.ApiAdminWebsiteInvisible)
+	router.GET("/api/admin/websites/notifications", routes.ApiAdminWebsiteGetNotifications)
+	router.POST("/api/admin/websites/notifications", routes.ApiAdminWebsiteUpdateNotifications)
 	router.POST("/api/admin/websites/edit", routes.ApiAdminWebsiteEdit)
 	router.POST("/api/admin/websites/delete", routes.ApiAdminWebsiteDelete)
 

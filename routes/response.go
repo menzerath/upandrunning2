@@ -90,6 +90,18 @@ type AdminWebsite struct {
 	Time        string `json:"time"`
 }
 
+// Contains a success-bool and a notification-object.
+type AdminWebsiteNotificationsResponse struct {
+	Success       bool                 `json:"requestSuccess"`
+	Notifications WebsiteNotifications `json:"notifications"`
+}
+
+// Contains all saved notification settings of a website.
+type WebsiteNotifications struct {
+	PushbulletKey string `json:"pushbulletKey"`
+	Email         string `json:"email"`
+}
+
 // Contains the application's data, which will be used on publicly visible pages.
 type SiteData struct {
 	Title string

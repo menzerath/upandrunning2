@@ -77,6 +77,11 @@ func (w *Website) sendNotifications(newStatusCode int, newStatusText string) {
 		logging.MustGetLogger("logger").Error("Unable to get Website's notification-settings: ", err)
 	}
 
+	// Check for empty result
+	if pushbulletKey == "" && email == "" {
+		return
+	}
+
 	err = db.QueryRow("SELECT name FROM websites WHERE id = ?", w.Id).Scan(&name)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to get Website's data: ", err)
