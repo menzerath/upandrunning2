@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"database/sql"
 	"github.com/franela/goreq"
 	"github.com/op/go-logging"
 	"strconv"
@@ -47,41 +48,55 @@ func (w *Website) RunCheck(secondTry bool) {
 		defer res.Body.Close()
 	}
 
-	// TODO: Check for notifications and send them
-	// If Pushbullet-notifications are active: get old status and Website's name and send a Push
-	if false {
-		var (
-			name          string
-			oldStatusCode string
-			oldStatusText string
-		)
-
-		db := GetDatabase()
-		noError := true
-		err = db.QueryRow("SELECT name FROM websites WHERE id = ?", w.Id).Scan(&name)
-		if err != nil {
-			logging.MustGetLogger("logger").Error("Unable to get Website's data: ", err)
-			noError = false
-		}
-		err = db.QueryRow("SELECT statusCode, statusText FROM checks WHERE websiteId = ? ORDER BY id DESC LIMIT 1", w.Id).Scan(&oldStatusCode, &oldStatusText)
-		if err != nil {
-			logging.MustGetLogger("logger").Warning("Unable to get Website's data: ", err)
-			logging.MustGetLogger("logger").Warning("This is totally normal if this is the first result inserted into the database.")
-			noError = false
-		}
-
-		oldStatus := oldStatusCode + " - " + oldStatusText
-		newStatus := strconv.Itoa(newStatusCode) + " - " + newStatusText
-		if oldStatus != newStatus && noError {
-			sendPush("", name, w.Url, newStatus, oldStatus)
-			sendMail("", name, w.Url, newStatus, oldStatus)
-		}
-	}
+	w.sendNotifications(newStatusCode, newStatusText)
 
 	// Save the new Result
 	_, err = db.Exec("INSERT INTO checks (websiteId, statusCode, statusText, responseTime, time) VALUES (?, ?, ?, ?, NOW());", w.Id, newStatusCode, newStatusText, requestDuration)
 	if err != nil {
 		logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
 		return
+	}
+}
+
+// Gets the notification-settings and sends a notification (if necessary and requested)
+func (w *Website) sendNotifications(newStatusCode int, newStatusText string) {
+	var (
+		pushbulletKey string
+		email string
+		name string
+		oldStatusCode string
+		oldStatusText string
+	)
+
+	db := GetDatabase()
+	err := db.QueryRow("SELECT pushbulletKey, email FROM notifications WHERE websiteId = ?", w.Id).Scan(&pushbulletKey, &email)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return
+		}
+		logging.MustGetLogger("logger").Error("Unable to get Website's notification-settings: ", err)
+	}
+
+	err = db.QueryRow("SELECT name FROM websites WHERE id = ?", w.Id).Scan(&name)
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to get Website's data: ", err)
+		return
+	}
+	err = db.QueryRow("SELECT statusCode, statusText FROM checks WHERE websiteId = ? ORDER BY id DESC LIMIT 1", w.Id).Scan(&oldStatusCode, &oldStatusText)
+	if err != nil {
+		logging.MustGetLogger("logger").Error("Unable to get Website's data: ", err)
+		logging.MustGetLogger("logger").Info("This is totally normal if this is the first result inserted into the database.")
+		return
+	}
+
+	oldStatus := oldStatusCode + " - " + oldStatusText
+	newStatus := strconv.Itoa(newStatusCode) + " - " + newStatusText
+	if oldStatus != newStatus {
+		if pushbulletKey != "" {
+			sendPush(pushbulletKey, name, w.Url, newStatus, oldStatus)
+		}
+		if email != "" {
+			sendMail(email, name, w.Url, newStatus, oldStatus)
+		}
 	}
 }

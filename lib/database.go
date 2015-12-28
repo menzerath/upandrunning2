@@ -50,7 +50,7 @@ func prepareDatabase() {
 	}
 
 	// v2.1.0; Default Setup with v2.2.0
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `notifications` (`websiteId` int(11) NOT NULL, `pushbulletKey` varchar(300) DEFAULT NULL, `email` varchar(300) DEFAULT NULL, PRIMARY KEY (`websiteId`), UNIQUE KEY (`websiteId`), FOREIGN KEY (`websiteId`) REFERENCES websites(`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;")
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `notifications` (`websiteId` int(11) NOT NULL, `pushbulletKey` varchar(300) NOT NULL DEFAULT '', `email` varchar(300) NOT NULL DEFAULT '', PRIMARY KEY (`websiteId`), UNIQUE KEY (`websiteId`), FOREIGN KEY (`websiteId`) REFERENCES websites(`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;")
 	if err != nil {
 		logging.MustGetLogger("logger").Fatal("Unable to create table 'notifications': ", err)
 	}
