@@ -62,8 +62,8 @@ func (w *Website) RunCheck(secondTry bool) {
 func (w *Website) sendNotifications(newStatusCode int, newStatusText string) {
 	var (
 		pushbulletKey string
-		email string
-		name string
+		email         string
+		name          string
 		oldStatusCode string
 		oldStatusText string
 	)

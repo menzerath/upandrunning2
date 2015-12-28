@@ -46,7 +46,6 @@ func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 		time        string
 	)
 
-	totalRows := 0
 	for rows.Next() {
 		err = rows.Scan(&id, &name, &enabled, &visible, &protocol, &url, &checkMethod)
 		if err != nil {
@@ -55,31 +54,15 @@ func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 			return
 		}
 
-		websites = append(websites, AdminWebsite{id, name, enabled, visible, protocol, url, checkMethod, "", ""})
-		totalRows++
-	}
-
-	// Query the database for status data
-	rows, err = db.Query("SELECT statusCode, statusText, time FROM (SELECT name, statusCode, statusText, time FROM checks, websites WHERE checks.websiteId = websites.id ORDER BY checks.id DESC LIMIT ?) AS t ORDER BY name;", totalRows)
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
-		return
-	}
-	defer rows.Close()
-
-	i := 0
-	for rows.Next() {
-		err = rows.Scan(&statusCode, &statusText, &time)
+		// Query the database for status data
+		err = db.QueryRow("SELECT statusCode, statusText, time FROM checks WHERE websiteId = ? ORDER BY id DESC LIMIT 1;", id).Scan(&statusCode, &statusText, &time)
 		if err != nil {
-			logging.MustGetLogger("logger").Error("Unable to read Website-Status-Row: ", err)
+			logging.MustGetLogger("logger").Error("Unable to fetch Website-Status: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 			return
 		}
 
-		websites[i].Status = statusCode + " - " + statusText
-		websites[i].Time = time
-		i++
+		websites = append(websites, AdminWebsite{id, name, enabled, visible, protocol, url, checkMethod, statusCode + " - " + statusText, time})
 	}
 
 	// Send Response
