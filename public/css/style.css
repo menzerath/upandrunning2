@@ -57,10 +57,6 @@ pre {
 	cursor: pointer;
 }
 
-.label-info-inactive {
-	background-color: rgba(156, 39, 176, 0.5);
-}
-
 .close {
 	font-size: 22px;
 	font-weight: 300;
