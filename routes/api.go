@@ -175,6 +175,12 @@ func ApiResults(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 // Returns a WebsiteResponse containing all publicly visible Websites as BasicWebsite.
 func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if lib.IsLoggedIn(r) {
+		// Send a more detailed version if the user is logged in
+		ApiAdminWebsites(w, r, ps)
+		return
+	}
+
 	// Query the Database for basic data
 	db := lib.GetDatabase()
 	rows, err := db.Query("SELECT id, name, protocol, url FROM websites WHERE enabled = 1 AND visible = 1 ORDER BY name;")

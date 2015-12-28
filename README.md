@@ -45,14 +45,48 @@ Otherwise you may loose access to your data and need to wipe your database.
 
 Also make sure that your custom applications using UpAndRunning's API are up-to-date and are not using a deprecated API-version.
 
-## API
+## API v1
 
-### User
-Notice: Everyone is able to access those APIs.
+### Just Text
 
-#### Status
-`GET` `/api/v1/websites/:url/status`:
+#### Welcome Message
+`GET` `/api`:  
+```json
+{
+	"requestSuccess": true,
+	"message": "Welcome to UpAndRunning2's API!"
+}
+```
 
+#### Welcome Message
+`GET` `/api/v1`:  
+```json
+{
+	"requestSuccess": true,
+	"message": "Welcome to UpAndRunning2's API v1!"
+}
+```
+
+### Public Statistics
+
+#### List of all (publicly available) Websites
+`GET` `/api/v1/websites`:  
+```json
+{
+	"requestSuccess": true,
+	"websites": [
+		{
+			"name": "My Website",
+			"protocol": "https",
+			"url": "website.com",
+			"status": "200 - OK"
+		}
+	]
+}
+```
+
+#### Current Status of a Website
+`GET` `/api/v1/websites/:url/status`:  
 ```json
 {
 	"requestSuccess": true,
@@ -80,12 +114,8 @@ Notice: Everyone is able to access those APIs.
 }
 ```
 
-#### Results
-`GET` `/api/v1/websites/:url/results`:
-
-Optional parameter: `?limit=100`  
-Optional parameter: `?offset=50`
-
+#### Last Check-Results of a Website
+`GET` `/api/v1/websites/:url/results`:  
 ```json
 {
 	"requestSuccess": true,
@@ -98,83 +128,154 @@ Optional parameter: `?offset=50`
 	]
 }
 ```
+**Optional Parameters:**
+* `?limit=100`
+* `?offset=50`
 
-#### List
-`GET` `/api/v1/websites`:
+### Actions
+Notice: These APIs require authentication.
 
+#### Trigger a Check
+`GET` `/api/v1/check`:  
 ```json
 {
 	"requestSuccess": true,
-	"websites": [
-		{
-			"name": "My Website",
-			"protocol": "https",
-			"url": "website.com",
-			"status": "200 - OK"
-		}
-	]
+	"message": ""
 }
 ```
 
-### Admin
-Notice: You have to login before you are able to use those APIs.
+### Authentication
 
-#### List all Websites
-`GET` `/api/v1/admin/websites`:
-
+#### Login
+`POST` `/api/v1/auth/login`:  
 ```json
 {
 	"requestSuccess": true,
-	"websites": [
-		{
-			"id": 1,
-			"name": "My Website",
-			"enabled": true,
-			"visible": true,
-			"protocol": "https",
-			"url": "website.com",
-			"checkMethod": "HEAD",
-			"status": "200 - OK",
-			"time": "2015-01-01 00:00:00"
-		}
-	]
+	"message": ""
 }
 ```
+**Required Parameters:**
+* `password`
+
+#### Logout
+`GET` `/api/v1/auth/logout`:  
+```json
+{
+	"requestSuccess": true,
+	"message": ""
+}
+```
+
+### Settings
+Notice: These APIs require authentication.
+
+#### Application-Title
+`PUT` `/api/v1/settings/title`:  
+```json
+{
+	"requestSuccess": true,
+	"message": ""
+}
+```
+**Required Parameters:**
+* `title`
+
+#### Check-Interval
+`PUT` `/api/v1/settings/interval`:  
+```json
+{
+	"requestSuccess": true,
+	"message": ""
+}
+```
+**Required Parameters:**
+* `interval`
+
+#### Admin-Password
+`PUT` `/api/v1/settings/password`:  
+```json
+{
+	"requestSuccess": true,
+	"message": ""
+}
+```
+**Required Parameters:**
+* `password`
+
+#### Amount of Redirects
+`PUT` `/api/v1/settings/redirects`:  
+```json
+{
+	"requestSuccess": true,
+	"message": ""
+}
+```
+**Required Parameters:**
+* `redirects`
+
+### Website Management
+Notice: These APIs require authentication.
 
 #### Add a Website
-`POST` `/api/v1/admin/websites/:url`:
+`POST` `/api/v1/admin/websites/:url`:  
+```json
+{
+	"requestSuccess": true,
+	"message": ""
+}
+```
+**Required Parameters:**
+* `name`
+* `protocol`
+* `checkMethod`
 
+#### Update a Website
+`PUT` `/api/v1/admin/websites/:url`:  
+```json
+{
+	"requestSuccess": true,
+	"message": ""
+}
 ```
-POST-parameters: name, protocol, checkMethod
-```
-
-#### Edit a Website
-`PUT` `/api/v1/admin/websites/:url`:
-
-```
-PUT-parameters: name, protocol, url, checkMethod
-```
+**Required Parameters:**
+* `name`
+* `protocol`
+* `url`
+* `checkMethod`
 
 #### Delete a Website
-`DELETE` `/api/v1/admin/websites/:url`:
+`DELETE` `/api/v1/admin/websites/:url`:  
+```json
+{
+	"requestSuccess": true,
+	"message": ""
+}
+```
 
 #### Enable / Disable a Website
-`PUT` `/api/v1/admin/websites/:url/enabled`:
-
+`PUT` `/api/v1/admin/websites/:url/enabled`:  
+```json
+{
+	"requestSuccess": true,
+	"message": ""
+}
 ```
-PUT-parameters: enabled {true / false}
-```
+**Required Parameters:**
+* `enabled` - `true / false`
 
 #### Set a Website's visibility
-`PUT` `/api/v1/admin/websites/:url/visibility`:
-
+`PUT` `/api/v1/admin/websites/:url/visibility`:  
+```json
+{
+	"requestSuccess": true,
+	"message": ""
+}
 ```
-PUT-parameters: visible {true / false}
-```
+**Required Parameters:**
+* `visible` - `true / false`
 
 #### Get a Website's notification settings
-`GET` `/api/v1/admin/websites/:url/notifications`:
-
+`GET` `/api/v1/admin/websites/:url/notifications`:  
 ```
 {
 	"requestSuccess": true,
@@ -186,52 +287,16 @@ PUT-parameters: visible {true / false}
 ```
 
 #### Set a Website's notification settings
-`PUT` `/api/v1/admin/websites/:url/notifications`:
-
+`PUT` `/api/v1/admin/websites/:url/notifications`:  
+```json
+{
+	"requestSuccess": true,
+	"message": ""
+}
 ```
-PUT-parameters: pushbulletKey, email {"" to disable}
-```
-
-#### Change Application-Title
-`PUT` `/api/v1/settings/title`:
-
-```
-PUT-parameters: title
-```
-
-#### Change Check-Interval
-`PUT` `/api/v1/settings/interval`:
-
-```
-PUT-parameters: interval
-```
-
-#### Change Admin-Password
-`PUT` `/api/v1/settings/password`:
-
-```
-PUT-parameters: password
-```
-
-#### Change amount of Redirects
-`PUT` `/api/v1/settings/redirects`:
-
-```
-PUT-parameters: redirects
-```
-
-#### Trigger a Check
-`GET` `/api/v1/check`:
-
-#### Login
-`POST` `/api/v1/auth/login`:
-
-```
-POST-parameters: password
-```
-
-#### Logout
-`GET` `/api/v1/auth/logout`:
+**Required Parameters:**
+* `pushbulletKey` - `"" to disable`
+* `email` - `"" to disable`
 
 ## Screenshots
 ![User-Interface](doc/Screenshot1.jpg)

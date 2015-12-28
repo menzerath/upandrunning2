@@ -127,7 +127,7 @@ func ApiAdminWebsiteEnabled(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	var enabledValue int
-	if (enabled == "true") {
+	if enabled == "true" {
 		enabledValue = 1
 	} else if enabled == "false" {
 		enabledValue = 0
@@ -173,7 +173,7 @@ func ApiAdminWebsiteVisibility(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	var visibilityValue int
-	if (visible == "true") {
+	if visible == "true" {
 		visibilityValue = 1
 	} else if visible == "false" {
 		visibilityValue = 0

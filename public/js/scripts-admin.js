@@ -58,7 +58,7 @@ $(document).ready(function() {
 
 function loadWebsites() {
 	$.ajax({
-		url: "/api/v1/admin/websites",
+		url: "/api/v1/websites",
 		type: "GET",
 		success: function(data) {
 			loadedWebsiteData = data.websites;
@@ -155,7 +155,7 @@ function addWebsite() {
 
 	if (name.trim() && protocol.trim() && url.trim() && method.trim()) {
 		$.ajax({
-			url: "/api/v1/admin/websites/" + url,
+			url: "/api/v1/websites/" + url,
 			type: "POST",
 			data: {name: name, protocol: protocol, url: url, checkMethod: method},
 			success: function() {
@@ -189,7 +189,7 @@ function addWebsite() {
 
 function enableWebsite(url) {
 	$.ajax({
-		url: "/api/v1/admin/websites/" + url + "/enabled",
+		url: "/api/v1/websites/" + url + "/enabled",
 		type: "PUT",
 		data: {enabled: true},
 		success: function() {
@@ -207,7 +207,7 @@ function enableWebsite(url) {
 
 function disableWebsite(url) {
 	$.ajax({
-		url: "/api/v1/admin/websites/" + url + "/enabled",
+		url: "/api/v1/websites/" + url + "/enabled",
 		type: "PUT",
 		data: {enabled: false},
 		success: function() {
@@ -225,7 +225,7 @@ function disableWebsite(url) {
 
 function visibleWebsite(url) {
 	$.ajax({
-		url: "/api/v1/admin/websites/" + url + "/visibility",
+		url: "/api/v1/websites/" + url + "/visibility",
 		type: "PUT",
 		data: {visible: true},
 		success: function() {
@@ -243,7 +243,7 @@ function visibleWebsite(url) {
 
 function invisibleWebsite(url) {
 	$.ajax({
-		url: "/api/v1/admin/websites/" + url + "/visibility",
+		url: "/api/v1/websites/" + url + "/visibility",
 		type: "PUT",
 		data: {visible: false},
 		success: function() {
@@ -263,7 +263,7 @@ function editNotificationPushbullet(url) {
 	if (!url.trim()) return;
 
 	$.ajax({
-		url: "/api/v1/admin/websites/" + url + "/notifications",
+		url: "/api/v1/websites/" + url + "/notifications",
 		type: "GET",
 		success: function(data) {
 			swal({
@@ -280,7 +280,7 @@ function editNotificationPushbullet(url) {
 				if (inputValue === false) return;
 
 				$.ajax({
-					url: "/api/v1/admin/websites/" + url + "/notifications",
+					url: "/api/v1/websites/" + url + "/notifications",
 					type: "PUT",
 					data: {pushbulletKey: inputValue.trim(), email: data.notifications.email},
 					success: function() {
@@ -316,7 +316,7 @@ function editNotificationEmail(url) {
 	if (!url.trim()) return;
 
 	$.ajax({
-		url: "/api/v1/admin/websites/" + url + "/notifications",
+		url: "/api/v1/websites/" + url + "/notifications",
 		type: "GET",
 		success: function(data) {
 			swal({
@@ -333,7 +333,7 @@ function editNotificationEmail(url) {
 				if (inputValue === false) return;
 
 				$.ajax({
-					url: "/api/v1/admin/websites/" + url + "/notifications",
+					url: "/api/v1/websites/" + url + "/notifications",
 					type: "PUT",
 					data: {pushbulletKey: data.notifications.pushbulletKey, email: inputValue.trim()},
 					success: function() {
@@ -396,7 +396,7 @@ function saveWebsite() {
 
 	if (name.trim() && protocol.trim() && url.trim() && method.trim()) {
 		$.ajax({
-			url: "/api/v1/admin/websites/" + editUrl,
+			url: "/api/v1/websites/" + editUrl,
 			type: "PUT",
 			data: {name: name, protocol: protocol, url: url, checkMethod: method},
 			success: function() {
@@ -442,7 +442,7 @@ function deleteWebsite(url) {
 		closeOnConfirm: false
 	}, function() {
 		$.ajax({
-			url: "/api/v1/admin/websites/" + url,
+			url: "/api/v1/websites/" + url,
 			type: "DELETE",
 			success: function() {
 				loadWebsites();
@@ -605,7 +605,7 @@ function checkNow() {
 
 	allowCheck = false;
 	$.ajax({
-		url: "/api/v1/check",
+		url: "/api/v1/action/check",
 		type: "GET",
 		success: function() {
 			$('.bottom-right').notify({
