@@ -10,11 +10,6 @@ import (
 	"strconv"
 )
 
-// Sends a simple welcome-message to the user.
-func ApiAdminIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	SendJsonMessage(w, http.StatusOK, true, "Welcome to UpAndRunning2's Admin-API! Please be aware that most operations need an incoming POST-request.")
-}
-
 // Returns a AdminWebsiteResponse containing all Websites as AdminWebsite.
 func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
@@ -57,8 +52,13 @@ func ApiAdminWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 		// Query the database for status data
 		err = db.QueryRow("SELECT statusCode, statusText, time FROM checks WHERE websiteId = ? ORDER BY id DESC LIMIT 1;", id).Scan(&statusCode, &statusText, &time)
-		if err != nil {
-			logging.MustGetLogger("logger").Error("Unable to fetch Website-Status: ", err)
+		switch {
+		case err == sql.ErrNoRows:
+			statusCode = "0"
+			statusText = "unknown"
+			time = "0000-00-00 00:00:00"
+		case err != nil:
+			logging.MustGetLogger("logger").Error("Unable to fetch Website's status: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 			return
 		}
@@ -87,7 +87,7 @@ func ApiAdminWebsiteAdd(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	r.ParseForm()
 	name := r.Form.Get("name")
 	protocol := r.Form.Get("protocol")
-	url := r.Form.Get("url")
+	url := ps.ByName("url")
 	method := r.Form.Get("checkMethod")
 
 	// Simple Validation
@@ -109,7 +109,7 @@ func ApiAdminWebsiteAdd(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 }
 
 // Enables an existing Website in the database.
-func ApiAdminWebsiteEnable(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func ApiAdminWebsiteEnabled(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
 		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
 		return
@@ -117,69 +117,45 @@ func ApiAdminWebsiteEnable(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	// Get data from Request
 	r.ParseForm()
-	value := r.Form.Get("url")
+	value := ps.ByName("url")
+	enabled := r.Form.Get("enabled")
 
 	// Simple Validation
-	if value == "" {
-		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value.")
+	if value == "" || enabled == "" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit valid values.")
+		return
+	}
+
+	var enabledValue int
+	if (enabled == "true") {
+		enabledValue = 1
+	} else if enabled == "false" {
+		enabledValue = 0
+	} else {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit valid values.")
 		return
 	}
 
 	// Update Database-Row
 	db := lib.GetDatabase()
-	res, err := db.Exec("UPDATE websites SET enabled = 1 WHERE url = ?;", value)
+	res, err := db.Exec("UPDATE websites SET enabled = ? WHERE url = ?;", enabledValue, value)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to enable Website: ", err)
+		logging.MustGetLogger("logger").Error("Unable to enable / disable Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
 
-	// Check if exactly one Website has been enabled
+	// Check if exactly one Website is affected
 	rowsAffected, _ := res.RowsAffected()
 	if rowsAffected == 1 {
 		SendJsonMessage(w, http.StatusOK, true, "")
 	} else {
-		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Could not enable Website.")
-	}
-}
-
-// Disables an existing Website in the database.
-func ApiAdminWebsiteDisable(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	if !lib.IsLoggedIn(r) {
-		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
-		return
-	}
-
-	// Get data from Request
-	r.ParseForm()
-	value := r.Form.Get("url")
-
-	// Simple Validation
-	if value == "" {
-		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value.")
-		return
-	}
-
-	// Update Database-Row
-	db := lib.GetDatabase()
-	res, err := db.Exec("UPDATE websites SET enabled = 0 WHERE url = ?;", value)
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to disable Website: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
-		return
-	}
-
-	// Check if exactly one Website has been disabled
-	rowsAffected, _ := res.RowsAffected()
-	if rowsAffected == 1 {
-		SendJsonMessage(w, http.StatusOK, true, "")
-	} else {
-		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Could not disable Website.")
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Could not enable / disable Website.")
 	}
 }
 
 // Sets an existing Website to visible in the database.
-func ApiAdminWebsiteVisible(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func ApiAdminWebsiteVisibility(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {
 		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
 		return
@@ -187,64 +163,40 @@ func ApiAdminWebsiteVisible(w http.ResponseWriter, r *http.Request, ps httproute
 
 	// Get data from Request
 	r.ParseForm()
-	value := r.Form.Get("url")
+	value := ps.ByName("url")
+	visible := r.Form.Get("visible")
 
 	// Simple Validation
-	if value == "" {
-		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value.")
+	if value == "" || visible == "" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit valid values.")
+		return
+	}
+
+	var visibilityValue int
+	if (visible == "true") {
+		visibilityValue = 1
+	} else if visible == "false" {
+		visibilityValue = 0
+	} else {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit valid values.")
 		return
 	}
 
 	// Update Database-Row
 	db := lib.GetDatabase()
-	res, err := db.Exec("UPDATE websites SET visible = 1 WHERE url = ?;", value)
+	res, err := db.Exec("UPDATE websites SET visible = ? WHERE url = ?;", visibilityValue, value)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to set Website visible: ", err)
+		logging.MustGetLogger("logger").Error("Unable to set Website's visibility: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
 
-	// Check if exactly one Website has been set to visible
+	// Check if exactly one Website is affected
 	rowsAffected, _ := res.RowsAffected()
 	if rowsAffected == 1 {
 		SendJsonMessage(w, http.StatusOK, true, "")
 	} else {
-		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Could not set Website to visible.")
-	}
-}
-
-// Sets an existing Website to invisible in the database.
-func ApiAdminWebsiteInvisible(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	if !lib.IsLoggedIn(r) {
-		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
-		return
-	}
-
-	// Get data from Request
-	r.ParseForm()
-	value := r.Form.Get("url")
-
-	// Simple Validation
-	if value == "" {
-		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value.")
-		return
-	}
-
-	// Update Database-Row
-	db := lib.GetDatabase()
-	res, err := db.Exec("UPDATE websites SET visible = 0 WHERE url = ?;", value)
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to set Website invisible: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
-		return
-	}
-
-	// Check if exactly one Website has been set to invisible
-	rowsAffected, _ := res.RowsAffected()
-	if rowsAffected == 1 {
-		SendJsonMessage(w, http.StatusOK, true, "")
-	} else {
-		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Could not set Website to invisible.")
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Could not set Website's visibility.")
 	}
 }
 
@@ -255,9 +207,8 @@ func ApiAdminWebsiteGetNotifications(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	// TODO
 	// Get data from Request
-	// value := ps.ByName("url")
+	value := ps.ByName("url")
 
 	// Simple Validation
 	if value == "" {
@@ -265,12 +216,11 @@ func ApiAdminWebsiteGetNotifications(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	// Check for existing settings
+	// Get existing settings
 	var (
 		cPushbulletKey string
 		cEmail         string
 	)
-
 	db := lib.GetDatabase()
 	var resp AdminWebsiteNotificationsResponse
 	err := db.QueryRow("SELECT pushbulletKey, email FROM notifications, websites WHERE notifications.websiteId = websites.id AND url = ?;", value).Scan(&cPushbulletKey, &cEmail)
@@ -305,7 +255,7 @@ func ApiAdminWebsiteUpdateNotifications(w http.ResponseWriter, r *http.Request, 
 
 	// Get data from Request
 	r.ParseForm()
-	url := r.Form.Get("url")
+	url := ps.ByName("url")
 	pushbulletKey := r.Form.Get("pushbulletKey")
 	email := r.Form.Get("email")
 
@@ -366,7 +316,7 @@ func ApiAdminWebsiteEdit(w http.ResponseWriter, r *http.Request, ps httprouter.P
 
 	// Get data from Request
 	r.ParseForm()
-	oldUrl := r.Form.Get("oldUrl")
+	oldUrl := ps.ByName("url")
 	name := r.Form.Get("name")
 	protocol := r.Form.Get("protocol")
 	url := r.Form.Get("url")
@@ -412,8 +362,7 @@ func ApiAdminWebsiteDelete(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	// Get data from Request
-	r.ParseForm()
-	value := r.Form.Get("url")
+	value := ps.ByName("url")
 
 	// Simple Validation
 	if value == "" {

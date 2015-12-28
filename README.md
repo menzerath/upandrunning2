@@ -58,7 +58,7 @@ Also you should notice that some of the APIs changed and you may need to adjust 
 Notice: Everyone is able to access those APIs.
 
 #### Status
-`GET` `/api/status/website.com`:
+`GET` `/api/v1/websites/:url/status`:
 
 ```json
 {
@@ -88,7 +88,7 @@ Notice: Everyone is able to access those APIs.
 ```
 
 #### Results
-`GET` `/api/results/website.com`:
+`GET` `/api/v1/websites/:url/results`:
 
 Optional parameter: `?limit=100`  
 Optional parameter: `?offset=50`
@@ -107,7 +107,7 @@ Optional parameter: `?offset=50`
 ```
 
 #### List
-`GET` `/api/websites`:
+`GET` `/api/v1/websites`:
 
 ```json
 {
@@ -127,7 +127,7 @@ Optional parameter: `?offset=50`
 Notice: You have to login before you are able to use those APIs.
 
 #### List all Websites
-`GET` `/api/admin/websites`:
+`GET` `/api/v1/admin/websites`:
 
 ```json
 {
@@ -149,46 +149,38 @@ Notice: You have to login before you are able to use those APIs.
 ```
 
 #### Add a Website
-`POST` `/api/admin/websites/add`:
+`POST` `/api/v1/admin/websites/:url`:
 
 ```json
-POST-parameters: name, protocol, url, checkMethod
+POST-parameters: name, protocol, checkMethod
 ```
 
-#### Enable a Website
-`POST` `/api/admin/websites/enable`:
+#### Edit a Website
+`PUT` `/api/v1/admin/websites/:url`:
 
 ```json
-POST-parameters: url
+PUT-parameters: name, protocol, url, checkMethod
 ```
 
-#### Disable a Website
-`POST` `/api/admin/websites/disable`:
+#### Delete a Website
+`DELETE` `/api/v1/admin/websites/:url`:
+
+#### Enable / Disable a Website
+`PUT` `/api/v1/admin/websites/:url/enabled`:
 
 ```json
-POST-parameters: url
+PUT-parameters: enabled {true / false}
 ```
 
-#### Set a Website visible
-`POST` `/api/admin/websites/visible`:
+#### Set a Website's visibility
+`PUT` `/api/v1/admin/websites/:url/visibility`:
 
 ```json
-POST-parameters: url
-```
-
-#### Set a Website invisible
-`POST` `/api/admin/websites/invisible`:
-
-```json
-POST-parameters: url
+PUT-parameters: visible {true / false}
 ```
 
 #### Get a Website's notification settings
-`GET` `/api/admin/websites/notifications`:
-
-```json
-POST-parameters: url
-```
+`GET` `/api/v1/admin/websites/:url/notifications`:
 
 ```json
 {
@@ -201,67 +193,52 @@ POST-parameters: url
 ```
 
 #### Set a Website's notification settings
-`POST` `/api/admin/websites/notifications`:
+`PUT` `/api/v1/admin/websites/:url/notifications`:
 
 ```json
-POST-parameters: url, pushbulletKey, email
-```
-
-#### Edit a Website
-`POST` `/api/admin/websites/edit`:
-
-```json
-POST-parameters: oldUrl, name, protocol, url, checkMethod
-```
-
-#### Delete a Website
-`POST` `/api/admin/websites/delete`:
-
-```json
-POST-parameters: url
+PUT-parameters: pushbulletKey, email
 ```
 
 #### Change Application-Title
-`POST` `/api/admin/settings/title`:
+`PUT` `/api/v1/settings/title`:
 
 ```json
-POST-parameters: title
+PUT-parameters: title
 ```
 
 #### Change Check-Interval
-`POST` `/api/admin/settings/interval`:
+`PUT` `/api/v1/settings/interval`:
 
 ```json
-POST-parameters: interval
+PUT-parameters: interval
 ```
 
 #### Change Admin-Password
-`POST` `/api/admin/settings/password`:
+`PUT` `/api/v1/settings/password`:
 
 ```json
-POST-parameters: password
+PUT-parameters: password
+```
+
+#### Change amount of Redirects
+`PUT` `/api/v1/settings/redirects`:
+
+```json
+PUT-parameters: redirects
 ```
 
 #### Trigger a Check
-`POST` `/api/admin/check`:
-
-```json
-POST-parameters: - none -
-```
+`GET` `/api/v1/check`:
 
 #### Login
-`POST` `/api/admin/login`:
+`POST` `/api/v1/auth/login`:
 
 ```json
 POST-parameters: password
 ```
 
 #### Logout
-`POST` `/api/admin/logout`:
-
-```json
-POST-parameters: - none -
-```
+`GET` `/api/v1/auth/logout`:
 
 ## Screenshots
 ![User-Interface](doc/Screenshot1.jpg)

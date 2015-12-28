@@ -88,9 +88,11 @@ func (w *Website) sendNotifications(newStatusCode int, newStatusText string) {
 		return
 	}
 	err = db.QueryRow("SELECT statusCode, statusText FROM checks WHERE websiteId = ? ORDER BY id DESC LIMIT 1", w.Id).Scan(&oldStatusCode, &oldStatusText)
-	if err != nil {
+	switch {
+	case err == sql.ErrNoRows:
+		return
+	case err != nil:
 		logging.MustGetLogger("logger").Error("Unable to get Website's data: ", err)
-		logging.MustGetLogger("logger").Info("This is totally normal if this is the first result inserted into the database.")
 		return
 	}
 

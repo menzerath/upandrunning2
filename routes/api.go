@@ -15,6 +15,11 @@ func ApiIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	SendJsonMessage(w, http.StatusOK, true, "Welcome to UpAndRunning2's API!")
 }
 
+// Sends a simple welcome-message to the user.
+func ApiIndexV1(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	SendJsonMessage(w, http.StatusOK, true, "Welcome to UpAndRunning2's API v1!")
+}
+
 // Returns a DetailedWebsiteResponse containing all the Website's important data if the Website is enabled.
 func ApiStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var (
@@ -201,7 +206,11 @@ func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 		// Query the database for status data
 		err = db.QueryRow("SELECT statusCode, statusText FROM checks WHERE websiteId = ? ORDER BY id DESC LIMIT 1;", id).Scan(&statusCode, &statusText)
-		if err != nil {
+		switch {
+		case err == sql.ErrNoRows:
+			statusCode = "0"
+			statusText = "unknown"
+		case err != nil:
 			logging.MustGetLogger("logger").Error("Unable to fetch Website-Status: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 			return

@@ -64,34 +64,36 @@ func serveRequests() {
 	router.GET("/admin", routes.AdminIndex)
 	router.GET("/admin/login", routes.AdminLogin)
 
-	// API
+	// **********
+	// * API v1 *
+	// **********
+
+	// Public
 	router.GET("/api", routes.ApiIndex)
-	router.GET("/api/status/:url", routes.ApiStatus)
-	router.GET("/api/results/:url", routes.ApiResults)
-	router.GET("/api/websites", routes.ApiWebsites)
+	router.GET("/api/v1", routes.ApiIndexV1)
+	router.GET("/api/v1/websites", routes.ApiWebsites)
+	router.GET("/api/v1/websites/:url/status", routes.ApiStatus)
+	router.GET("/api/v1/websites/:url/results", routes.ApiResults)
 
-	// Admin-API
-	router.GET("/api/admin", routes.ApiAdminIndex)
+	// Private
+	router.PUT("/api/v1/settings/title", routes.ApiAdminSettingTitle)
+	router.PUT("/api/v1/settings/password", routes.ApiAdminSettingPassword)
+	router.PUT("/api/v1/settings/interval", routes.ApiAdminSettingInterval)
+	router.PUT("/api/v1/settings/redirects", routes.ApiAdminSettingRedirects)
 
-	router.POST("/api/admin/settings/title", routes.ApiAdminSettingTitle)
-	router.POST("/api/admin/settings/password", routes.ApiAdminSettingPassword)
-	router.POST("/api/admin/settings/interval", routes.ApiAdminSettingInterval)
-	router.POST("/api/admin/settings/redirects", routes.ApiAdminSettingRedirects)
+	router.GET("/api/v1/check", routes.ApiAdminActionCheck)
+	router.POST("/api/v1/auth/login", routes.ApiAdminActionLogin)
+	router.GET("/api/v1/auth/logout", routes.ApiAdminActionLogout)
 
-	router.GET("/api/admin/websites", routes.ApiAdminWebsites)
-	router.POST("/api/admin/websites/add", routes.ApiAdminWebsiteAdd)
-	router.POST("/api/admin/websites/enable", routes.ApiAdminWebsiteEnable)
-	router.POST("/api/admin/websites/disable", routes.ApiAdminWebsiteDisable)
-	router.POST("/api/admin/websites/visible", routes.ApiAdminWebsiteVisible)
-	router.POST("/api/admin/websites/invisible", routes.ApiAdminWebsiteInvisible)
-	router.GET("/api/admin/websites/notifications", routes.ApiAdminWebsiteGetNotifications)
-	router.POST("/api/admin/websites/notifications", routes.ApiAdminWebsiteUpdateNotifications)
-	router.POST("/api/admin/websites/edit", routes.ApiAdminWebsiteEdit)
-	router.POST("/api/admin/websites/delete", routes.ApiAdminWebsiteDelete)
+	router.GET("/api/v1/admin/websites", routes.ApiAdminWebsites)
+	router.POST("/api/v1/admin/websites/:url", routes.ApiAdminWebsiteAdd)
+	router.PUT("/api/v1/admin/websites/:url", routes.ApiAdminWebsiteEdit)
+	router.DELETE("/api/v1/admin/websites/:url", routes.ApiAdminWebsiteDelete)
 
-	router.POST("/api/admin/check", routes.ApiAdminActionCheck)
-	router.POST("/api/admin/login", routes.ApiAdminActionLogin)
-	router.POST("/api/admin/logout", routes.ApiAdminActionLogout)
+	router.PUT("/api/v1/admin/websites/:url/enabled", routes.ApiAdminWebsiteEnabled)
+	router.PUT("/api/v1/admin/websites/:url/visibility", routes.ApiAdminWebsiteVisibility)
+	router.GET("/api/v1/admin/websites/:url/notifications", routes.ApiAdminWebsiteGetNotifications)
+	router.PUT("/api/v1/admin/websites/:url/notifications", routes.ApiAdminWebsiteUpdateNotifications)
 
 	// Static Files
 	router.ServeFiles("/public/*filepath", http.Dir("public"))
