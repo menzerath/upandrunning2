@@ -22,19 +22,19 @@ type WebsiteResponse struct {
 	Websites []BasicWebsite `json:"websites"`
 }
 
-// Contains a success-bool and an array of WebsiteCheckResults.
-type ResultsResponse struct {
-	Success  bool                 `json:"requestSuccess"`
-	Websites []WebsiteCheckResult `json:"results"`
-}
-
 // Contains a success-bool and the Website's details.
-type DetailedWebsiteResponse struct {
+type StatusResponse struct {
 	Success               bool                `json:"requestSuccess"`
 	WebsiteData           WebsiteData         `json:"websiteData"`
 	Availability          WebsiteAvailability `json:"availability"`
 	LastCheckResult       WebsiteCheckResult  `json:"lastCheckResult"`
 	LastFailedCheckResult WebsiteCheckResult  `json:"lastFailedCheckResult"`
+}
+
+// Contains a success-bool and an array of WebsiteCheckResults.
+type ResultsResponse struct {
+	Success  bool                 `json:"requestSuccess"`
+	Websites []WebsiteCheckResult `json:"results"`
 }
 
 // Contains the Website's basic data such as name, protocol, url and current status.
@@ -72,13 +72,19 @@ type WebsiteCheckResult struct {
 // *******************
 
 // Contains a success-bool and an array of AdminWebsites.
-type AdminWebsiteResponse struct {
-	Success  bool           `json:"requestSuccess"`
-	Websites []AdminWebsite `json:"websites"`
+type DetailedWebsiteResponse struct {
+	Success  bool              `json:"requestSuccess"`
+	Websites []DetailedWebsite `json:"websites"`
+}
+
+// Contains a success-bool and a notification-object.
+type WebsiteNotificationsResponse struct {
+	Success       bool          `json:"requestSuccess"`
+	Notifications Notifications `json:"notifications"`
 }
 
 // Contains the Website's data, which will be shown inside the admin-backend.
-type AdminWebsite struct {
+type DetailedWebsite struct {
 	Id          int    `json:"id"`
 	Name        string `json:"name"`
 	Enabled     bool   `json:"enabled"`
@@ -90,14 +96,8 @@ type AdminWebsite struct {
 	Time        string `json:"time"`
 }
 
-// Contains a success-bool and a notification-object.
-type AdminWebsiteNotificationsResponse struct {
-	Success       bool                 `json:"requestSuccess"`
-	Notifications WebsiteNotifications `json:"notifications"`
-}
-
 // Contains all saved notification settings of a website.
-type WebsiteNotifications struct {
+type Notifications struct {
 	PushbulletKey string `json:"pushbulletKey"`
 	Email         string `json:"email"`
 }
