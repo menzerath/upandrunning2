@@ -1,8 +1,12 @@
-# UpAndRunning2 [![Build Status](https://drone.io/github.com/MarvinMenzerath/UpAndRunning2/status.png)](https://drone.io/github.com/MarvinMenzerath/UpAndRunning2/latest)
+# UpAndRunning2
+[![Build Status](https://drone.io/github.com/MarvinMenzerath/UpAndRunning2/status.png)](https://drone.io/github.com/MarvinMenzerath/UpAndRunning2/latest)
+[![Docker Layers](https://badge.imagelayers.io/marvinmenzerath/upandrunning2:latest.svg)](https://imagelayers.io/?images=marvinmenzerath/upandrunning2:latest)
+
 UpAndRunning2 is a lightweight Go application which **monitors all of your websites**, offers a simple **JSON-REST-API** and user-defined **notifications**.
 
 ## Features
 * Easy [Installation](#installation) and Configuration
+	* Use a small Docker-image for quick and easy deployment
 * Checks all of your websites regularly
 	* Use `HEAD` or `GET` requests
 	* Set an interval of 10 seconds up to 10 minutes
@@ -33,6 +37,8 @@ Next to those HTTP status codes the application is also able to recognize a requ
 In this case you need to adjust the used Check-Method to a GET-request.
 
 ## Installation
+Looking for the Docker Guide? Click [here](docker/README.md).
+
 * Download and extract all the files in a directory
 * Prepare your MySQL-Server: create a new user and a new database
 * Copy `config/default.json` to `config/local.json` and change this file to your needs
