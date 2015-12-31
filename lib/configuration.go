@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/op/go-logging"
 	"os"
+	"strconv"
 )
 
 // This the one and only Configuration-object.
@@ -57,14 +58,48 @@ type StaticConfiguration struct {
 
 // Reads a configuration-file from a specified path.
 func ReadConfigurationFromFile(filePath string) {
-	logging.MustGetLogger("logger").Info("Reading Configuration from File...")
+	if os.Getenv("UAR2_IS_DOCKER") == "true" {
+		ReadDefaultConfiguration("config/default.json")
+		logging.MustGetLogger("logger").Info("Reading Configuration from Environment Variables...")
+
+		config.Database.Host = os.Getenv("MYSQL_PORT_3306_TCP_ADDR")
+		config.Database.User = "root"
+		config.Database.Password = os.Getenv("MYSQL_ENV_MYSQL_ROOT_PASSWORD")
+		config.Database.Database = "upandrunning"
+
+		config.Mailer.Host = os.Getenv("UAR2_MAILER_HOST")
+		i, err := strconv.Atoi(os.Getenv("UAR2_MAILER_PORT"))
+		if err == nil {
+			config.Mailer.Port = i
+		}
+		config.Mailer.User = os.Getenv("UAR2_MAILER_USER")
+		config.Mailer.Password = os.Getenv("UAR2_MAILER_PASSWORD")
+		config.Mailer.From = os.Getenv("UAR2_MAILER_FROM")
+
+		return
+	}
+
+	logging.MustGetLogger("logger").Info("Reading Configuration from File (" + filePath + ")...")
 
 	file, _ := os.Open(filePath)
 	decoder := json.NewDecoder(file)
 
 	err := decoder.Decode(&config)
 	if err != nil {
-		logging.MustGetLogger("logger").Fatal("Unable to read Configuration: ", err)
+		logging.MustGetLogger("logger").Fatal("Unable to read Configuration. Make sure the File exists and is valid: ", err)
+	}
+}
+
+// Reads the default configuration-file from a specified path.
+func ReadDefaultConfiguration(filePath string) {
+	logging.MustGetLogger("logger").Info("Reading Default-Configuration from File (" + filePath + ")...")
+
+	file, _ := os.Open(filePath)
+	decoder := json.NewDecoder(file)
+
+	err := decoder.Decode(&config)
+	if err != nil {
+		logging.MustGetLogger("logger").Fatal("Unable to read Configuration. Make sure the File exists and is valid: ", err)
 	}
 }
 
@@ -91,11 +126,11 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	// Interval
 	err = db.QueryRow("SELECT value FROM settings where name = 'interval';").Scan(&interval)
 	if err != nil {
-		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('interval', 30);")
+		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('interval', 60);")
 		if err != nil {
 			logging.MustGetLogger("logger").Fatal("Unable to insert 'interval'-setting: ", err)
 		}
-		interval = 5
+		interval = 60
 	}
 
 	// Redirects

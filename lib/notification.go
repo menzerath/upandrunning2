@@ -26,6 +26,11 @@ func sendPush(apiKey string, name string, url string, newStatus string, oldStatu
 // Sends an email containing the given data to the saved e-mail-address.
 // Needs a configured SMTP-server (in config-file).
 func sendMail(recipient string, name string, url string, newStatus string, oldStatus string) {
+	if GetConfiguration().Mailer.Host == "" || GetConfiguration().Mailer.Host == "smtp.mymail.com" {
+		logging.MustGetLogger("logger").Warning("Not sending email because of missing configuration.")
+		return
+	}
+
 	logging.MustGetLogger("logger").Debug("Sending email about \"" + url + "\"...")
 
 	mConf := GetConfiguration().Mailer

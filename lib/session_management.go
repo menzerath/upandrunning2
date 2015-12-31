@@ -2,15 +2,12 @@ package lib
 
 import (
 	"crypto/rand"
-
+	"encoding/base64"
 	"github.com/op/go-logging"
+	"io"
 	"net/http"
-
 	"strings"
 	"time"
-
-	"encoding/base64"
-	"io"
 )
 
 // Contains every user and the user's authentication Cookie.
