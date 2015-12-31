@@ -126,7 +126,7 @@ type AdminSiteData struct {
 func SendJsonMessage(w http.ResponseWriter, code int, success bool, message string) {
 	responseBytes, err := json.Marshal(BasicResponse{success, message})
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to send JSON-Message: ", err)
+		logging.MustGetLogger("").Error("Unable to send JSON-Message: ", err)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")

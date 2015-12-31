@@ -22,7 +22,7 @@ func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	db := lib.GetDatabase()
 	rows, err := db.Query("SELECT id, name, protocol, url FROM websites WHERE enabled = 1 AND visible = 1 ORDER BY name;")
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
+		logging.MustGetLogger("").Error("Unable to fetch Websites: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 		return
 	}
@@ -42,7 +42,7 @@ func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	for rows.Next() {
 		err = rows.Scan(&id, &name, &protocol, &url)
 		if err != nil {
-			logging.MustGetLogger("logger").Error("Unable to read Website-Data-Row: ", err)
+			logging.MustGetLogger("").Error("Unable to read Website-Data-Row: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 			return
 		}
@@ -54,7 +54,7 @@ func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 			statusCode = "0"
 			statusText = "unknown"
 		case err != nil:
-			logging.MustGetLogger("logger").Error("Unable to fetch Website-Status: ", err)
+			logging.MustGetLogger("").Error("Unable to fetch Website-Status: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 			return
 		}
@@ -83,7 +83,7 @@ func ApiWebsitesDetailed(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	db := lib.GetDatabase()
 	rows, err := db.Query("SELECT id, name, enabled, visible, protocol, url, checkMethod FROM websites ORDER BY name;")
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
+		logging.MustGetLogger("").Error("Unable to fetch Websites: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 		return
 	}
@@ -107,7 +107,7 @@ func ApiWebsitesDetailed(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	for rows.Next() {
 		err = rows.Scan(&id, &name, &enabled, &visible, &protocol, &url, &checkMethod)
 		if err != nil {
-			logging.MustGetLogger("logger").Error("Unable to read Website-Data-Row: ", err)
+			logging.MustGetLogger("").Error("Unable to read Website-Data-Row: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 			return
 		}
@@ -120,7 +120,7 @@ func ApiWebsitesDetailed(w http.ResponseWriter, r *http.Request, ps httprouter.P
 			statusText = "unknown"
 			time = "0000-00-00 00:00:00"
 		case err != nil:
-			logging.MustGetLogger("logger").Error("Unable to fetch Website's status: ", err)
+			logging.MustGetLogger("").Error("Unable to fetch Website's status: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 			return
 		}
@@ -165,7 +165,7 @@ func ApiWebsitesStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		SendJsonMessage(w, http.StatusNotFound, false, "Unable to find any data matching the given url.")
 		return
 	case err != nil:
-		logging.MustGetLogger("logger").Error("Unable to fetch Website-Status: ", err)
+		logging.MustGetLogger("").Error("Unable to fetch Website-Status: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 		return
 	}
@@ -179,7 +179,7 @@ func ApiWebsitesStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		lastFailResponseTime = "0"
 		lastFailTime = "0000-00-00 00:00:00"
 	case err != nil:
-		logging.MustGetLogger("logger").Error("Unable to fetch Website-Status: ", err)
+		logging.MustGetLogger("").Error("Unable to fetch Website-Status: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 		return
 	}
@@ -188,11 +188,11 @@ func ApiWebsitesStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	err = db.QueryRow("SELECT (SELECT COUNT(checks.id) FROM checks, websites WHERE checks.websiteId = websites.id AND (checks.statusCode LIKE '2%' OR checks.statusCode LIKE '3%') AND websites.url = ?) AS ups, (SELECT COUNT(checks.id) FROM checks, websites WHERE checks.websiteId = websites.id AND websites.url = ?) AS total FROM checks LIMIT 1;", ps.ByName("url"), ps.ByName("url")).Scan(&ups, &totalChecks)
 	switch {
 	case err == sql.ErrNoRows:
-		logging.MustGetLogger("logger").Error("Unable to fetch Website-Status: ", err)
+		logging.MustGetLogger("").Error("Unable to fetch Website-Status: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 		return
 	case err != nil:
-		logging.MustGetLogger("logger").Error("Unable to fetch Website-Status: ", err)
+		logging.MustGetLogger("").Error("Unable to fetch Website-Status: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 		return
 	}
@@ -248,7 +248,7 @@ func ApiWebsitesResults(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	db := lib.GetDatabase()
 	rows, err := db.Query("SELECT statusCode, statusText, responseTime, time FROM checks, websites WHERE checks.websiteId = websites.id AND websites.url = ? AND websites.enabled = 1 ORDER BY time DESC LIMIT ? OFFSET ?;", ps.ByName("url"), limit, offset)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to fetch Results: ", err)
+		logging.MustGetLogger("").Error("Unable to fetch Results: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 		return
 	}
@@ -265,7 +265,7 @@ func ApiWebsitesResults(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	for rows.Next() {
 		err = rows.Scan(&statusCode, &statusText, &responseTime, &time)
 		if err != nil {
-			logging.MustGetLogger("logger").Error("Unable to read Result-Row: ", err)
+			logging.MustGetLogger("").Error("Unable to read Result-Row: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 			return
 		}
@@ -276,7 +276,7 @@ func ApiWebsitesResults(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	// Check for Errors
 	err = rows.Err()
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to read Result-Rows: ", err)
+		logging.MustGetLogger("").Error("Unable to read Result-Rows: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 		return
 	}

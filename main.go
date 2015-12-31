@@ -22,7 +22,7 @@ func main() {
 	lib.SetupLogger()
 
 	// Welcome
-	logging.MustGetLogger("logger").Info("Welcome to UpAndRunning2 v%s [%s@%s]!", VERSION, goVersion, goArch)
+	logging.MustGetLogger("").Info("Welcome to UpAndRunning2 v%s [%s@%s]!", VERSION, goVersion, goArch)
 
 	// Config
 	lib.ReadConfigurationFromFile("config/local.json")
@@ -107,8 +107,8 @@ func serveRequests() {
 		http.Error(w, "Error 404: Not Found", 404)
 	})
 
-	logging.MustGetLogger("logger").Debug("Listening on Port " + strconv.Itoa(lib.GetConfiguration().Port) + "...")
-	logging.MustGetLogger("logger").Fatal(http.ListenAndServe(":"+strconv.Itoa(lib.GetConfiguration().Port), router))
+	logging.MustGetLogger("").Debug("Listening on Port " + strconv.Itoa(lib.GetConfiguration().Port) + "...")
+	logging.MustGetLogger("").Fatal(http.ListenAndServe(":"+strconv.Itoa(lib.GetConfiguration().Port), router))
 }
 
 // Creates a timer to regularly check all Websites
@@ -140,7 +140,7 @@ func checkAllSites() {
 	db := lib.GetDatabase()
 	rows, err := db.Query("SELECT id, protocol, url, checkMethod FROM websites WHERE enabled = 1;")
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to fetch Websites: ", err)
+		logging.MustGetLogger("").Error("Unable to fetch Websites: ", err)
 		return
 	}
 	defer rows.Close()
@@ -151,7 +151,7 @@ func checkAllSites() {
 		var website lib.Website
 		err = rows.Scan(&website.Id, &website.Protocol, &website.Url, &website.CheckMethod)
 		if err != nil {
-			logging.MustGetLogger("logger").Error("Unable to read Website-Row: ", err)
+			logging.MustGetLogger("").Error("Unable to read Website-Row: ", err)
 			return
 		}
 		go website.RunCheck(false)
@@ -162,9 +162,9 @@ func checkAllSites() {
 	// Check for Errors
 	err = rows.Err()
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to read Website-Rows: ", err)
+		logging.MustGetLogger("").Error("Unable to read Website-Rows: ", err)
 		return
 	}
 
-	logging.MustGetLogger("logger").Info("Checked " + strconv.Itoa(count) + " active Websites.")
+	logging.MustGetLogger("").Info("Checked " + strconv.Itoa(count) + " active Websites.")
 }

@@ -60,7 +60,7 @@ type StaticConfiguration struct {
 func ReadConfigurationFromFile(filePath string) {
 	if os.Getenv("UAR2_IS_DOCKER") == "true" {
 		ReadDefaultConfiguration("config/default.json")
-		logging.MustGetLogger("logger").Info("Reading Configuration from Environment Variables...")
+		logging.MustGetLogger("").Info("Reading Configuration from Environment Variables...")
 
 		config.Database.Host = os.Getenv("MYSQL_PORT_3306_TCP_ADDR")
 		config.Database.User = "root"
@@ -79,33 +79,33 @@ func ReadConfigurationFromFile(filePath string) {
 		return
 	}
 
-	logging.MustGetLogger("logger").Info("Reading Configuration from File (" + filePath + ")...")
+	logging.MustGetLogger("").Info("Reading Configuration from File (" + filePath + ")...")
 
 	file, _ := os.Open(filePath)
 	decoder := json.NewDecoder(file)
 
 	err := decoder.Decode(&config)
 	if err != nil {
-		logging.MustGetLogger("logger").Fatal("Unable to read Configuration. Make sure the File exists and is valid: ", err)
+		logging.MustGetLogger("").Fatal("Unable to read Configuration. Make sure the File exists and is valid: ", err)
 	}
 }
 
 // Reads the default configuration-file from a specified path.
 func ReadDefaultConfiguration(filePath string) {
-	logging.MustGetLogger("logger").Info("Reading Default-Configuration from File (" + filePath + ")...")
+	logging.MustGetLogger("").Info("Reading Default-Configuration from File (" + filePath + ")...")
 
 	file, _ := os.Open(filePath)
 	decoder := json.NewDecoder(file)
 
 	err := decoder.Decode(&config)
 	if err != nil {
-		logging.MustGetLogger("logger").Fatal("Unable to read Configuration. Make sure the File exists and is valid: ", err)
+		logging.MustGetLogger("").Fatal("Unable to read Configuration. Make sure the File exists and is valid: ", err)
 	}
 }
 
 // Reads all configuration-data from the database.
 func ReadConfigurationFromDatabase(db *sql.DB) {
-	logging.MustGetLogger("logger").Info("Reading Configuration from Database...")
+	logging.MustGetLogger("").Info("Reading Configuration from Database...")
 
 	var (
 		title     string
@@ -118,7 +118,7 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	if err != nil {
 		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('title', 'UpAndRunning2');")
 		if err != nil {
-			logging.MustGetLogger("logger").Fatal("Unable to insert 'title'-setting: ", err)
+			logging.MustGetLogger("").Fatal("Unable to insert 'title'-setting: ", err)
 		}
 		title = "UpAndRunning"
 	}
@@ -128,7 +128,7 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	if err != nil {
 		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('interval', 60);")
 		if err != nil {
-			logging.MustGetLogger("logger").Fatal("Unable to insert 'interval'-setting: ", err)
+			logging.MustGetLogger("").Fatal("Unable to insert 'interval'-setting: ", err)
 		}
 		interval = 60
 	}
@@ -138,7 +138,7 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	if err != nil {
 		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('redirects', 0);")
 		if err != nil {
-			logging.MustGetLogger("logger").Fatal("Unable to insert 'redirects'-setting: ", err)
+			logging.MustGetLogger("").Fatal("Unable to insert 'redirects'-setting: ", err)
 		}
 		redirects = 0
 	}
@@ -158,7 +158,7 @@ func SetStaticConfiguration(c StaticConfiguration) {
 // Returns the current Configuration-object.
 func GetConfiguration() *Configuration {
 	if config == nil {
-		logging.MustGetLogger("logger").Fatal("No active Configuration found.")
+		logging.MustGetLogger("").Fatal("No active Configuration found.")
 	} else {
 		return config
 	}

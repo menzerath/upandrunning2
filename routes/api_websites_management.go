@@ -33,7 +33,7 @@ func ApiWebsitesAdd(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	db := lib.GetDatabase()
 	_, err := db.Exec("INSERT INTO websites (name, protocol, url, checkMethod) VALUES (?, ?, ?, ?);", name, protocol, url, method)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to add Website: ", err)
+		logging.MustGetLogger("").Error("Unable to add Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
@@ -74,7 +74,7 @@ func ApiWebsitesEdit(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 	db := lib.GetDatabase()
 	res, err := db.Exec("UPDATE websites SET name = ?, protocol = ?, url = ?, checkMethod = ? WHERE url = ?;", name, protocol, url, method, oldUrl)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to edit Website: ", err)
+		logging.MustGetLogger("").Error("Unable to edit Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
@@ -108,7 +108,7 @@ func ApiWebsitesDelete(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	db := lib.GetDatabase()
 	res, err := db.Exec("DELETE c FROM checks c INNER JOIN websites w ON c.websiteId = w.id WHERE w.url = ?;", value)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to delete Check-Results: ", err)
+		logging.MustGetLogger("").Error("Unable to delete Check-Results: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
@@ -116,7 +116,7 @@ func ApiWebsitesDelete(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	// Remove Notifications from Database
 	res, err = db.Exec("DELETE n FROM notifications n INNER JOIN websites w ON n.websiteId = w.id WHERE w.url = ?;", value)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to delete Notifications: ", err)
+		logging.MustGetLogger("").Error("Unable to delete Notifications: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
@@ -125,7 +125,7 @@ func ApiWebsitesDelete(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	db = lib.GetDatabase()
 	res, err = db.Exec("DELETE FROM websites WHERE url = ?;", value)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to delete Website: ", err)
+		logging.MustGetLogger("").Error("Unable to delete Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
@@ -171,7 +171,7 @@ func ApiWebsitesEnabled(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	db := lib.GetDatabase()
 	res, err := db.Exec("UPDATE websites SET enabled = ? WHERE url = ?;", enabledValue, value)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to enable / disable Website: ", err)
+		logging.MustGetLogger("").Error("Unable to enable / disable Website: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
@@ -217,7 +217,7 @@ func ApiWebsitesVisibility(w http.ResponseWriter, r *http.Request, ps httprouter
 	db := lib.GetDatabase()
 	res, err := db.Exec("UPDATE websites SET visible = ? WHERE url = ?;", visibilityValue, value)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to set Website's visibility: ", err)
+		logging.MustGetLogger("").Error("Unable to set Website's visibility: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
@@ -259,7 +259,7 @@ func ApiWebsitesGetNotifications(w http.ResponseWriter, r *http.Request, ps http
 		if err == sql.ErrNoRows {
 			resp = WebsiteNotificationsResponse{true, Notifications{"", ""}}
 		} else {
-			logging.MustGetLogger("logger").Error("Unable to get Website's notification settings: ", err)
+			logging.MustGetLogger("").Error("Unable to get Website's notification settings: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 			return
 		}
@@ -309,19 +309,19 @@ func ApiWebsitePutNotifications(w http.ResponseWriter, r *http.Request, ps httpr
 			var id int
 			err := db.QueryRow("SELECT id FROM websites WHERE url = ?;", url).Scan(&id)
 			if err != nil {
-				logging.MustGetLogger("logger").Error("Unable to get Website's id for notification-insertion: ", err)
+				logging.MustGetLogger("").Error("Unable to get Website's id for notification-insertion: ", err)
 				SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 				return
 			}
 
 			_, err = db.Exec("INSERT INTO notifications (websiteId, pushbulletKey, email) VALUES (?, ?, ?);", id, pushbulletKey, email)
 			if err != nil {
-				logging.MustGetLogger("logger").Error("Unable to insert Website's notification settings: ", err)
+				logging.MustGetLogger("").Error("Unable to insert Website's notification settings: ", err)
 				SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 				return
 			}
 		} else {
-			logging.MustGetLogger("logger").Error("Unable to get Website's notification settings: ", err)
+			logging.MustGetLogger("").Error("Unable to get Website's notification settings: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 			return
 		}
@@ -329,7 +329,7 @@ func ApiWebsitePutNotifications(w http.ResponseWriter, r *http.Request, ps httpr
 		// existing settings found --> Update
 		_, err = db.Exec("UPDATE notifications, websites SET pushbulletKey = ?, email = ? WHERE notifications.websiteId = websites.id AND url = ?;", pushbulletKey, email, url)
 		if err != nil {
-			logging.MustGetLogger("logger").Error("Unable to update Website's notification settings: ", err)
+			logging.MustGetLogger("").Error("Unable to update Website's notification settings: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 			return
 		}

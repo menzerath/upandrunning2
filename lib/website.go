@@ -53,7 +53,7 @@ func (w *Website) RunCheck(secondTry bool) {
 	// Save the new Result
 	_, err = db.Exec("INSERT INTO checks (websiteId, statusCode, statusText, responseTime, time) VALUES (?, ?, ?, ?, NOW());", w.Id, newStatusCode, newStatusText, requestDuration)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
+		logging.MustGetLogger("").Error("Unable to save the new Website-status: ", err)
 		return
 	}
 }
@@ -74,7 +74,7 @@ func (w *Website) sendNotifications(newStatusCode int, newStatusText string) {
 		if err == sql.ErrNoRows {
 			return
 		}
-		logging.MustGetLogger("logger").Error("Unable to get Website's notification-settings: ", err)
+		logging.MustGetLogger("").Error("Unable to get Website's notification-settings: ", err)
 	}
 
 	// Check for empty result
@@ -84,7 +84,7 @@ func (w *Website) sendNotifications(newStatusCode int, newStatusText string) {
 
 	err = db.QueryRow("SELECT name FROM websites WHERE id = ?", w.Id).Scan(&name)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to get Website's data: ", err)
+		logging.MustGetLogger("").Error("Unable to get Website's data: ", err)
 		return
 	}
 	err = db.QueryRow("SELECT statusCode, statusText FROM checks WHERE websiteId = ? ORDER BY id DESC LIMIT 1", w.Id).Scan(&oldStatusCode, &oldStatusText)
@@ -92,7 +92,7 @@ func (w *Website) sendNotifications(newStatusCode int, newStatusText string) {
 	case err == sql.ErrNoRows:
 		return
 	case err != nil:
-		logging.MustGetLogger("logger").Error("Unable to get Website's data: ", err)
+		logging.MustGetLogger("").Error("Unable to get Website's data: ", err)
 		return
 	}
 

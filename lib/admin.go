@@ -25,10 +25,10 @@ func (a *Admin) ValidatePassword(userInput string) bool {
 	a.LoadPassword()
 	err := bcrypt.CompareHashAndPassword(a.password, []byte(userInput))
 	if err != nil {
-		logging.MustGetLogger("logger").Warning("Invalid Password: ", err)
+		logging.MustGetLogger("").Warning("Invalid Password: ", err)
 		return false
 	}
-	logging.MustGetLogger("logger").Info("Login successful.")
+	logging.MustGetLogger("").Info("Login successful.")
 	return true
 }
 
@@ -39,30 +39,30 @@ func (a *Admin) LoadPassword() bool {
 	err := db.QueryRow("SELECT value FROM settings WHERE name = 'password';").Scan(&value)
 	switch {
 	case err == sql.ErrNoRows:
-		logging.MustGetLogger("logger").Warning("No Admin-Password found.")
+		logging.MustGetLogger("").Warning("No Admin-Password found.")
 		return false
 	case err != nil:
-		logging.MustGetLogger("logger").Error("Error while checking for Admin-Password: ", err)
+		logging.MustGetLogger("").Error("Error while checking for Admin-Password: ", err)
 		return false
 	default:
 		a.password = value
 	}
 
-	logging.MustGetLogger("logger").Debug("Existing Admin-Password found.")
+	logging.MustGetLogger("").Debug("Existing Admin-Password found.")
 	return true
 }
 
 // Changes the current password to the given one.
 // Returns an error (if there was one).
 func (a *Admin) ChangePassword(userInput string) error {
-	logging.MustGetLogger("logger").Debug("Changing Admin-Password...")
+	logging.MustGetLogger("").Debug("Changing Admin-Password...")
 
 	clearPassword := []byte(userInput)
 	passwordHash, err := bcrypt.GenerateFromPassword(clearPassword, 15)
 
 	_, err = db.Exec("UPDATE settings SET value = ? WHERE name = 'password';", passwordHash)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to update Admin-Password: ", err)
+		logging.MustGetLogger("").Error("Unable to update Admin-Password: ", err)
 	}
 
 	a.password = passwordHash
@@ -71,14 +71,14 @@ func (a *Admin) ChangePassword(userInput string) error {
 
 // Adds a new admin user to the database.
 func (a *Admin) Add() {
-	logging.MustGetLogger("logger").Info("Adding default Admin...")
+	logging.MustGetLogger("").Info("Adding default Admin...")
 
 	clearPassword := []byte("admin")
 	passwordHash, err := bcrypt.GenerateFromPassword(clearPassword, 15)
 
 	_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('password', ?);", passwordHash)
 	if err != nil {
-		logging.MustGetLogger("logger").Fatal("Unable to insert Admin-Password: ", err)
+		logging.MustGetLogger("").Fatal("Unable to insert Admin-Password: ", err)
 	}
 
 	a.password = passwordHash

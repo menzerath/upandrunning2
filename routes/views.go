@@ -19,7 +19,7 @@ func ViewIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		w.Header().Set("Content-Type", "text/html")
 		t.Execute(w, data)
 	} else {
-		logging.MustGetLogger("logger").Error("Error while parsing Template: ", err)
+		logging.MustGetLogger("").Error("Error while parsing Template: ", err)
 		http.Error(w, "Error 500: Internal Server Error", http.StatusInternalServerError)
 	}
 }
@@ -40,7 +40,7 @@ func ViewLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		w.Header().Set("Content-Type", "text/html")
 		t.Execute(w, data)
 	} else {
-		logging.MustGetLogger("logger").Error("Error while parsing Template: ", err)
+		logging.MustGetLogger("").Error("Error while parsing Template: ", err)
 		http.Error(w, "Error 500: Internal Server Error", http.StatusInternalServerError)
 	}
 }
@@ -62,7 +62,7 @@ func ViewAdmin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		w.Header().Set("Content-Type", "text/html")
 		t.Execute(w, data)
 	} else {
-		logging.MustGetLogger("logger").Error("Error while parsing Template: ", err)
+		logging.MustGetLogger("").Error("Error while parsing Template: ", err)
 		http.Error(w, "Error 500: Internal Server Error", http.StatusInternalServerError)
 	}
 }

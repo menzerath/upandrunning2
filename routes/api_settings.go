@@ -29,7 +29,7 @@ func ApiSettingsTitle(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	db := lib.GetDatabase()
 	_, err := db.Exec("UPDATE settings SET value = ? WHERE name = 'title';", value)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to change Application-Title: ", err)
+		logging.MustGetLogger("").Error("Unable to change Application-Title: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
@@ -88,7 +88,7 @@ func ApiSettingsInterval(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	db := lib.GetDatabase()
 	_, err = db.Exec("UPDATE settings SET value = ? WHERE name = 'interval';", value)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to change Interval: ", err)
+		logging.MustGetLogger("").Error("Unable to change Interval: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}
@@ -120,7 +120,7 @@ func ApiSettingsRedirects(w http.ResponseWriter, r *http.Request, ps httprouter.
 	db := lib.GetDatabase()
 	_, err = db.Exec("UPDATE settings SET value = ? WHERE name = 'redirects';", value)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to change Redirects: ", err)
+		logging.MustGetLogger("").Error("Unable to change Redirects: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 		return
 	}

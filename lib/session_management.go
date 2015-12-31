@@ -15,7 +15,7 @@ var cookieStorage map[string]http.Cookie
 
 // Init the cookieStorage-map.
 func InitSessionManagement() {
-	logging.MustGetLogger("logger").Debug("Initializing Session-Management...")
+	logging.MustGetLogger("").Debug("Initializing Session-Management...")
 	cookieStorage = make(map[string]http.Cookie)
 }
 
@@ -67,7 +67,7 @@ func LogoutAndDestroyCookie(r *http.Request) http.Cookie {
 
 	// Remove the saved Cookie
 	delete(cookieStorage, strings.Split(cookie.Value, ":")[0])
-	logging.MustGetLogger("logger").Info("Logout successful.")
+	logging.MustGetLogger("").Info("Logout successful.")
 
 	// Return useless Cookie
 	return http.Cookie{Name: "session", Value: "", Path: "/", Expires: time.Now().AddDate(0, 0, -1), HttpOnly: true}

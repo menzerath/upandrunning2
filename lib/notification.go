@@ -9,7 +9,7 @@ import (
 
 // Sends a Pushbullet-Push containing the given data to the saved API-key.
 func sendPush(apiKey string, name string, url string, newStatus string, oldStatus string) {
-	logging.MustGetLogger("logger").Debug("Sending Push about \"" + url + "\"...")
+	logging.MustGetLogger("").Debug("Sending Push about \"" + url + "\"...")
 
 	pb := pushbullet.New(apiKey)
 
@@ -19,7 +19,7 @@ func sendPush(apiKey string, name string, url string, newStatus string, oldStatu
 
 	_, err := pb.PostPushesNote(push)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to send Push: ", err)
+		logging.MustGetLogger("").Error("Unable to send Push: ", err)
 	}
 }
 
@@ -27,11 +27,11 @@ func sendPush(apiKey string, name string, url string, newStatus string, oldStatu
 // Needs a configured SMTP-server (in config-file).
 func sendMail(recipient string, name string, url string, newStatus string, oldStatus string) {
 	if GetConfiguration().Mailer.Host == "" || GetConfiguration().Mailer.Host == "smtp.mymail.com" {
-		logging.MustGetLogger("logger").Warning("Not sending email because of missing configuration.")
+		logging.MustGetLogger("").Warning("Not sending email because of missing configuration.")
 		return
 	}
 
-	logging.MustGetLogger("logger").Debug("Sending email about \"" + url + "\"...")
+	logging.MustGetLogger("").Debug("Sending email about \"" + url + "\"...")
 
 	mConf := GetConfiguration().Mailer
 
@@ -44,6 +44,6 @@ func sendMail(recipient string, name string, url string, newStatus string, oldSt
 	d := gomail.NewPlainDialer(mConf.Host, mConf.Port, mConf.User, mConf.Password)
 
 	if err := d.DialAndSend(m); err != nil {
-		logging.MustGetLogger("logger").Error("Unable to send email: ", err)
+		logging.MustGetLogger("").Error("Unable to send email: ", err)
 	}
 }
