@@ -28,4 +28,4 @@ _testmain.go
 UpAndRunning2.iml
 
 # Application
-config/local.json
+config/local*.json

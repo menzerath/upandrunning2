@@ -15,6 +15,7 @@ func OpenDatabase(config databaseConfiguration) {
 	logging.MustGetLogger("logger").Info("Opening Database...")
 	var err error = nil
 
+	// Open connection to database-server
 	// username:password@protocol(address)
 	db, err = sql.Open("mysql", config.User+":"+config.Password+"@tcp("+config.Host+":"+strconv.Itoa(config.Port)+")/")
 	if err != nil {
@@ -24,18 +25,26 @@ func OpenDatabase(config databaseConfiguration) {
 
 	err = db.Ping()
 	if err != nil {
-		logging.MustGetLogger("logger").Fatal("Unable to reach Database: ", err)
+		logging.MustGetLogger("logger").Fatal("Unable to reach Database-server: ", err)
 	}
 
-	// Create database
+	// Create database and close connection
 	_, err = db.Exec("CREATE DATABASE IF NOT EXISTS " + config.Database + ";")
 	if err != nil {
 		logging.MustGetLogger("logger").Fatal("Unable to create database '"+config.Database+"': ", err)
 	}
+	db.Close()
 
-	_, err = db.Exec("USE " + config.Database + ";")
+	// Open connection to newly created database
+	db, err = sql.Open("mysql", config.User+":"+config.Password+"@tcp("+config.Host+":"+strconv.Itoa(config.Port)+")/"+config.Database)
 	if err != nil {
-		logging.MustGetLogger("logger").Fatal("Unable to use database '"+config.Database+"': ", err)
+		logging.MustGetLogger("logger").Fatal("Unable to open Database-Connection: ", err)
+	}
+	db.SetMaxOpenConns(config.ConnectionLimit)
+
+	err = db.Ping()
+	if err != nil {
+		logging.MustGetLogger("logger").Fatal("Unable to reach Database: ", err)
 	}
 
 	prepareDatabase()
@@ -89,11 +98,6 @@ func GetDatabase() *sql.DB {
 	if db == nil {
 		logging.MustGetLogger("logger").Fatal("No active Database found.")
 	} else {
-		// Make sure to always use the correct Database
-		_, err := db.Exec("USE " + config.Database.Database + ";")
-		if err != nil {
-			logging.MustGetLogger("logger").Fatal("Unable to use database '"+config.Database.Database+"': ", err)
-		}
 		return db
 	}
 	return nil

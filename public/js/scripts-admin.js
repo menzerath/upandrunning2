@@ -102,6 +102,9 @@ function loadWebsites() {
 					'<span class="label label-primary label-action" onclick="editWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Edit"><span class="fa fa-pencil"></span></span> ' +
 					'<span class="label label-danger label-action" onclick="deleteWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Delete"><span class="fa fa-trash"></span></span></td></tr>';
 			}
+			if (dataString === '') {
+				dataString = '<tr><td colspan="11">No Websites found.</td></tr>';
+			}
 			$('#table-websites').html(dataString);
 		},
 		error: function(error) {
@@ -161,6 +164,7 @@ function addWebsite() {
 			success: function() {
 				$('#input-add-name').val('');
 				$('#input-add-protocol').val('https');
+				$('#input-add-url').val('');
 				$('#input-add-method').val('HEAD');
 				loadWebsites();
 
