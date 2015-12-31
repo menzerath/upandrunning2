@@ -18,10 +18,11 @@ docker run -d --name uar2 --link uar2-db:mysql -p 80:8080 marvinmenzerath/upandr
 ```
 
 ## Upgrading
-Just remove the old container and deploy a new one. Make sure to add previously set environment-variables.
+Just remove the old container, pull the new image and deploy a new container. Make sure to add previously set environment-variables.
 ```
 docker stop uar2
 docker rm uar2
+docker pull marvinmenzerath/upandrunning2
 docker run -d --name uar2 --link uar2-db:mysql -p 80:8080 marvinmenzerath/upandrunning2
 ```
 
