@@ -8,11 +8,11 @@ import (
 
 // The application-wide used logging-format.
 var format = logging.MustStringFormatter(
-	"%{time:15:04:05.000} %{color}%{level:.4s}%{color:reset} %{message} @ %{shortfunc}",
+	"%{time:15:04:05} %{color}%{level:.4s}%{color:reset} %{message} @ %{shortfunc}",
 )
 
 var dockerFormat = logging.MustStringFormatter(
-	"%{time:15:04:05.000} %{level:.4s} %{message} @ %{shortfunc}",
+	"%{time:15:04:05} %{level:.4s} %{message} @ %{shortfunc}",
 )
 
 // Init the logger.
