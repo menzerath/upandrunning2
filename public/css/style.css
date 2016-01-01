@@ -33,19 +33,7 @@ pre {
 	margin-bottom: 0;
 }
 
-#bc-feature, #bc-site {
-	display: none;
-}
-
-#row-information {
-	display: none;
-}
-
-#row-responsetime {
-	display: none;
-}
-
-#row-edit-website {
+#bc-feature, #bc-site, #row-information, #row-responsetime, #row-edit-website {
 	display: none;
 }
 
@@ -59,6 +47,11 @@ pre {
 
 .label-action {
 	cursor: pointer;
+}
+
+.swal-wide{
+	margin-left: -450px !important;
+	width: 900px !important;
 }
 
 .close {

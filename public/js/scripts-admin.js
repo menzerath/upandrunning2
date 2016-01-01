@@ -99,6 +99,7 @@ function loadWebsites() {
 					'<span class="label label-info label-info label-action" onclick="editNotificationEmail(\'' + loadedWebsiteData[i].url + '\')" title="Email"><span class="fa fa-envelope"></span></span></td>';
 
 				dataString += '<td><span class="label label-default label-action" onclick="showWebsiteDetails(\'' + loadedWebsiteData[i].url + '\')" title="More"><span class="fa fa-info"></span></span> ' +
+					'<span class="label label-default label-action" onclick="showWebsiteResponseTimes(\'' + loadedWebsiteData[i].url + '\')" title="Response Times"><span class="fa fa-line-chart"></span></span> ' +
 					'<span class="label label-primary label-action" onclick="editWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Edit"><span class="fa fa-pencil"></span></span> ' +
 					'<span class="label label-danger label-action" onclick="deleteWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Delete"><span class="fa fa-trash"></span></span></td></tr>';
 			}
@@ -138,6 +139,89 @@ function showWebsiteDetails(website) {
 				text: '<pre>' + JSON.stringify(data, null, '\t') + '</pre>',
 				html: true,
 				confirmButtonText: "Close"
+			});
+		},
+		error: function(error) {
+			$('.bottom-right').notify({
+				type: 'danger',
+				message: {text: "Sorry, but I was unable to process your Request. Error: " + JSON.parse(error.responseText).message},
+				fadeOut: {enabled: true, delay: 3000}
+			}).show();
+		}
+	});
+}
+
+function showWebsiteResponseTimes(website) {
+	if (website == "") {
+		return;
+	}
+
+	if (typeof responseTimeGraph !== 'undefined') {
+		responseTimeGraph.destroy();
+	}
+
+	$.ajax({
+		url: "/api/v1/websites/" + website + "/results?limit=100",
+		type: "GET",
+		success: function(data) {
+			var chartValuesResponseTimes = [];
+			var chartValuesDatestamps = [];
+			for (var i = data.results.length - 1; i >= 0; i--) {
+				chartValuesResponseTimes.push(parseInt(data.results[i].responseTime.substr(0, data.results[i].responseTime.length - 3)));
+				chartValuesDatestamps.push(data.results[i].time);
+			}
+
+			swal({
+				title: website,
+				text: '<canvas id="graph-responsetime" height="200" width="800"></canvas>',
+				html: true,
+				customClass: "swal-wide",
+				confirmButtonText: "Close"
+			});
+
+			var chartData = {
+				labels: chartValuesDatestamps,
+				datasets: [
+					{
+						label: "Response Time (in ms)",
+						fill: true,
+						backgroundColor: "rgba(220,220,220,0.3)",
+						borderColor: "rgba(220,220,220,1)",
+						pointBorderColor: "rgba(220,220,220,1)",
+						pointBackgroundColor: "#fff",
+						pointBorderWidth: 1,
+						pointHoverRadius: 5,
+						pointHoverBackgroundColor: "rgba(220,220,220,1)",
+						pointHoverBorderColor: "rgba(220,220,220,1)",
+						pointHoverBorderWidth: 2,
+						data: chartValuesResponseTimes
+					}
+				]
+			};
+
+			var ctx = document.getElementById("graph-responsetime").getContext("2d");
+			window.responseTimeGraph = new Chart(ctx, {
+				type: 'line',
+				data: chartData,
+				options: {
+					legend: {
+						display: false
+					},
+					scales: {
+						xAxes: [{
+							ticks: {
+								display: false
+							}
+						}],
+						yAxes: [{
+							ticks: {
+								beginAtZero: true,
+								fontFamily: 'Roboto'
+							}
+						}]
+					},
+					responsive: true
+				}
 			});
 		},
 		error: function(error) {
