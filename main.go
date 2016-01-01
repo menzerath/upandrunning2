@@ -59,6 +59,7 @@ func serveRequests() {
 	// Index
 	router.GET("/", routes.ViewIndex)
 	router.GET("/status/:url", routes.ViewIndex)
+	router.GET("/results/:url", routes.ViewIndex)
 
 	// Admin
 	router.GET("/admin", routes.ViewAdmin)

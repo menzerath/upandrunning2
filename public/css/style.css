@@ -41,6 +41,10 @@ pre {
 	display: none;
 }
 
+#row-responsetime {
+	display: none;
+}
+
 #row-edit-website {
 	display: none;
 }

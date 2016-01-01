@@ -147,11 +147,11 @@ func ApiWebsitesStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		url                  string
 		statusCode           string
 		statusText           string
-		responseTime         string
+		responseTime         int
 		time                 string
 		lastFailStatusCode   string
 		lastFailStatusText   string
-		lastFailResponseTime string
+		lastFailResponseTime int
 		lastFailTime         string
 		ups                  int
 		totalChecks          int
@@ -176,7 +176,7 @@ func ApiWebsitesStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	case err == sql.ErrNoRows:
 		lastFailStatusCode = "0"
 		lastFailStatusText = "unknown"
-		lastFailResponseTime = "0"
+		lastFailResponseTime = 0
 		lastFailTime = "0000-00-00 00:00:00"
 	case err != nil:
 		logging.MustGetLogger("").Error("Unable to fetch Website-Status: ", err)
@@ -198,7 +198,7 @@ func ApiWebsitesStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	}
 
 	// Build Response
-	responseJson := StatusResponse{true, WebsiteData{id, name, protocol + "://" + url}, WebsiteAvailability{ups, totalChecks - ups, totalChecks, strconv.FormatFloat((float64(ups)/float64(totalChecks))*100, 'f', 2, 64) + "%"}, WebsiteCheckResult{statusCode + " - " + statusText, responseTime + " ms", time}, WebsiteCheckResult{lastFailStatusCode + " - " + lastFailStatusText, lastFailResponseTime + " ms", lastFailTime}}
+	responseJson := StatusResponse{true, WebsiteData{id, name, protocol + "://" + url}, WebsiteAvailability{ups, totalChecks - ups, totalChecks, strconv.FormatFloat((float64(ups)/float64(totalChecks))*100, 'f', 2, 64) + "%"}, WebsiteCheckResult{statusCode + " - " + statusText, strconv.Itoa(responseTime) + " ms", time}, WebsiteCheckResult{lastFailStatusCode + " - " + lastFailStatusText, strconv.Itoa(lastFailResponseTime) + " ms", lastFailTime}}
 
 	// Send Response
 	responseBytes, err := json.Marshal(responseJson)
@@ -247,7 +247,11 @@ func ApiWebsitesResults(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	// Query the Database
 	db := lib.GetDatabase()
 	rows, err := db.Query("SELECT statusCode, statusText, responseTime, time FROM checks, websites WHERE checks.websiteId = websites.id AND websites.url = ? AND websites.enabled = 1 ORDER BY time DESC LIMIT ? OFFSET ?;", ps.ByName("url"), limit, offset)
-	if err != nil {
+	switch {
+	case err == sql.ErrNoRows:
+		SendJsonMessage(w, http.StatusNotFound, false, "Unable to find any data matching the given url.")
+		return
+	case err != nil:
 		logging.MustGetLogger("").Error("Unable to fetch Results: ", err)
 		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
 		return
@@ -259,7 +263,7 @@ func ApiWebsitesResults(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	var (
 		statusCode   string
 		statusText   string
-		responseTime string
+		responseTime int
 		time         string
 	)
 	for rows.Next() {
@@ -270,7 +274,12 @@ func ApiWebsitesResults(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 			return
 		}
 
-		results = append(results, WebsiteCheckResult{statusCode + " - " + statusText, responseTime, time})
+		results = append(results, WebsiteCheckResult{statusCode + " - " + statusText, strconv.Itoa(responseTime) + " ms", time})
+	}
+
+	if len(results) == 0 {
+		SendJsonMessage(w, http.StatusNotFound, false, "Unable to find any data matching the given url.")
+		return
 	}
 
 	// Check for Errors
