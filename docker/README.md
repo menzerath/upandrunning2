@@ -6,9 +6,15 @@ You can use the small and always up-to-date Docker-image from [Docker Hub](https
 ## Installation
 
 ### Database
-Use this command to create and start a new MariaDB-container called `uar2-db`, which stores it's data inside `/data/uar2-db/` and uses the root-password `topSecretPassword`:
+Use these commands to create a new volume called `uar2-db-data` and start a new MariaDB-container called `uar2-db`, which stores it's data inside the previously created volume and uses the root-password `topSecretPassword`:
 ```
-docker run -d --name uar2-db -v /data/uar2-db/:/var/lib/mysql/ -e MYSQL_ROOT_PASSWORD='topSecretPassword' mariadb
+docker volume create --name uar2-db-data
+docker run -d --name uar2-db -v uar2-db-data:/var/lib/mysql/ -e MYSQL_ROOT_PASSWORD='topSecretPassword' mariadb
+```
+
+If you do not want to use a volume to store the databases's data, simply use this command:
+```
+docker run -d --name uar2-db -e MYSQL_ROOT_PASSWORD='topSecretPassword' mariadb
 ```
 
 ### UpAndRunning2
