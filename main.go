@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/MarvinMenzerath/UpAndRunning2/lib"
 	"github.com/MarvinMenzerath/UpAndRunning2/routes"
+	"github.com/franela/goreq"
 	"github.com/julienschmidt/httprouter"
 	"github.com/op/go-logging"
 	"net/http"
@@ -42,6 +43,7 @@ func main() {
 	lib.InitSessionManagement()
 
 	// Additional Libraries
+	goreq.SetConnectTimeout(5 * time.Second)
 	lib.InitHttpStatusCodeMap()
 
 	// Start Checking and Serving
