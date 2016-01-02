@@ -58,7 +58,7 @@ func (a *Admin) ChangePassword(userInput string) error {
 	logging.MustGetLogger("").Debug("Changing Admin-Password...")
 
 	clearPassword := []byte(userInput)
-	passwordHash, err := bcrypt.GenerateFromPassword(clearPassword, 15)
+	passwordHash, err := bcrypt.GenerateFromPassword(clearPassword, 12)
 
 	_, err = db.Exec("UPDATE settings SET value = ? WHERE name = 'password';", passwordHash)
 	if err != nil {
@@ -74,7 +74,7 @@ func (a *Admin) Add() {
 	logging.MustGetLogger("").Info("Adding default Admin...")
 
 	clearPassword := []byte("admin")
-	passwordHash, err := bcrypt.GenerateFromPassword(clearPassword, 15)
+	passwordHash, err := bcrypt.GenerateFromPassword(clearPassword, 12)
 
 	_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('password', ?);", passwordHash)
 	if err != nil {
