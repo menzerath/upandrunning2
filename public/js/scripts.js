@@ -27,7 +27,7 @@ function showInformation(website) {
 		url: "/api/v1/websites/" + website + "/status",
 		type: "GET",
 		success: function(data) {
-			var dataString = '<div class="well"><legend>Information about ' + website + '</legend>';
+			var dataString = '<div class="well"><legend>More Information</legend>';
 			dataString += '<p>The website at <a href="' + data.websiteData.url + '">' + data.websiteData.url + '</a> is called <b>"' + data.websiteData.name + '"</b>, was checked <b>' + data.availability.total + ' times</b> and has an average availability of <b>' + data.availability.average + '</b>.</p>';
 
 			if (data.lastCheckResult.status !== '0 - unknown') {
@@ -45,6 +45,7 @@ function showInformation(website) {
 			$('#col-form-information').html(dataString);
 
 			// show everything to the user
+			hideResponseTime();
 			$('#bc-feature').css('display', 'inline-block').text('Status');
 			$('#bc-site').css('display', 'inline-block').text(website).html('<a href="/status/' + website + '">' + website + '</a>');
 			history.replaceState('data', '', '/status/' + website + '/');
@@ -62,7 +63,7 @@ function showInformation(website) {
 }
 
 function hideInformation() {
-	$('#row-information').fadeOut(200);
+	$('#row-information').hide();
 
 	$('#bc-feature').css('display', 'none').text('');
 	$('#bc-site').css('display', 'none').text('');
@@ -109,6 +110,7 @@ function showResponseTimeGraph(website) {
 				]
 			};
 
+			hideInformation();
 			$('#row-responsetime').fadeIn(200);
 
 			var ctx = document.getElementById("graph-responsetime").getContext("2d");
@@ -151,7 +153,7 @@ function showResponseTimeGraph(website) {
 }
 
 function hideResponseTime() {
-	$('#row-responsetime').fadeOut(200);
+	$('#row-responsetime').hide();
 
 	$('#bc-feature').css('display', 'none').text('');
 	$('#bc-site').css('display', 'none').text('');
