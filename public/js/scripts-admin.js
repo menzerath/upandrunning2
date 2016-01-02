@@ -380,6 +380,7 @@ function editNotificationPushbullet(url) {
 					type: "PUT",
 					data: {pushbulletKey: inputValue.trim(), email: data.notifications.email},
 					success: function() {
+						loadWebsites();
 						swal({
 							title: "Done!",
 							text: "Your settings have been saved.",
@@ -433,6 +434,7 @@ function editNotificationEmail(url) {
 					type: "PUT",
 					data: {pushbulletKey: data.notifications.pushbulletKey, email: inputValue.trim()},
 					success: function() {
+						loadWebsites();
 						swal({
 							title: "Done!",
 							text: "Your settings have been saved.",
