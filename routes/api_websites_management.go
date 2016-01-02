@@ -257,6 +257,13 @@ func ApiWebsitesGetNotifications(w http.ResponseWriter, r *http.Request, ps http
 	err := db.QueryRow("SELECT pushbulletKey, email FROM notifications, websites WHERE notifications.websiteId = websites.id AND url = ?;", value).Scan(&cPushbulletKey, &cEmail)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			// Check if Website exists
+			var id int
+			err := db.QueryRow("SELECT id FROM websites WHERE url = ?;", value).Scan(&id)
+			if err != nil {
+				SendJsonMessage(w, http.StatusNotFound, false, "Unable to process your Request: Could not find Website.")
+				return
+			}
 			resp = WebsiteNotificationsResponse{true, Notifications{"", ""}}
 		} else {
 			logging.MustGetLogger("").Error("Unable to get Website's notification settings: ", err)
@@ -309,8 +316,7 @@ func ApiWebsitePutNotifications(w http.ResponseWriter, r *http.Request, ps httpr
 			var id int
 			err := db.QueryRow("SELECT id FROM websites WHERE url = ?;", url).Scan(&id)
 			if err != nil {
-				logging.MustGetLogger("").Error("Unable to get Website's id for notification-insertion: ", err)
-				SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+				SendJsonMessage(w, http.StatusNotFound, false, "Unable to process your Request: Could not find Website.")
 				return
 			}
 
