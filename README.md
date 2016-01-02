@@ -91,6 +91,31 @@ Also make sure that your custom applications using UpAndRunning's API are up-to-
 }
 ```
 
+If this API is accessed while being authenticated, the user will receive a slightly different response:
+`GET` `/api/v1/websites`:  
+```json
+{
+	"requestSuccess": true,
+	"websites": [
+		{
+			"id": 1,
+			"name": "My Website",
+			"enabled": true,
+			"visible": true,
+			"protocol": "https",
+			"url": "website.com",
+			"checkMethod": "HEAD",
+			"status": "200 - OK",
+			"time": "2015-01-01 00:00:00",
+			"notifications": {
+				"pushbullet": false,
+				"email": true
+			}
+		}
+	]
+}
+```
+
 #### Current Status of a Website
 `GET` `/api/v1/websites/:url/status`:  
 ```json

@@ -92,16 +92,17 @@ func ApiWebsitesDetailed(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	// Add every Website
 	websites := []DetailedWebsite{}
 	var (
-		id          int
-		name        string
-		enabled     bool
-		visible     bool
-		protocol    string
-		url         string
-		checkMethod string
-		statusCode  string
-		statusText  string
-		time        string
+		id            int
+		name          string
+		enabled       bool
+		visible       bool
+		protocol      string
+		url           string
+		checkMethod   string
+		statusCode    string
+		statusText    string
+		time          string
+		notifications EnabledNotifications
 	)
 
 	for rows.Next() {
@@ -125,7 +126,34 @@ func ApiWebsitesDetailed(w http.ResponseWriter, r *http.Request, ps httprouter.P
 			return
 		}
 
-		websites = append(websites, DetailedWebsite{id, name, enabled, visible, protocol, url, checkMethod, statusCode + " - " + statusText, time})
+		// Query the database for enabled notifications
+		var (
+			tmpPushbullet string
+			tmpEmail      string
+		)
+		err = db.QueryRow("SELECT pushbulletKey, email FROM notifications WHERE websiteId = ?;", id).Scan(&tmpPushbullet, &tmpEmail)
+		switch {
+		case err == sql.ErrNoRows:
+			notifications.Pushbullet = false
+			notifications.Email = false
+		case err != nil:
+			logging.MustGetLogger("").Error("Unable to fetch Website's status: ", err)
+			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
+			return
+		}
+
+		if tmpPushbullet != "" {
+			notifications.Pushbullet = true
+		} else {
+			notifications.Pushbullet = false
+		}
+		if tmpEmail != "" {
+			notifications.Email = true
+		} else {
+			notifications.Email = false
+		}
+
+		websites = append(websites, DetailedWebsite{id, name, enabled, visible, protocol, url, checkMethod, statusCode + " - " + statusText, time, notifications})
 	}
 
 	// Send Response

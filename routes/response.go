@@ -85,21 +85,28 @@ type WebsiteNotificationsResponse struct {
 
 // Contains the Website's data, which will be shown inside the admin-backend.
 type DetailedWebsite struct {
-	Id          int    `json:"id"`
-	Name        string `json:"name"`
-	Enabled     bool   `json:"enabled"`
-	Visible     bool   `json:"visible"`
-	Protocol    string `json:"protocol"`
-	Url         string `json:"url"`
-	CheckMethod string `json:"checkMethod"`
-	Status      string `json:"status"`
-	Time        string `json:"time"`
+	Id                   int                  `json:"id"`
+	Name                 string               `json:"name"`
+	Enabled              bool                 `json:"enabled"`
+	Visible              bool                 `json:"visible"`
+	Protocol             string               `json:"protocol"`
+	Url                  string               `json:"url"`
+	CheckMethod          string               `json:"checkMethod"`
+	Status               string               `json:"status"`
+	Time                 string               `json:"time"`
+	EnabledNotifications EnabledNotifications `json:"notifications"`
 }
 
 // Contains all saved notification settings of a website.
 type Notifications struct {
 	PushbulletKey string `json:"pushbulletKey"`
 	Email         string `json:"email"`
+}
+
+// Contains whether a notification-type is enabled or not.
+type EnabledNotifications struct {
+	Pushbullet bool `json:"pushbullet"`
+	Email      bool `json:"email"`
 }
 
 // Contains the application's data, which will be used on publicly visible pages.
