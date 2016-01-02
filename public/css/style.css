@@ -49,7 +49,7 @@ pre {
 	cursor: pointer;
 }
 
-.swal-wide{
+.swal-wide {
 	margin-left: -450px !important;
 	width: 900px !important;
 }
@@ -61,6 +61,10 @@ pre {
 	opacity: 0.6;
 	padding-left: 10px;
 	margin-right: -2px;
+}
+
+.label-info-inactive {
+	background-color: rgba(156, 39, 176, 0.4);
 }
 
 .notifications {
