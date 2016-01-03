@@ -51,6 +51,10 @@ $(document).ready(function() {
 		}
 	});
 
+	$('#input-new-checkWhenOffline').mouseup(function() {
+		changeCheckWhenOffline();
+	});
+
 	loadWebsites();
 
 	setInterval(loadWebsites, 60 * 1000);
@@ -689,6 +693,28 @@ function changeRedirects() {
 			fadeOut: {enabled: true, delay: 3000}
 		}).show();
 	}
+}
+
+function changeCheckWhenOffline() {
+	$.ajax({
+		url: "/api/v1/settings/checkWhenOffline",
+		type: "PUT",
+		data: {checkWhenOffline: !$('#input-new-checkWhenOffline').is(':checked')},
+		success: function() {
+			$('.bottom-right').notify({
+				type: 'success',
+				message: {text: "\"Run Checks when Offline\" setting successfully changed."},
+				fadeOut: {enabled: true, delay: 3000}
+			}).show();
+		},
+		error: function(error) {
+			$('.bottom-right').notify({
+				type: 'danger',
+				message: {text: JSON.parse(error.responseText).message},
+				fadeOut: {enabled: true, delay: 3000}
+			}).show();
+		}
+	});
 }
 
 function checkNow() {

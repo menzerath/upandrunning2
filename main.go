@@ -92,6 +92,7 @@ func serveRequests() {
 	router.PUT("/api/v1/settings/password", routes.ApiSettingsPassword)
 	router.PUT("/api/v1/settings/interval", routes.ApiSettingsInterval)
 	router.PUT("/api/v1/settings/redirects", routes.ApiSettingsRedirects)
+	router.PUT("/api/v1/settings/checkWhenOffline", routes.ApiSettingsCheckWhenOffline)
 
 	// Website Management
 	router.POST("/api/v1/websites/:url", routes.ApiWebsitesAdd)
@@ -139,6 +140,21 @@ func startCheckNowTimer() {
 
 // Checks all enabled Websites
 func checkAllSites() {
+	// Check for internet-connection
+	if lib.GetConfiguration().Dynamic.RunChecksWhenOffline == 0 {
+		res, err := goreq.Request{Uri: "https://google.com", Method: "HEAD", UserAgent: "UpAndRunning2 (https://github.com/MarvinMenzerath/UpAndRunning2)", MaxRedirects: 1, Timeout: 5 * time.Second}.Do()
+		if err != nil {
+			logging.MustGetLogger("").Warning("Did not check Websites because of missing internet-connection: ", err)
+			return
+		} else {
+			if res.StatusCode != 200 {
+				logging.MustGetLogger("").Warning("Did not check Websites because of missing internet-connection.")
+				res.Body.Close()
+				return
+			}
+		}
+	}
+
 	// Query the Database
 	db := lib.GetDatabase()
 	rows, err := db.Query("SELECT id, protocol, url, checkMethod FROM websites WHERE enabled = 1;")

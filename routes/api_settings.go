@@ -129,3 +129,44 @@ func ApiSettingsRedirects(w http.ResponseWriter, r *http.Request, ps httprouter.
 	lib.GetConfiguration().Dynamic.Redirects = value
 	SendJsonMessage(w, http.StatusOK, true, "")
 }
+
+// Updates whether the application should run checks when there is not internet-connection or not.
+func ApiSettingsCheckWhenOffline(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
+
+	// Get data from Request
+	r.ParseForm()
+	value := r.Form.Get("checkWhenOffline")
+
+	// Simple Validation
+	if value == "" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value.")
+		return
+	}
+
+	var enabledValue int
+	if value == "true" {
+		enabledValue = 1
+	} else if value == "false" {
+		enabledValue = 0
+	} else {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value (true or false).")
+		return
+	}
+
+	// Update Database-Row
+	db := lib.GetDatabase()
+	_, err := db.Exec("UPDATE settings SET value = ? WHERE name = 'check_when_offline';", enabledValue)
+	if err != nil {
+		logging.MustGetLogger("").Error("Unable to change Redirects: ", err)
+		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+		return
+	}
+
+	// Update Configuration
+	lib.GetConfiguration().Dynamic.RunChecksWhenOffline = enabledValue
+	SendJsonMessage(w, http.StatusOK, true, "")
+}

@@ -12,6 +12,7 @@ UpAndRunning2 is a lightweight Go application which **monitors all of your websi
 	* Set an interval of 10 seconds up to 10 minutes
 	* Set a maximum amount of redirects to follow
 	* Detects nearly all HTTP-status-codes, timeouts and unknown hosts
+	* Control whether the application checks without an internet-connection or not
 * Simple, but powerful [JSON-REST-API](#api)
 * Build your own client or use the fully-featured web-interface
 * bcrypt ensures your password is stored safely
@@ -220,7 +221,7 @@ Notice: These APIs require authentication.
 }
 ```
 **Required Parameters:**
-* `interval`
+* `interval` - `10 - 600`
 
 #### Admin-Password
 `PUT` `/api/v1/settings/password`:  
@@ -242,7 +243,18 @@ Notice: These APIs require authentication.
 }
 ```
 **Required Parameters:**
-* `redirects`
+* `redirects` - `0 - 10`
+
+#### Run Checks when Offline
+`PUT` `/api/v1/settings/checkWhenOffline`:  
+```json
+{
+	"requestSuccess": true,
+	"message": ""
+}
+```
+**Required Parameters:**
+* `checkWhenOffline` - `true / false`
 
 ### Website Management
 Notice: These APIs require authentication.
