@@ -185,9 +185,14 @@ func ApiWebsitesStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		totalChecks          int
 	)
 
+	enabledWebsitesOnly := "AND websites.enabled = 1"
+	if lib.IsLoggedIn(r) {
+		enabledWebsitesOnly = ""
+	}
+
 	// Query the Database for basic data and the last successful check
 	db := lib.GetDatabase()
-	err := db.QueryRow("SELECT websites.id, websites.name, websites.protocol, websites.url, checks.statusCode, checks.statusText, checks.responseTime, checks.time FROM checks, websites WHERE checks.websiteId = websites.id AND websites.url = ? AND websites.enabled = 1 ORDER BY checks.id DESC LIMIT 1;", ps.ByName("url")).Scan(&id, &name, &protocol, &url, &statusCode, &statusText, &responseTime, &time)
+	err := db.QueryRow("SELECT websites.id, websites.name, websites.protocol, websites.url, checks.statusCode, checks.statusText, checks.responseTime, checks.time FROM checks, websites WHERE checks.websiteId = websites.id AND websites.url = ? "+enabledWebsitesOnly+" ORDER BY checks.id DESC LIMIT 1;", ps.ByName("url")).Scan(&id, &name, &protocol, &url, &statusCode, &statusText, &responseTime, &time)
 	switch {
 	case err == sql.ErrNoRows:
 		SendJsonMessage(w, http.StatusNotFound, false, "Unable to find any data matching the given url.")
@@ -199,7 +204,7 @@ func ApiWebsitesStatus(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	}
 
 	// Query the Database for the last unsuccessful check
-	err = db.QueryRow("SELECT checks.statusCode, checks.statusText, checks.responseTime, checks.time FROM checks, websites WHERE checks.websiteId = websites.id AND (checks.statusCode NOT LIKE '2%' AND checks.statusCode NOT LIKE '3%') AND websites.url = ? AND websites.enabled = 1 ORDER BY checks.id DESC LIMIT 1;", ps.ByName("url")).Scan(&lastFailStatusCode, &lastFailStatusText, &lastFailResponseTime, &lastFailTime)
+	err = db.QueryRow("SELECT checks.statusCode, checks.statusText, checks.responseTime, checks.time FROM checks, websites WHERE checks.websiteId = websites.id AND (checks.statusCode NOT LIKE '2%' AND checks.statusCode NOT LIKE '3%') AND websites.url = ? ORDER BY checks.id DESC LIMIT 1;", ps.ByName("url")).Scan(&lastFailStatusCode, &lastFailStatusText, &lastFailResponseTime, &lastFailTime)
 	switch {
 	case err == sql.ErrNoRows:
 		lastFailStatusCode = "0"
@@ -272,9 +277,14 @@ func ApiWebsitesResults(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		offset = parsedOffset
 	}
 
+	enabledWebsitesOnly := "AND websites.enabled = 1"
+	if lib.IsLoggedIn(r) {
+		enabledWebsitesOnly = ""
+	}
+
 	// Query the Database
 	db := lib.GetDatabase()
-	rows, err := db.Query("SELECT statusCode, statusText, responseTime, time FROM checks, websites WHERE checks.websiteId = websites.id AND websites.url = ? AND websites.enabled = 1 ORDER BY time DESC LIMIT ? OFFSET ?;", ps.ByName("url"), limit, offset)
+	rows, err := db.Query("SELECT statusCode, statusText, responseTime, time FROM checks, websites WHERE checks.websiteId = websites.id AND websites.url = ? "+enabledWebsitesOnly+" ORDER BY time DESC LIMIT ? OFFSET ?;", ps.ByName("url"), limit, offset)
 	switch {
 	case err == sql.ErrNoRows:
 		SendJsonMessage(w, http.StatusNotFound, false, "Unable to find any data matching the given url.")
