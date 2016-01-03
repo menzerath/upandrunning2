@@ -92,7 +92,7 @@ Also make sure that your custom applications using UpAndRunning's API are up-to-
 }
 ```
 
-If this API is accessed while being authenticated, the user will receive a slightly different response:
+If this API is accessed while being authenticated, the user will receive a slightly different response:  
 `GET` `/api/v1/websites`:  
 ```json
 {
