@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/op/go-logging"
 	"os"
+	"strconv"
 )
 
 // This the one and only Configuration-object.
@@ -15,6 +16,7 @@ var config *Configuration
 type Configuration struct {
 	Port     int
 	Database databaseConfiguration
+	Mailer   mailerConfiguration
 	Dynamic  dynamicConfiguration
 	Static   StaticConfiguration
 }
@@ -29,14 +31,24 @@ type databaseConfiguration struct {
 	ConnectionLimit int
 }
 
+// The mailer configuration.
+type mailerConfiguration struct {
+	Host     string
+	Port     int
+	User     string
+	Password string
+	From     string
+}
+
 // A dynamic Configuration.
 // Used to store data, which may be changed through the API.
 type dynamicConfiguration struct {
-	Title         string
-	Interval      int
-	Redirects     int
-	PushbulletKey string
-	CheckNow      bool
+	Title                string
+	Interval             int
+	Redirects            int
+	RunChecksWhenOffline int
+	CleanDatabase        int
+	CheckNow             bool
 }
 
 // Static data about (e.g.) the application's version.
@@ -48,27 +60,61 @@ type StaticConfiguration struct {
 
 // Reads a configuration-file from a specified path.
 func ReadConfigurationFromFile(filePath string) {
-	logging.MustGetLogger("logger").Info("Reading Configuration from File...")
+	if os.Getenv("UAR2_IS_DOCKER") == "true" {
+		ReadDefaultConfiguration("config/default.json")
+		logging.MustGetLogger("").Info("Reading Configuration from Environment Variables...")
+
+		config.Database.Host = os.Getenv("MYSQL_PORT_3306_TCP_ADDR")
+		config.Database.User = "root"
+		config.Database.Password = os.Getenv("MYSQL_ENV_MYSQL_ROOT_PASSWORD")
+		config.Database.Database = "upandrunning"
+
+		config.Mailer.Host = os.Getenv("UAR2_MAILER_HOST")
+		i, err := strconv.Atoi(os.Getenv("UAR2_MAILER_PORT"))
+		if err == nil {
+			config.Mailer.Port = i
+		}
+		config.Mailer.User = os.Getenv("UAR2_MAILER_USER")
+		config.Mailer.Password = os.Getenv("UAR2_MAILER_PASSWORD")
+		config.Mailer.From = os.Getenv("UAR2_MAILER_FROM")
+
+		return
+	}
+
+	logging.MustGetLogger("").Info("Reading Configuration from File (" + filePath + ")...")
 
 	file, _ := os.Open(filePath)
 	decoder := json.NewDecoder(file)
 
 	err := decoder.Decode(&config)
-
 	if err != nil {
-		logging.MustGetLogger("logger").Fatal("Unable to read Configuration: ", err)
+		logging.MustGetLogger("").Fatal("Unable to read Configuration. Make sure the File exists and is valid: ", err)
+	}
+}
+
+// Reads the default configuration-file from a specified path.
+func ReadDefaultConfiguration(filePath string) {
+	logging.MustGetLogger("").Info("Reading Default-Configuration from File (" + filePath + ")...")
+
+	file, _ := os.Open(filePath)
+	decoder := json.NewDecoder(file)
+
+	err := decoder.Decode(&config)
+	if err != nil {
+		logging.MustGetLogger("").Fatal("Unable to read Configuration. Make sure the File exists and is valid: ", err)
 	}
 }
 
 // Reads all configuration-data from the database.
 func ReadConfigurationFromDatabase(db *sql.DB) {
-	logging.MustGetLogger("logger").Info("Reading Configuration from Database...")
+	logging.MustGetLogger("").Info("Reading Configuration from Database...")
 
 	var (
-		title         string
-		interval      int
-		redirects     int
-		pushbulletKey string
+		title                string
+		interval             int
+		redirects            int
+		runChecksWhenOffline int
+		cleanDatabase        int
 	)
 
 	// Title
@@ -76,7 +122,7 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	if err != nil {
 		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('title', 'UpAndRunning2');")
 		if err != nil {
-			logging.MustGetLogger("logger").Fatal("Unable to insert 'title'-setting: ", err)
+			logging.MustGetLogger("").Fatal("Unable to insert 'title'-setting: ", err)
 		}
 		title = "UpAndRunning"
 	}
@@ -84,11 +130,11 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	// Interval
 	err = db.QueryRow("SELECT value FROM settings where name = 'interval';").Scan(&interval)
 	if err != nil {
-		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('interval', 30);")
+		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('interval', 60);")
 		if err != nil {
-			logging.MustGetLogger("logger").Fatal("Unable to insert 'interval'-setting: ", err)
+			logging.MustGetLogger("").Fatal("Unable to insert 'interval'-setting: ", err)
 		}
-		interval = 5
+		interval = 60
 	}
 
 	// Redirects
@@ -96,25 +142,36 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	if err != nil {
 		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('redirects', 0);")
 		if err != nil {
-			logging.MustGetLogger("logger").Fatal("Unable to insert 'redirects'-setting: ", err)
+			logging.MustGetLogger("").Fatal("Unable to insert 'redirects'-setting: ", err)
 		}
 		redirects = 0
 	}
 
-	// Pushbullet-Key
-	err = db.QueryRow("SELECT value FROM settings where name = 'pushbullet_key';").Scan(&pushbulletKey)
+	// Run Checks when offline
+	err = db.QueryRow("SELECT value FROM settings where name = 'check_when_offline';").Scan(&runChecksWhenOffline)
 	if err != nil {
-		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('pushbullet_key', '');")
+		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('check_when_offline', 1);")
 		if err != nil {
-			logging.MustGetLogger("logger").Fatal("Unable to insert 'pushbullet_key'-setting: ", err)
+			logging.MustGetLogger("").Fatal("Unable to insert 'check_when_offline'-setting: ", err)
 		}
-		pushbulletKey = ""
+		runChecksWhenOffline = 1
+	}
+
+	// Regularly clean old check-results from database
+	err = db.QueryRow("SELECT value FROM settings where name = 'clean_database';").Scan(&cleanDatabase)
+	if err != nil {
+		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('clean_database', 1);")
+		if err != nil {
+			logging.MustGetLogger("").Fatal("Unable to insert 'clean_database'-setting: ", err)
+		}
+		cleanDatabase = 1
 	}
 
 	config.Dynamic.Title = title
 	config.Dynamic.Interval = interval
 	config.Dynamic.Redirects = redirects
-	config.Dynamic.PushbulletKey = pushbulletKey
+	config.Dynamic.RunChecksWhenOffline = runChecksWhenOffline
+	config.Dynamic.CleanDatabase = cleanDatabase
 
 	config.Dynamic.CheckNow = true
 }
@@ -127,7 +184,7 @@ func SetStaticConfiguration(c StaticConfiguration) {
 // Returns the current Configuration-object.
 func GetConfiguration() *Configuration {
 	if config == nil {
-		logging.MustGetLogger("logger").Fatal("No active Configuration found.")
+		logging.MustGetLogger("").Fatal("No active Configuration found.")
 	} else {
 		return config
 	}

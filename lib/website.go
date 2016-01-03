@@ -1,12 +1,10 @@
 package lib
 
 import (
+	"database/sql"
 	"github.com/franela/goreq"
-	"github.com/mitsuse/pushbullet-go"
-	"github.com/mitsuse/pushbullet-go/requests"
 	"github.com/op/go-logging"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -23,19 +21,19 @@ func (w *Website) RunCheck(secondTry bool) {
 	// Request new Status
 	var requestStartTime = time.Now()
 	res, err := goreq.Request{Uri: w.Protocol + "://" + w.Url, Method: w.CheckMethod, UserAgent: "UpAndRunning2 (https://github.com/MarvinMenzerath/UpAndRunning2)", MaxRedirects: GetConfiguration().Dynamic.Redirects, Timeout: 5 * time.Second}.Do()
-	var requestDuration = time.Now().Sub(requestStartTime).String()
+	var requestDuration = time.Now().Sub(requestStartTime).Nanoseconds() / 1000000
 
-	var newStatus string
+	var newStatusText string
 	var newStatusCode int
 	if err != nil {
 		if secondTry {
-			newStatus = "Host not found"
+			newStatusText = "Host not found"
 			newStatusCode = 0
 
 			// On Timeout: allow second try
 			if serr, ok := err.(*goreq.Error); ok {
 				if serr.Timeout() {
-					newStatus = "Timeout"
+					newStatusText = "Timeout"
 					newStatusCode = 0
 				}
 			}
@@ -45,88 +43,67 @@ func (w *Website) RunCheck(secondTry bool) {
 			return
 		}
 	} else {
-		newStatus = strconv.Itoa(res.StatusCode) + " - " + GetHttpStatus(res.StatusCode)
+		newStatusText = GetHttpStatus(res.StatusCode)
 		newStatusCode = res.StatusCode
 		defer res.Body.Close()
 	}
 
-	// If Pushbullet-notifications are active: get old status and Website's name and send a Push
-	if GetConfiguration().Dynamic.PushbulletKey != "" {
-		var (
-			name   string
-			status string
-		)
-
-		db := GetDatabase()
-		err = db.QueryRow("SELECT name, status FROM websites WHERE id = ?", w.Id).Scan(&name, &status)
-		if err != nil {
-			logging.MustGetLogger("logger").Error("Unable to get Website's data: ", err)
-			return
-		}
-
-		if newStatus != status {
-			sendPush(name, w.Url, newStatus, status)
-		}
-	}
-
-	newStatusCodeString := strconv.Itoa(newStatusCode)
+	w.sendNotifications(newStatusCode, newStatusText)
 
 	// Save the new Result
-	if strings.HasPrefix(newStatusCodeString, "2") || strings.HasPrefix(newStatusCodeString, "3") {
-		// Success
-		_, err = db.Exec("UPDATE websites SET status = ?, responseTime = ?, time = NOW(), ups = ups + 1, totalChecks = totalChecks + 1 WHERE id = ?;", newStatus, requestDuration, w.Id)
-		if err != nil {
-			logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
-			return
-		}
-	} else {
-		// Failure
-		_, err = db.Exec("UPDATE websites SET status = ?, responseTime = ?, time = NOW(), lastFailStatus = ?, lastFailTime = NOW(), downs = downs + 1, totalChecks = totalChecks + 1 WHERE id = ?;", newStatus, requestDuration, newStatus, w.Id)
-		if err != nil {
-			logging.MustGetLogger("logger").Error("Unable to save the new Website-status: ", err)
-			return
-		}
+	_, err = db.Exec("INSERT INTO checks (websiteId, statusCode, statusText, responseTime, time) VALUES (?, ?, ?, ?, NOW());", w.Id, newStatusCode, newStatusText, requestDuration)
+	if err != nil {
+		logging.MustGetLogger("").Error("Unable to save the new Website-status: ", err)
+		return
 	}
-
-	w.calcAvgAvailability()
 }
 
-// Calculates the average Website availability and stores it inside the database.
-func (w *Website) calcAvgAvailability() {
-	// Query the Database and format the returned value
+// Gets the notification-settings and sends a notification (if necessary and requested)
+func (w *Website) sendNotifications(newStatusCode int, newStatusText string) {
+	var (
+		pushbulletKey string
+		email         string
+		name          string
+		oldStatusCode string
+		oldStatusText string
+	)
+
 	db := GetDatabase()
-	var avg float64
-	err := db.QueryRow("SELECT ((SELECT ups FROM websites WHERE id = ?) / (SELECT totalChecks FROM websites WHERE id = ?))*100 AS avg", w.Id, w.Id).Scan(&avg)
+	err := db.QueryRow("SELECT pushbulletKey, email FROM notifications WHERE websiteId = ?", w.Id).Scan(&pushbulletKey, &email)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to calculate Website-Availability: ", err)
-		return
+		if err == sql.ErrNoRows {
+			return
+		}
+		logging.MustGetLogger("").Error("Unable to get Website's notification-settings: ", err)
 	}
-	strconv.FormatFloat(avg, 'f', 2, 64)
 
-	// Save the new value
-	_, err = db.Exec("UPDATE websites SET avgAvail = ? WHERE id = ?;", avg, w.Id)
-	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to save Website-Availability: ", err)
-		return
-	}
-}
-
-// Sends a Pushbullet-Push containing the given data to the saved API-key.
-func sendPush(name string, url string, newStatus string, oldStatus string) {
-	if GetConfiguration().Dynamic.PushbulletKey == "" {
+	// Check for empty result
+	if pushbulletKey == "" && email == "" {
 		return
 	}
 
-	logging.MustGetLogger("logger").Debug("Sending Push about \"" + url + "\"...")
-
-	pb := pushbullet.New(GetConfiguration().Dynamic.PushbulletKey)
-
-	push := requests.NewNote()
-	push.Title = GetConfiguration().Dynamic.Title + " - Status Change"
-	push.Body = name + " (" + url + ") went from \"" + oldStatus + "\" to \"" + newStatus + "\"."
-
-	_, err := pb.PostPushesNote(push)
+	err = db.QueryRow("SELECT name FROM websites WHERE id = ?", w.Id).Scan(&name)
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to send Push: ", err)
+		logging.MustGetLogger("").Error("Unable to get Website's data: ", err)
+		return
+	}
+	err = db.QueryRow("SELECT statusCode, statusText FROM checks WHERE websiteId = ? ORDER BY id DESC LIMIT 1", w.Id).Scan(&oldStatusCode, &oldStatusText)
+	switch {
+	case err == sql.ErrNoRows:
+		return
+	case err != nil:
+		logging.MustGetLogger("").Error("Unable to get Website's data: ", err)
+		return
+	}
+
+	oldStatus := oldStatusCode + " - " + oldStatusText
+	newStatus := strconv.Itoa(newStatusCode) + " - " + newStatusText
+	if oldStatus != newStatus {
+		if pushbulletKey != "" {
+			sendPush(pushbulletKey, name, w.Url, newStatus, oldStatus)
+		}
+		if email != "" {
+			sendMail(email, name, w.Url, newStatus, oldStatus)
+		}
 	}
 }

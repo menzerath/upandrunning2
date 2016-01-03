@@ -1,0 +1,11 @@
+# Git
+.git/
+
+# IDE (IntelliJ IDEA)
+.idea/
+UpAndRunning2.iml
+
+# Application
+config/local*.json
+doc/
+README.md

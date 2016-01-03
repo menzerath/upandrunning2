@@ -19,7 +19,7 @@ function login() {
 
 	if (password.trim()) {
 		$.ajax({
-			url: "/api/admin/login",
+			url: "/api/v1/auth/login",
 			type: "POST",
 			data: {"password": password},
 			success: function() {

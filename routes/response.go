@@ -6,6 +6,10 @@ import (
 	"net/http"
 )
 
+// ******************
+// * USER-RESPONSES *
+// ******************
+
 // Contains a success-bool and a message, which may be empty.
 type BasicResponse struct {
 	Success bool   `json:"requestSuccess"`
@@ -18,21 +22,27 @@ type WebsiteResponse struct {
 	Websites []BasicWebsite `json:"websites"`
 }
 
+// Contains a success-bool and the Website's details.
+type StatusResponse struct {
+	Success               bool                `json:"requestSuccess"`
+	WebsiteData           WebsiteData         `json:"websiteData"`
+	Availability          WebsiteAvailability `json:"availability"`
+	LastCheckResult       WebsiteCheckResult  `json:"lastCheckResult"`
+	LastFailedCheckResult WebsiteCheckResult  `json:"lastFailedCheckResult"`
+}
+
+// Contains a success-bool and an array of WebsiteCheckResults.
+type ResultsResponse struct {
+	Success  bool                 `json:"requestSuccess"`
+	Websites []WebsiteCheckResult `json:"results"`
+}
+
 // Contains the Website's basic data such as name, protocol, url and current status.
 type BasicWebsite struct {
 	Name     string `json:"name"`
 	Protocol string `json:"protocol"`
 	Url      string `json:"url"`
 	Status   string `json:"status"`
-}
-
-// Contains a success-bool and the Website's details.
-type DetailedWebsiteResponse struct {
-	Success               bool                `json:"requestSuccess"`
-	WebsiteData           WebsiteData         `json:"websiteData"`
-	Availability          WebsiteAvailability `json:"availability"`
-	LastCheckResult       WebsiteCheckResult  `json:"lastCheckResult"`
-	LastFailedCheckResult WebsiteCheckResult  `json:"lastFailedCheckResult"`
 }
 
 // Contains the Website's basic data such as id, name and url.
@@ -57,23 +67,46 @@ type WebsiteCheckResult struct {
 	Time         string `json:"time"`
 }
 
+// *******************
+// * ADMIN-RESPONSES *
+// *******************
+
 // Contains a success-bool and an array of AdminWebsites.
-type AdminWebsiteResponse struct {
-	Success  bool           `json:"requestSuccess"`
-	Websites []AdminWebsite `json:"websites"`
+type DetailedWebsiteResponse struct {
+	Success  bool              `json:"requestSuccess"`
+	Websites []DetailedWebsite `json:"websites"`
+}
+
+// Contains a success-bool and a notification-object.
+type WebsiteNotificationsResponse struct {
+	Success       bool          `json:"requestSuccess"`
+	Notifications Notifications `json:"notifications"`
 }
 
 // Contains the Website's data, which will be shown inside the admin-backend.
-type AdminWebsite struct {
-	Id          int    `json:"id"`
-	Name        string `json:"name"`
-	Enabled     bool   `json:"enabled"`
-	Visible     bool   `json:"visible"`
-	Protocol    string `json:"protocol"`
-	Url         string `json:"url"`
-	CheckMethod string `json:"checkMethod"`
-	Status      string `json:"status"`
-	Time        string `json:"time"`
+type DetailedWebsite struct {
+	Id                   int                  `json:"id"`
+	Name                 string               `json:"name"`
+	Enabled              bool                 `json:"enabled"`
+	Visible              bool                 `json:"visible"`
+	Protocol             string               `json:"protocol"`
+	Url                  string               `json:"url"`
+	CheckMethod          string               `json:"checkMethod"`
+	Status               string               `json:"status"`
+	Time                 string               `json:"time"`
+	EnabledNotifications EnabledNotifications `json:"notifications"`
+}
+
+// Contains all saved notification settings of a website.
+type Notifications struct {
+	PushbulletKey string `json:"pushbulletKey"`
+	Email         string `json:"email"`
+}
+
+// Contains whether a notification-type is enabled or not.
+type EnabledNotifications struct {
+	Pushbullet bool `json:"pushbullet"`
+	Email      bool `json:"email"`
 }
 
 // Contains the application's data, which will be used on publicly visible pages.
@@ -83,21 +116,26 @@ type SiteData struct {
 
 // Contains the application's data, which will be used on admin-pages.
 type AdminSiteData struct {
-	Title      string
-	Interval   int
-	Redirects  int
-	PbKey      string
-	AppVersion string
-	GoVersion  string
-	GoArch     string
+	Title            string
+	Interval         int
+	Redirects        int
+	CheckWhenOffline string
+	CleanDatabase    string
+	AppVersion       string
+	GoVersion        string
+	GoArch           string
 }
+
+// *************
+// * FUNCTIONS *
+// *************
 
 // Sends a simple Json-message.
 // It contains a success-bool and a message, which may be empty.
 func SendJsonMessage(w http.ResponseWriter, code int, success bool, message string) {
 	responseBytes, err := json.Marshal(BasicResponse{success, message})
 	if err != nil {
-		logging.MustGetLogger("logger").Error("Unable to send JSON-Message: ", err)
+		logging.MustGetLogger("").Error("Unable to send JSON-Message: ", err)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")

@@ -51,6 +51,14 @@ $(document).ready(function() {
 		}
 	});
 
+	$('#input-new-checkWhenOffline').mouseup(function() {
+		changeCheckWhenOffline();
+	});
+
+	$('#input-new-cleanDatabase').mouseup(function() {
+		changeCleanDatabase();
+	});
+
 	loadWebsites();
 
 	setInterval(loadWebsites, 60 * 1000);
@@ -58,7 +66,7 @@ $(document).ready(function() {
 
 function loadWebsites() {
 	$.ajax({
-		url: "/api/admin/websites",
+		url: "/api/v1/websites",
 		type: "GET",
 		success: function(data) {
 			loadedWebsiteData = data.websites;
@@ -95,9 +103,24 @@ function loadWebsites() {
 					dataString += '</td><td>' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString() + '</td>';
 				}
 
-				dataString += '<td><span class="label label-default label-action" onclick="showWebsiteDetails(\'' + loadedWebsiteData[i].url + '\')">More</span> ' +
-					'<span class="label label-primary label-action" onclick="editWebsite(\'' + loadedWebsiteData[i].url + '\')">Edit</span> ' +
-					'<span class="label label-danger label-action" onclick="deleteWebsite(\'' + loadedWebsiteData[i].url + '\')">Delete</span></td></tr>';
+				if (loadedWebsiteData[i].notifications.pushbullet) {
+					dataString += '<td><span class="label label-info label-action" onclick="editNotificationPushbullet(\'' + loadedWebsiteData[i].url + '\')" title="Pushbullet"><span class="fa fa-bell"></span></span> ';
+				} else {
+					dataString += '<td><span class="label label-info-inactive label-action" onclick="editNotificationPushbullet(\'' + loadedWebsiteData[i].url + '\')" title="Pushbullet"><span class="fa fa-bell"></span></span> ';
+				}
+				if (loadedWebsiteData[i].notifications.email) {
+					dataString += '<span class="label label-info label-info label-action" onclick="editNotificationEmail(\'' + loadedWebsiteData[i].url + '\')" title="Email"><span class="fa fa-envelope"></span></span></td>';
+				} else {
+					dataString += '<span class="label label-info-inactive label-info label-action" onclick="editNotificationEmail(\'' + loadedWebsiteData[i].url + '\')" title="Email"><span class="fa fa-envelope"></span></span></td>';
+				}
+
+				dataString += '<td><span class="label label-default label-action" onclick="showWebsiteDetails(\'' + loadedWebsiteData[i].url + '\')" title="More"><span class="fa fa-info"></span></span> ' +
+					'<span class="label label-default label-action" onclick="showWebsiteResponseTimes(\'' + loadedWebsiteData[i].url + '\')" title="Response Times"><span class="fa fa-line-chart"></span></span> ' +
+					'<span class="label label-primary label-action" onclick="editWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Edit"><span class="fa fa-pencil"></span></span> ' +
+					'<span class="label label-danger label-action" onclick="deleteWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Delete"><span class="fa fa-trash"></span></span></td></tr>';
+			}
+			if (dataString === '') {
+				dataString = '<tr><td colspan="11">No Websites found.</td></tr>';
 			}
 			$('#table-websites').html(dataString);
 		},
@@ -122,19 +145,17 @@ function showWebsiteDetails(website) {
 	}
 
 	$.ajax({
-		url: "/api/status/" + website,
+		url: "/api/v1/websites/" + website + "/status",
 		type: "GET",
 		success: function(data) {
 			delete data['requestSuccess'];
 			delete data['websiteData'];
-
-			var dataString = '<div class="well"><legend>Public Data about ' + website + '</legend>';
-			dataString += '<pre>' + JSON.stringify(data, null, '\t') + '</pre>';
-			dataString += '<button class="btn btn-primary" onclick="hideWebsiteDetails()">Close</button></div>';
-			$('#col-website-details').html(dataString);
-
-			// show everything to the user
-			$('#row-details').fadeIn(200);
+			swal({
+				title: website,
+				text: '<pre>' + JSON.stringify(data, null, '\t') + '</pre>',
+				html: true,
+				confirmButtonText: "Close"
+			});
 		},
 		error: function(error) {
 			$('.bottom-right').notify({
@@ -146,8 +167,87 @@ function showWebsiteDetails(website) {
 	});
 }
 
-function hideWebsiteDetails() {
-	$('#row-details').fadeOut(200);
+function showWebsiteResponseTimes(website) {
+	if (website == "") {
+		return;
+	}
+
+	if (typeof responseTimeGraph !== 'undefined') {
+		responseTimeGraph.destroy();
+	}
+
+	$.ajax({
+		url: "/api/v1/websites/" + website + "/results?limit=100",
+		type: "GET",
+		success: function(data) {
+			var chartValuesResponseTimes = [];
+			var chartValuesDatestamps = [];
+			for (var i = data.results.length - 1; i >= 0; i--) {
+				chartValuesResponseTimes.push(parseInt(data.results[i].responseTime.substr(0, data.results[i].responseTime.length - 3)));
+				chartValuesDatestamps.push(data.results[i].time);
+			}
+
+			swal({
+				title: website,
+				text: '<canvas id="graph-responsetime" height="200" width="800"></canvas>',
+				html: true,
+				customClass: "swal-wide",
+				confirmButtonText: "Close"
+			});
+
+			var chartData = {
+				labels: chartValuesDatestamps,
+				datasets: [
+					{
+						label: "Response Time (in ms)",
+						fill: true,
+						backgroundColor: "rgba(220,220,220,0.3)",
+						borderColor: "rgba(220,220,220,1)",
+						pointBorderColor: "rgba(220,220,220,1)",
+						pointBackgroundColor: "#fff",
+						pointBorderWidth: 1,
+						pointHoverRadius: 5,
+						pointHoverBackgroundColor: "rgba(220,220,220,1)",
+						pointHoverBorderColor: "rgba(220,220,220,1)",
+						pointHoverBorderWidth: 2,
+						data: chartValuesResponseTimes
+					}
+				]
+			};
+
+			var ctx = document.getElementById("graph-responsetime").getContext("2d");
+			window.responseTimeGraph = new Chart(ctx, {
+				type: 'line',
+				data: chartData,
+				options: {
+					legend: {
+						display: false
+					},
+					scales: {
+						xAxes: [{
+							ticks: {
+								display: false
+							}
+						}],
+						yAxes: [{
+							ticks: {
+								beginAtZero: true,
+								fontFamily: 'Roboto'
+							}
+						}]
+					},
+					responsive: true
+				}
+			});
+		},
+		error: function(error) {
+			$('.bottom-right').notify({
+				type: 'danger',
+				message: {text: "Sorry, but I was unable to process your Request. Error: " + JSON.parse(error.responseText).message},
+				fadeOut: {enabled: true, delay: 3000}
+			}).show();
+		}
+	});
 }
 
 function addWebsite() {
@@ -158,7 +258,7 @@ function addWebsite() {
 
 	if (name.trim() && protocol.trim() && url.trim() && method.trim()) {
 		$.ajax({
-			url: "/api/admin/websites/add",
+			url: "/api/v1/websites/" + url,
 			type: "POST",
 			data: {name: name, protocol: protocol, url: url, checkMethod: method},
 			success: function() {
@@ -193,9 +293,9 @@ function addWebsite() {
 
 function enableWebsite(url) {
 	$.ajax({
-		url: "/api/admin/websites/enable",
-		type: "POST",
-		data: {url: url},
+		url: "/api/v1/websites/" + url + "/enabled",
+		type: "PUT",
+		data: {enabled: true},
 		success: function() {
 			loadWebsites();
 		},
@@ -211,9 +311,9 @@ function enableWebsite(url) {
 
 function disableWebsite(url) {
 	$.ajax({
-		url: "/api/admin/websites/disable",
-		type: "POST",
-		data: {url: url},
+		url: "/api/v1/websites/" + url + "/enabled",
+		type: "PUT",
+		data: {enabled: false},
 		success: function() {
 			loadWebsites();
 		},
@@ -229,9 +329,9 @@ function disableWebsite(url) {
 
 function visibleWebsite(url) {
 	$.ajax({
-		url: "/api/admin/websites/visible",
-		type: "POST",
-		data: {url: url},
+		url: "/api/v1/websites/" + url + "/visibility",
+		type: "PUT",
+		data: {visible: true},
 		success: function() {
 			loadWebsites();
 		},
@@ -247,11 +347,119 @@ function visibleWebsite(url) {
 
 function invisibleWebsite(url) {
 	$.ajax({
-		url: "/api/admin/websites/invisible",
-		type: "POST",
-		data: {url: url},
+		url: "/api/v1/websites/" + url + "/visibility",
+		type: "PUT",
+		data: {visible: false},
 		success: function() {
 			loadWebsites();
+		},
+		error: function(error) {
+			$('.bottom-right').notify({
+				type: 'danger',
+				message: {text: JSON.parse(error.responseText).message},
+				fadeOut: {enabled: true, delay: 3000}
+			}).show();
+		}
+	});
+}
+
+function editNotificationPushbullet(url) {
+	if (!url.trim()) return;
+
+	$.ajax({
+		url: "/api/v1/websites/" + url + "/notifications",
+		type: "GET",
+		success: function(data) {
+			swal({
+				title: "Pushbullet",
+				text: "Please enter a valid <b>Pushbullet-API Key</b> in order to recieve push-messages.<br />Leave this field blank if you do not want this kind of notification.",
+				html: true,
+				type: "input",
+				inputPlaceholder: "API key",
+				inputValue: data.notifications.pushbulletKey,
+				showCancelButton: true,
+				confirmButtonText: "Save",
+				closeOnConfirm: false
+			}, function(inputValue) {
+				if (inputValue === false) return;
+
+				$.ajax({
+					url: "/api/v1/websites/" + url + "/notifications",
+					type: "PUT",
+					data: {pushbulletKey: inputValue.trim(), email: data.notifications.email},
+					success: function() {
+						loadWebsites();
+						swal({
+							title: "Done!",
+							text: "Your settings have been saved.",
+							timer: 2000,
+							type: "success"
+						});
+					},
+					error: function(error) {
+						swal({
+							title: "Oops!",
+							text: JSON.parse(error.responseText).message,
+							timer: 2000,
+							type: "error"
+						});
+					}
+				});
+			});
+		},
+		error: function(error) {
+			$('.bottom-right').notify({
+				type: 'danger',
+				message: {text: JSON.parse(error.responseText).message},
+				fadeOut: {enabled: true, delay: 3000}
+			}).show();
+		}
+	});
+}
+
+function editNotificationEmail(url) {
+	if (!url.trim()) return;
+
+	$.ajax({
+		url: "/api/v1/websites/" + url + "/notifications",
+		type: "GET",
+		success: function(data) {
+			swal({
+				title: "Email",
+				text: "Please enter a valid <b>email address</b> in order to recieve email-notifications.<br />Leave this field blank if you do not want this kind of notification.",
+				html: true,
+				type: "input",
+				inputPlaceholder: "email address",
+				inputValue: data.notifications.email,
+				showCancelButton: true,
+				confirmButtonText: "Save",
+				closeOnConfirm: false
+			}, function(inputValue) {
+				if (inputValue === false) return;
+
+				$.ajax({
+					url: "/api/v1/websites/" + url + "/notifications",
+					type: "PUT",
+					data: {pushbulletKey: data.notifications.pushbulletKey, email: inputValue.trim()},
+					success: function() {
+						loadWebsites();
+						swal({
+							title: "Done!",
+							text: "Your settings have been saved.",
+							timer: 2000,
+							type: "success"
+						});
+					},
+					error: function(error) {
+						swal({
+							title: "Oops!",
+							text: JSON.parse(error.responseText).message,
+							timer: 2000,
+							type: "error"
+						});
+					}
+				});
+			});
 		},
 		error: function(error) {
 			$('.bottom-right').notify({
@@ -288,17 +496,17 @@ function saveWebsite() {
 	var method = $('#input-edit-method').val();
 
 	if (name == editName && protocol == editProtocol && editUrl == url && editMethod == method) {
-		cancleSaveWebsite();
+		cancelSaveWebsite();
 		return;
 	}
 
 	if (name.trim() && protocol.trim() && url.trim() && method.trim()) {
 		$.ajax({
-			url: "/api/admin/websites/edit",
-			type: "POST",
-			data: {oldUrl: editUrl, name: name, protocol: protocol, url: url, checkMethod: method},
+			url: "/api/v1/websites/" + editUrl,
+			type: "PUT",
+			data: {name: name, protocol: protocol, url: url, checkMethod: method},
 			success: function() {
-				cancleSaveWebsite();
+				cancelSaveWebsite();
 				loadWebsites();
 
 				$('.bottom-right').notify({
@@ -324,34 +532,38 @@ function saveWebsite() {
 	}
 }
 
-function cancleSaveWebsite() {
+function cancelSaveWebsite() {
 	$('#row-edit-website').fadeOut(200);
 }
 
 function deleteWebsite(url) {
-	if (window.confirm("Are you sure?")) {
+	if (!url.trim()) return;
+	swal({
+		title: "Are you sure?",
+		text: "The website's settings and check-results will be lost forever. You can not undo this operation.",
+		type: "warning",
+		showCancelButton: true,
+		confirmButtonColor: "#DD6B55",
+		confirmButtonText: "Yes",
+		closeOnConfirm: false
+	}, function() {
 		$.ajax({
-			url: "/api/admin/websites/delete",
-			type: "POST",
-			data: {url: url},
+			url: "/api/v1/websites/" + url,
+			type: "DELETE",
 			success: function() {
 				loadWebsites();
-
-				$('.bottom-right').notify({
-					type: 'success',
-					message: {text: "Website successfully deleted."},
-					fadeOut: {enabled: true, delay: 3000}
-				}).show();
+				swal({
+					title: "Deleted!",
+					text: "This website has been deleted.",
+					timer: 2000,
+					type: "success"
+				});
 			},
 			error: function(error) {
-				$('.bottom-right').notify({
-					type: 'danger',
-					message: {text: JSON.parse(error.responseText).message},
-					fadeOut: {enabled: true, delay: 3000}
-				}).show();
+				swal("Oops!", JSON.parse(error.responseText).message, "error");
 			}
 		});
-	}
+	});
 }
 
 function changeTitle() {
@@ -359,8 +571,8 @@ function changeTitle() {
 
 	if (newTitle.trim()) {
 		$.ajax({
-			url: "/api/admin/settings/title",
-			type: "POST",
+			url: "/api/v1/settings/title",
+			type: "PUT",
 			data: {title: newTitle},
 			success: function() {
 				$(document).attr("title", "Administration | " + newTitle);
@@ -394,8 +606,8 @@ function changePassword() {
 
 	if (newPassword.trim()) {
 		$.ajax({
-			url: "/api/admin/settings/password",
-			type: "POST",
+			url: "/api/v1/settings/password",
+			type: "PUT",
 			data: {password: newPassword},
 			success: function() {
 				$('#input-new-password').val('');
@@ -428,8 +640,8 @@ function changeInterval() {
 
 	if (newInterval.trim() && !(isNaN(newInterval) || newInterval < 1 || newInterval > 600)) {
 		$.ajax({
-			url: "/api/admin/settings/interval",
-			type: "POST",
+			url: "/api/v1/settings/interval",
+			type: "PUT",
 			data: {interval: newInterval},
 			success: function() {
 				$('.bottom-right').notify({
@@ -460,8 +672,8 @@ function changeRedirects() {
 
 	if (newRedirects.trim() && !(isNaN(newRedirects) || newRedirects < 0 || newRedirects > 10)) {
 		$.ajax({
-			url: "/api/admin/settings/redirects",
-			type: "POST",
+			url: "/api/v1/settings/redirects",
+			type: "PUT",
 			data: {redirects: newRedirects},
 			success: function() {
 				$('.bottom-right').notify({
@@ -487,17 +699,37 @@ function changeRedirects() {
 	}
 }
 
-function changePBKey() {
-	var newKey = $('#input-new-pb_key').val();
-
+function changeCheckWhenOffline() {
 	$.ajax({
-		url: "/api/admin/settings/pbkey",
-		type: "POST",
-		data: {key: newKey},
+		url: "/api/v1/settings/checkWhenOffline",
+		type: "PUT",
+		data: {checkWhenOffline: !$('#input-new-checkWhenOffline').is(':checked')},
 		success: function() {
 			$('.bottom-right').notify({
 				type: 'success',
-				message: {text: "API-Key successfully changed."},
+				message: {text: "\"Run Checks when Offline\" setting successfully changed."},
+				fadeOut: {enabled: true, delay: 3000}
+			}).show();
+		},
+		error: function(error) {
+			$('.bottom-right').notify({
+				type: 'danger',
+				message: {text: JSON.parse(error.responseText).message},
+				fadeOut: {enabled: true, delay: 3000}
+			}).show();
+		}
+	});
+}
+
+function changeCleanDatabase() {
+	$.ajax({
+		url: "/api/v1/settings/cleanDatabase",
+		type: "PUT",
+		data: {cleanDatabase: !$('#input-new-cleanDatabase').is(':checked')},
+		success: function() {
+			$('.bottom-right').notify({
+				type: 'success',
+				message: {text: "\"Clean Database automatically\" setting successfully changed."},
 				fadeOut: {enabled: true, delay: 3000}
 			}).show();
 		},
@@ -523,8 +755,8 @@ function checkNow() {
 
 	allowCheck = false;
 	$.ajax({
-		url: "/api/admin/check",
-		type: "POST",
+		url: "/api/v1/action/check",
+		type: "GET",
 		success: function() {
 			$('.bottom-right').notify({
 				type: 'success',
@@ -551,8 +783,8 @@ function checkNow() {
 
 function logout() {
 	$.ajax({
-		url: "/api/admin/logout",
-		type: "POST",
+		url: "/api/v1/auth/logout",
+		type: "GET",
 		success: function() {
 			window.location.replace("/");
 		},

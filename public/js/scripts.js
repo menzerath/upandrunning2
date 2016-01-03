@@ -5,6 +5,12 @@ $(document).ready(function() {
 		} else {
 			history.replaceState('data', '', '/');
 		}
+	} else if (location.pathname.split("/")[1] == "results") {
+		if (location.pathname.split("/")[2] !== undefined && location.pathname.split("/")[2] !== "") {
+			showResponseTimeGraph(location.pathname.split("/")[2]);
+		} else {
+			history.replaceState('data', '', '/');
+		}
 	}
 
 	loadWebsiteData();
@@ -18,20 +24,20 @@ function showInformation(website) {
 	}
 
 	$.ajax({
-		url: "/api/status/" + website,
+		url: "/api/v1/websites/" + website + "/status",
 		type: "GET",
 		success: function(data) {
-			var dataString = '<div class="well"><legend>Information about ' + website + '</legend>';
+			var dataString = '<div class="well"><legend>More Information</legend>';
 			dataString += '<p>The website at <a href="' + data.websiteData.url + '">' + data.websiteData.url + '</a> is called <b>"' + data.websiteData.name + '"</b>, was checked <b>' + data.availability.total + ' times</b> and has an average availability of <b>' + data.availability.average + '</b>.</p>';
 
-			if (data.lastCheckResult.status !== 'unknown') {
+			if (data.lastCheckResult.status !== '0 - unknown') {
 				var dateRecent = new Date(data.lastCheckResult.time.replace(' ', 'T'));
-				dataString += '<p>The most recent check on <b>' + dateRecent.toLocaleDateString() + '</b> at <b>' + dateRecent.toLocaleTimeString() + '</b> got the following response after <b>' + data.lastCheckResult.responseTime + '</b>: <b>' + data.lastCheckResult.status + '</b>.</p>';
+				dataString += '<p>The most recent check on <b>' + dateRecent.toLocaleDateString() + '</b> at <b>' + dateRecent.toLocaleTimeString() + '</b> got the following response after <b>' + data.lastCheckResult.responseTime.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + '</b>: <b>' + data.lastCheckResult.status + '</b>.</p>';
 			}
 
-			if (data.lastFailedCheckResult.status !== 'unknown') {
+			if (data.lastFailedCheckResult.status !== '0 - unknown') {
 				var dateFail = new Date(data.lastFailedCheckResult.time.replace(' ', 'T'));
-				dataString += '<p>The last failed check on <b>' + dateFail.toLocaleDateString() + '</b> at <b>' + dateFail.toLocaleTimeString() + '</b> failed because of this response: <b>' + data.lastFailedCheckResult.status + '</b>.</p>';
+				dataString += '<p>The last failed check on <b>' + dateFail.toLocaleDateString() + '</b> at <b>' + dateFail.toLocaleTimeString() + '</b> failed after <b>' + data.lastFailedCheckResult.responseTime.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + '</b> because of this response: <b>' + data.lastFailedCheckResult.status + '</b>.</p>';
 			}
 
 			dataString += '<button class="btn btn-primary" onclick="hideInformation()">Close</button></div>';
@@ -39,7 +45,7 @@ function showInformation(website) {
 			$('#col-form-information').html(dataString);
 
 			// show everything to the user
-			$('#button-information').text('Loading...');
+			hideResponseTime();
 			$('#bc-feature').css('display', 'inline-block').text('Status');
 			$('#bc-site').css('display', 'inline-block').text(website).html('<a href="/status/' + website + '">' + website + '</a>');
 			history.replaceState('data', '', '/status/' + website + '/');
@@ -57,7 +63,97 @@ function showInformation(website) {
 }
 
 function hideInformation() {
-	$('#row-information').fadeOut(200);
+	$('#row-information').hide();
+
+	$('#bc-feature').css('display', 'none').text('');
+	$('#bc-site').css('display', 'none').text('');
+	history.replaceState('data', '', '/');
+}
+
+function showResponseTimeGraph(website) {
+	if (website == "") {
+		return;
+	}
+
+	if (typeof responseTimeGraph !== 'undefined') {
+		responseTimeGraph.destroy();
+	}
+
+	$.ajax({
+		url: "/api/v1/websites/" + website + "/results?limit=100",
+		type: "GET",
+		success: function(data) {
+			var chartValuesResponseTimes = [];
+			var chartValuesDatestamps = [];
+			for (var i = data.results.length - 1; i >= 0; i--) {
+				chartValuesResponseTimes.push(parseInt(data.results[i].responseTime.substr(0, data.results[i].responseTime.length - 3)));
+				chartValuesDatestamps.push(data.results[i].time);
+			}
+
+			var chartData = {
+				labels: chartValuesDatestamps,
+				datasets: [
+					{
+						label: "Response Time (in ms)",
+						fill: true,
+						backgroundColor: "rgba(220,220,220,0.3)",
+						borderColor: "rgba(220,220,220,1)",
+						pointBorderColor: "rgba(220,220,220,1)",
+						pointBackgroundColor: "#fff",
+						pointBorderWidth: 1,
+						pointHoverRadius: 5,
+						pointHoverBackgroundColor: "rgba(220,220,220,1)",
+						pointHoverBorderColor: "rgba(220,220,220,1)",
+						pointHoverBorderWidth: 2,
+						data: chartValuesResponseTimes
+					}
+				]
+			};
+
+			hideInformation();
+			$('#row-responsetime').fadeIn(200);
+
+			var ctx = document.getElementById("graph-responsetime").getContext("2d");
+			window.responseTimeGraph = new Chart(ctx, {
+				type: 'line',
+				data: chartData,
+				options: {
+					legend: {
+						display: false
+					},
+					scales: {
+						xAxes: [{
+							ticks: {
+								display: false
+							}
+						}],
+						yAxes: [{
+							ticks: {
+								beginAtZero: true,
+								fontFamily: 'Roboto'
+							}
+						}]
+					},
+					responsive: true
+				}
+			});
+
+			$('#bc-feature').css('display', 'inline-block').text('Response Times');
+			$('#bc-site').css('display', 'inline-block').text(website).html('<a href="/results/' + website + '">' + website + '</a>');
+			history.replaceState('data', '', '/results/' + website + '/');
+		},
+		error: function(error) {
+			$('.bottom-right').notify({
+				type: 'danger',
+				message: {text: "Sorry, but I was unable to process your Request. Error: " + JSON.parse(error.responseText).message},
+				fadeOut: {enabled: true, delay: 3000}
+			}).show();
+		}
+	});
+}
+
+function hideResponseTime() {
+	$('#row-responsetime').hide();
 
 	$('#bc-feature').css('display', 'none').text('');
 	$('#bc-site').css('display', 'none').text('');
@@ -66,7 +162,7 @@ function hideInformation() {
 
 function loadWebsiteData() {
 	$.ajax({
-		url: "/api/websites",
+		url: "/api/v1/websites",
 		type: "GET",
 		success: function(data) {
 			loadedWebsiteData = data.websites;
@@ -86,7 +182,8 @@ function loadWebsiteData() {
 					newEntry += ' <span class="label label-danger">' + loadedWebsiteData[i].status + '</span> ';
 				}
 
-				newEntry += '</td><td> <span class="label label-primary label-action" onclick="showInformation(\'' + loadedWebsiteData[i].url + '\')">More</span> </td></tr>';
+				newEntry += '</td><td> <span class="label label-primary label-action" onclick="showInformation(\'' + loadedWebsiteData[i].url + '\')" title="More"><span class="fa fa-info"></span></span> ' +
+					'<span class="label label-primary label-action" onclick="showResponseTimeGraph(\'' + loadedWebsiteData[i].url + '\')" title="Response Times"><span class="fa fa-line-chart"></span></span> </td></tr>';
 
 				if (loadedWebsiteData[i].status.indexOf("2") == 0 || loadedWebsiteData[i].status.indexOf("3") == 0) {
 					dataStringUp += newEntry;
