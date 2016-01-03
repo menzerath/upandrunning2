@@ -343,8 +343,11 @@ Notice: These APIs require authentication.
 
 ## Screenshots
 ![User-Interface](doc/Screenshot1.jpg)
-![API](doc/Screenshot2.jpg)
+![User-Interface](doc/Screenshot2.jpg)
 ![Admin-Backend](doc/Screenshot3.jpg)
+![Admin-Backend](doc/Screenshot4.jpg)
+![Admin-Backend](doc/Screenshot5.jpg)
+![API](doc/Screenshot6.jpg)
 
 ## Credits
 
