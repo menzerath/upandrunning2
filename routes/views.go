@@ -61,7 +61,12 @@ func ViewAdmin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		dynCheckWhenOffline = "checked"
 	}
 
-	data := AdminSiteData{c.Dynamic.Title, c.Dynamic.Interval, c.Dynamic.Redirects, dynCheckWhenOffline, c.Static.Version, runtime.Version(), runtime.GOOS + "_" + runtime.GOARCH}
+	dynCleanDatabase := ""
+	if c.Dynamic.CleanDatabase == 1 {
+		dynCleanDatabase = "checked"
+	}
+
+	data := AdminSiteData{c.Dynamic.Title, c.Dynamic.Interval, c.Dynamic.Redirects, dynCheckWhenOffline, dynCleanDatabase, c.Static.Version, runtime.Version(), runtime.GOOS + "_" + runtime.GOARCH}
 	t, err := template.ParseFiles("views/admin.html", "views/partials/styles.html", "views/partials/footer.html", "views/partials/scripts.html")
 
 	if t != nil {

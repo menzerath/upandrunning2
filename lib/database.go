@@ -48,6 +48,7 @@ func OpenDatabase(config databaseConfiguration) {
 	}
 
 	prepareDatabase()
+	CleanDatabase()
 }
 
 // Creates the needed tables in the database.
@@ -91,6 +92,18 @@ func prepareDatabase() {
 	if err != nil {
 		logging.MustGetLogger("").Warning("Unable to delete unneccessary row: ", err)
 	}
+}
+
+// Removes all check-results older than one month from the Database
+func CleanDatabase() {
+	res, err := db.Exec("DELETE FROM checks WHERE time <= NOW() - INTERVAL 1 MONTH;")
+	if err != nil {
+		logging.MustGetLogger("").Fatal("Unable to cleanup Database: ", err)
+		return
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	logging.MustGetLogger("").Info("Cleaned " + strconv.FormatInt(rowsAffected, 10) + " rows from the Database.")
 }
 
 // Returns the current Database-object.

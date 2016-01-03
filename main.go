@@ -49,6 +49,7 @@ func main() {
 	// Start Checking and Serving
 	startCheckTimer()
 	startCheckNowTimer()
+	startCleaningTimer()
 	serveRequests()
 
 	lib.GetDatabase().Close()
@@ -93,6 +94,7 @@ func serveRequests() {
 	router.PUT("/api/v1/settings/interval", routes.ApiSettingsInterval)
 	router.PUT("/api/v1/settings/redirects", routes.ApiSettingsRedirects)
 	router.PUT("/api/v1/settings/checkWhenOffline", routes.ApiSettingsCheckWhenOffline)
+	router.PUT("/api/v1/settings/cleanDatabase", routes.ApiSettingsCleanDatabase)
 
 	// Website Management
 	router.POST("/api/v1/websites/:url", routes.ApiWebsitesAdd)
@@ -135,6 +137,18 @@ func startCheckNowTimer() {
 			lib.GetConfiguration().Dynamic.CheckNow = false
 		}
 		startCheckNowTimer()
+	}()
+}
+
+// Creates a timer to remove old check-results from the Database
+func startCleaningTimer() {
+	timer := time.NewTimer(time.Hour * 24)
+	go func() {
+		<-timer.C
+		if lib.GetConfiguration().Dynamic.CleanDatabase == 1 {
+			lib.CleanDatabase()
+		}
+		startCleaningTimer()
 	}()
 }
 
