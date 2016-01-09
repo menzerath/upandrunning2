@@ -371,7 +371,6 @@ Notice: These APIs require authentication.
 	* [Chart.js](https://github.com/nnnick/Chart.js)
 	* [SweetAlert](https://github.com/t4t5/sweetalert)
 * Golang Libraries
-	* [go-colorable](https://github.com/mattn/go-colorable)
 	* [Go-MySQL-Driver](https://github.com/go-sql-driver/mysql)
 	* [Golang logging library](https://github.com/op/go-logging)
 	* [gomail](http://gopkg.in/gomail.v2)
