@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"github.com/mattn/go-colorable"
 	"github.com/op/go-logging"
 	"os"
 )
@@ -17,7 +16,7 @@ var dockerFormat = logging.MustStringFormatter(
 
 // Init the logger.
 func SetupLogger() {
-	backend := logging.NewLogBackend(colorable.NewColorableStderr(), "", 0)
+	backend := logging.NewLogBackend(os.Stdout, "", 0)
 	backendFormatter := logging.NewBackendFormatter(backend, format)
 	if os.Getenv("UAR2_IS_DOCKER") == "true" {
 		backendFormatter = logging.NewBackendFormatter(backend, dockerFormat)
