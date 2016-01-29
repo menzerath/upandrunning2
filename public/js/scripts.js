@@ -166,13 +166,10 @@ function loadWebsiteData() {
 		type: "GET",
 		success: function(data) {
 			loadedWebsiteData = data.websites;
-			var dataStringUp = '';
-			var dataStringDown = '';
-			var newEntry = '';
+			var dataStringUp = '', dataStringDown = '', newEntry = '';
+			var countUp = 1, countDown = 1;
 			for (var i = 0; i < loadedWebsiteData.length; i++) {
-				newEntry = '';
-
-				newEntry += '<tr><td>' + (i + 1) + '</td><td><a href="' + loadedWebsiteData[i].protocol + '://' + loadedWebsiteData[i].url + '" target="_blank">' + loadedWebsiteData[i].name + '</a></td><td>';
+				newEntry = '<td><a href="' + loadedWebsiteData[i].protocol + '://' + loadedWebsiteData[i].url + '" target="_blank">' + loadedWebsiteData[i].name + '</a></td><td>';
 
 				if (loadedWebsiteData[i].status.indexOf("2") == 0) {
 					newEntry += ' <span class="label label-success">' + loadedWebsiteData[i].status + '</span> ';
@@ -183,12 +180,14 @@ function loadWebsiteData() {
 				}
 
 				newEntry += '</td><td> <span class="label label-primary label-action" onclick="showInformation(\'' + loadedWebsiteData[i].url + '\')" title="More"><span class="fa fa-info"></span></span> ' +
-					'<span class="label label-primary label-action" onclick="showResponseTimeGraph(\'' + loadedWebsiteData[i].url + '\')" title="Response Times"><span class="fa fa-line-chart"></span></span> </td></tr>';
+					'<span class="label label-primary label-action" onclick="showResponseTimeGraph(\'' + loadedWebsiteData[i].url + '\')" title="Response Times"><span class="fa fa-line-chart"></span></span> </td>';
 
 				if (loadedWebsiteData[i].status.indexOf("2") == 0 || loadedWebsiteData[i].status.indexOf("3") == 0) {
-					dataStringUp += newEntry;
+					dataStringUp += '<tr><td>' + countUp + '</td>' + newEntry + '</tr>';
+					countUp++;
 				} else {
-					dataStringDown += newEntry;
+					dataStringDown += '<tr><td>' + countDown+ '</td>' + newEntry + '</tr>';
+					countDown++;
 				}
 			}
 
