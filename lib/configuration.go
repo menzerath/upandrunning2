@@ -14,6 +14,7 @@ var config *Configuration
 // The whole configuration.
 // Contains all other configuration-data.
 type Configuration struct {
+	Address  string
 	Port     int
 	Database databaseConfiguration
 	Mailer   mailerConfiguration

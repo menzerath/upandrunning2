@@ -113,8 +113,8 @@ func serveRequests() {
 		http.Error(w, "Error 404: Not Found", 404)
 	})
 
-	logging.MustGetLogger("").Debug("Listening on Port " + strconv.Itoa(lib.GetConfiguration().Port) + "...")
-	logging.MustGetLogger("").Fatal(http.ListenAndServe(":"+strconv.Itoa(lib.GetConfiguration().Port), router))
+	logging.MustGetLogger("").Debug("Listening on " + lib.GetConfiguration().Address + ":" + strconv.Itoa(lib.GetConfiguration().Port) + "...")
+	logging.MustGetLogger("").Fatal(http.ListenAndServe(lib.GetConfiguration().Address+":"+strconv.Itoa(lib.GetConfiguration().Port), router))
 }
 
 // Creates a timer to regularly check all Websites
