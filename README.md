@@ -256,17 +256,6 @@ Notice: These APIs require authentication.
 **Required Parameters:**
 * `checkWhenOffline` - `true / false`
 
-#### Automatic Database-Cleaning
-`PUT` `/api/v1/settings/cleanDatabase`:  
-```json
-{
-	"requestSuccess": true,
-	"message": ""
-}
-```
-**Required Parameters:**
-* `cleanDatabase` - `true / false`
-
 ### Website Management
 Notice: These APIs require authentication.
 

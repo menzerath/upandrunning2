@@ -94,7 +94,6 @@ func serveRequests() {
 	router.PUT("/api/v1/settings/interval", routes.ApiSettingsInterval)
 	router.PUT("/api/v1/settings/redirects", routes.ApiSettingsRedirects)
 	router.PUT("/api/v1/settings/checkWhenOffline", routes.ApiSettingsCheckWhenOffline)
-	router.PUT("/api/v1/settings/cleanDatabase", routes.ApiSettingsCleanDatabase)
 
 	// Website Management
 	router.POST("/api/v1/websites/:url", routes.ApiWebsitesAdd)
@@ -145,9 +144,7 @@ func startCleaningTimer() {
 	timer := time.NewTimer(time.Hour * 24)
 	go func() {
 		<-timer.C
-		if lib.GetConfiguration().CheckLifetime > 0 {
-			lib.CleanDatabase()
-		}
+		lib.CleanDatabase()
 		startCleaningTimer()
 	}()
 }

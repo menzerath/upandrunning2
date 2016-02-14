@@ -55,10 +55,6 @@ $(document).ready(function() {
 		changeCheckWhenOffline();
 	});
 
-	$('#input-new-cleanDatabase').mouseup(function() {
-		changeCleanDatabase();
-	});
-
 	loadWebsites();
 
 	setInterval(loadWebsites, 60 * 1000);
@@ -708,28 +704,6 @@ function changeCheckWhenOffline() {
 			$('.bottom-right').notify({
 				type: 'success',
 				message: {text: "\"Run Checks when Offline\" setting successfully changed."},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
-		},
-		error: function(error) {
-			$('.bottom-right').notify({
-				type: 'danger',
-				message: {text: JSON.parse(error.responseText).message},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
-		}
-	});
-}
-
-function changeCleanDatabase() {
-	$.ajax({
-		url: "/api/v1/settings/cleanDatabase",
-		type: "PUT",
-		data: {cleanDatabase: !$('#input-new-cleanDatabase').is(':checked')},
-		success: function() {
-			$('.bottom-right').notify({
-				type: 'success',
-				message: {text: "\"Clean Database automatically\" setting successfully changed."},
 				fadeOut: {enabled: true, delay: 3000}
 			}).show();
 		},
