@@ -52,13 +52,7 @@ function showInformation(website) {
 
 			$('#row-information').fadeIn(200);
 		},
-		error: function(error) {
-			if (error.status=== 0) {
-				swal("Oops!", "Could not connect to API.", "error");
-			} else {
-				swal("Oops!", JSON.parse(error.responseText).message, "error");
-			}
-		}
+		error: handleAjaxErrorAlert
 	});
 }
 
@@ -142,13 +136,7 @@ function showResponseTimeGraph(website) {
 			$('#bc-site').css('display', 'inline-block').text(website).html('<a href="/results/' + website + '">' + website + '</a>');
 			history.replaceState('data', '', '/results/' + website + '/');
 		},
-		error: function(error) {
-			if (error.status=== 0) {
-				swal("Oops!", "Could not connect to API.", "error");
-			} else {
-				swal("Oops!", JSON.parse(error.responseText).message, "error");
-			}
-		}
+		error: handleAjaxErrorAlert
 	});
 }
 

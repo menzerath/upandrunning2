@@ -17,14 +17,14 @@ function login() {
 			type: "POST",
 			data: {"password": password},
 			success: function() {
-				swal("Success!", "Logging you in...", "success");
+				showSuccessAlert("Logging you in...");
 				setTimeout(function() {
 					window.location.replace("/admin");
 				}, 1000);
 			},
-			error: function(error) {
-				swal("Oops!", JSON.parse(error.responseText).message, "error");
-			}
+			error: handleAjaxErrorAlert
 		});
+	} else {
+		showErrorAlert("Please enter a Password to continue.");
 	}
 }
