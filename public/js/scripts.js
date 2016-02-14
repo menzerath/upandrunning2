@@ -53,11 +53,11 @@ function showInformation(website) {
 			$('#row-information').fadeIn(200);
 		},
 		error: function(error) {
-			$('.bottom-right').notify({
-				type: 'danger',
-				message: {text: "Sorry, but I was unable to process your Request. Error: " + JSON.parse(error.responseText).message},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
+			if (error.status=== 0) {
+				swal("Oops!", "Could not connect to API.", "error");
+			} else {
+				swal("Oops!", JSON.parse(error.responseText).message, "error");
+			}
 		}
 	});
 }
@@ -143,11 +143,11 @@ function showResponseTimeGraph(website) {
 			history.replaceState('data', '', '/results/' + website + '/');
 		},
 		error: function(error) {
-			$('.bottom-right').notify({
-				type: 'danger',
-				message: {text: "Sorry, but I was unable to process your Request. Error: " + JSON.parse(error.responseText).message},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
+			if (error.status=== 0) {
+				swal("Oops!", "Could not connect to API.", "error");
+			} else {
+				swal("Oops!", JSON.parse(error.responseText).message, "error");
+			}
 		}
 	});
 }
