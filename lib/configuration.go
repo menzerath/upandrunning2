@@ -14,11 +14,13 @@ var config *Configuration
 // The whole configuration.
 // Contains all other configuration-data.
 type Configuration struct {
-	Port     int
-	Database databaseConfiguration
-	Mailer   mailerConfiguration
-	Dynamic  dynamicConfiguration
-	Static   StaticConfiguration
+	Address       string
+	Port          int
+	Database      databaseConfiguration
+	Mailer        mailerConfiguration
+	Dynamic       dynamicConfiguration
+	Static        StaticConfiguration
+	CheckLifetime int
 }
 
 // The database configuration.
@@ -47,7 +49,6 @@ type dynamicConfiguration struct {
 	Interval             int
 	Redirects            int
 	RunChecksWhenOffline int
-	CleanDatabase        int
 	CheckNow             bool
 }
 
@@ -69,8 +70,13 @@ func ReadConfigurationFromFile(filePath string) {
 		config.Database.Password = os.Getenv("MYSQL_ENV_MYSQL_ROOT_PASSWORD")
 		config.Database.Database = "upandrunning"
 
+		i, err := strconv.Atoi(os.Getenv("UAR2_CHECKLIFETIME"))
+		if err == nil {
+			config.CheckLifetime = i
+		}
+
 		config.Mailer.Host = os.Getenv("UAR2_MAILER_HOST")
-		i, err := strconv.Atoi(os.Getenv("UAR2_MAILER_PORT"))
+		i, err = strconv.Atoi(os.Getenv("UAR2_MAILER_PORT"))
 		if err == nil {
 			config.Mailer.Port = i
 		}
@@ -114,7 +120,6 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 		interval             int
 		redirects            int
 		runChecksWhenOffline int
-		cleanDatabase        int
 	)
 
 	// Title
@@ -157,21 +162,10 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 		runChecksWhenOffline = 1
 	}
 
-	// Regularly clean old check-results from database
-	err = db.QueryRow("SELECT value FROM settings where name = 'clean_database';").Scan(&cleanDatabase)
-	if err != nil {
-		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('clean_database', 1);")
-		if err != nil {
-			logging.MustGetLogger("").Fatal("Unable to insert 'clean_database'-setting: ", err)
-		}
-		cleanDatabase = 1
-	}
-
 	config.Dynamic.Title = title
 	config.Dynamic.Interval = interval
 	config.Dynamic.Redirects = redirects
 	config.Dynamic.RunChecksWhenOffline = runChecksWhenOffline
-	config.Dynamic.CleanDatabase = cleanDatabase
 
 	config.Dynamic.CheckNow = true
 }

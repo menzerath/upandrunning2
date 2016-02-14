@@ -1,4 +1,5 @@
 {
+	"address": "0.0.0.0",
 	"port": 8080,
 	"database": {
 		"host": "localhost",
@@ -14,5 +15,6 @@
 		"user": "myUser@mymail.com",
 		"password": "mySecretPassword",
 		"from": "upandrunning2@mymail.com"
-	}
+	},
+	"checkLifetime": 31
 }

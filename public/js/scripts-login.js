@@ -11,27 +11,20 @@ $(document).ready(function() {
 function login() {
 	var password = $('#input-password').val();
 
-	$('.bottom-right').notify({
-		type: 'warning',
-		message: {text: "Processing..."},
-		fadeOut: {enabled: true, delay: 3000}
-	}).show();
-
 	if (password.trim()) {
 		$.ajax({
 			url: "/api/v1/auth/login",
 			type: "POST",
 			data: {"password": password},
 			success: function() {
-				window.location.replace("/admin");
+				showSuccessAlert("Logging you in...");
+				setTimeout(function() {
+					window.location.replace("/admin");
+				}, 1000);
 			},
-			error: function(error) {
-				$('.bottom-right').notify({
-					type: 'danger',
-					message: {text: JSON.parse(error.responseText).message},
-					fadeOut: {enabled: true, delay: 3000}
-				}).show();
-			}
+			error: handleAjaxErrorAlert
 		});
+	} else {
+		showErrorAlert("Please enter a Password to continue.");
 	}
 }

@@ -96,14 +96,18 @@ func prepareDatabase() {
 
 // Removes all check-results older than one month from the Database
 func CleanDatabase() {
-	res, err := db.Exec("DELETE FROM checks WHERE time <= NOW() - INTERVAL 1 MONTH;")
+	if config.CheckLifetime <= 0 {
+		return
+	}
+
+	res, err := db.Exec("DELETE FROM checks WHERE time <= NOW() - INTERVAL ? DAY;", config.CheckLifetime)
 	if err != nil {
 		logging.MustGetLogger("").Fatal("Unable to cleanup Database: ", err)
 		return
 	}
 
 	rowsAffected, _ := res.RowsAffected()
-	logging.MustGetLogger("").Info("Cleaned " + strconv.FormatInt(rowsAffected, 10) + " rows from the Database.")
+	logging.MustGetLogger("").Info("Cleaned " + strconv.FormatInt(rowsAffected, 10) + " rows from the Database (older than " + strconv.Itoa(config.CheckLifetime) + " days).")
 }
 
 // Returns the current Database-object.

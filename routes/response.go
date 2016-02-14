@@ -120,7 +120,6 @@ type AdminSiteData struct {
 	Interval         int
 	Redirects        int
 	CheckWhenOffline string
-	CleanDatabase    string
 	AppVersion       string
 	GoVersion        string
 	GoArch           string

@@ -55,10 +55,6 @@ $(document).ready(function() {
 		changeCheckWhenOffline();
 	});
 
-	$('#input-new-cleanDatabase').mouseup(function() {
-		changeCleanDatabase();
-	});
-
 	loadWebsites();
 
 	setInterval(loadWebsites, 60 * 1000);
@@ -131,11 +127,6 @@ function loadWebsites() {
 }
 
 function reloadWebsites() {
-	$('.bottom-right').notify({
-		type: 'success',
-		message: {text: "Reloading websites..."},
-		fadeOut: {enabled: true, delay: 3000}
-	}).show();
 	loadWebsites();
 }
 
@@ -157,13 +148,7 @@ function showWebsiteDetails(website) {
 				confirmButtonText: "Close"
 			});
 		},
-		error: function(error) {
-			$('.bottom-right').notify({
-				type: 'danger',
-				message: {text: "Sorry, but I was unable to process your Request. Error: " + JSON.parse(error.responseText).message},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
-		}
+		error: handleAjaxErrorAlert
 	});
 }
 
@@ -240,13 +225,7 @@ function showWebsiteResponseTimes(website) {
 				}
 			});
 		},
-		error: function(error) {
-			$('.bottom-right').notify({
-				type: 'danger',
-				message: {text: "Sorry, but I was unable to process your Request. Error: " + JSON.parse(error.responseText).message},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
-		}
+		error: handleAjaxErrorAlert
 	});
 }
 
@@ -268,26 +247,12 @@ function addWebsite() {
 				$('#input-add-method').val('HEAD');
 				loadWebsites();
 
-				$('.bottom-right').notify({
-					type: 'success',
-					message: {text: "Website successfully added."},
-					fadeOut: {enabled: true, delay: 3000}
-				}).show();
+				showSuccessAlert("Website successfully added.");
 			},
-			error: function(error) {
-				$('.bottom-right').notify({
-					type: 'danger',
-					message: {text: JSON.parse(error.responseText).message},
-					fadeOut: {enabled: true, delay: 3000}
-				}).show();
-			}
+			error: handleAjaxErrorAlert
 		});
 	} else {
-		$('.bottom-right').notify({
-			type: 'danger',
-			message: {text: "Please fill in all fields to add a new website."},
-			fadeOut: {enabled: true, delay: 3000}
-		}).show();
+		showErrorAlert("Please fill in all fields to continue.");
 	}
 }
 
@@ -299,13 +264,7 @@ function enableWebsite(url) {
 		success: function() {
 			loadWebsites();
 		},
-		error: function(error) {
-			$('.bottom-right').notify({
-				type: 'danger',
-				message: {text: JSON.parse(error.responseText).message},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
-		}
+		error: handleAjaxErrorAlert
 	});
 }
 
@@ -317,13 +276,7 @@ function disableWebsite(url) {
 		success: function() {
 			loadWebsites();
 		},
-		error: function(error) {
-			$('.bottom-right').notify({
-				type: 'danger',
-				message: {text: JSON.parse(error.responseText).message},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
-		}
+		error: handleAjaxErrorAlert
 	});
 }
 
@@ -335,13 +288,7 @@ function visibleWebsite(url) {
 		success: function() {
 			loadWebsites();
 		},
-		error: function(error) {
-			$('.bottom-right').notify({
-				type: 'danger',
-				message: {text: JSON.parse(error.responseText).message},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
-		}
+		error: handleAjaxErrorAlert
 	});
 }
 
@@ -353,13 +300,7 @@ function invisibleWebsite(url) {
 		success: function() {
 			loadWebsites();
 		},
-		error: function(error) {
-			$('.bottom-right').notify({
-				type: 'danger',
-				message: {text: JSON.parse(error.responseText).message},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
-		}
+		error: handleAjaxErrorAlert
 	});
 }
 
@@ -389,31 +330,13 @@ function editNotificationPushbullet(url) {
 					data: {pushbulletKey: inputValue.trim(), email: data.notifications.email},
 					success: function() {
 						loadWebsites();
-						swal({
-							title: "Done!",
-							text: "Your settings have been saved.",
-							timer: 2000,
-							type: "success"
-						});
+						showSuccessAlert("Settings have been updated.");
 					},
-					error: function(error) {
-						swal({
-							title: "Oops!",
-							text: JSON.parse(error.responseText).message,
-							timer: 2000,
-							type: "error"
-						});
-					}
+					error: handleAjaxErrorAlert
 				});
 			});
 		},
-		error: function(error) {
-			$('.bottom-right').notify({
-				type: 'danger',
-				message: {text: JSON.parse(error.responseText).message},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
-		}
+		error: handleAjaxErrorAlert
 	});
 }
 
@@ -443,31 +366,13 @@ function editNotificationEmail(url) {
 					data: {pushbulletKey: data.notifications.pushbulletKey, email: inputValue.trim()},
 					success: function() {
 						loadWebsites();
-						swal({
-							title: "Done!",
-							text: "Your settings have been saved.",
-							timer: 2000,
-							type: "success"
-						});
+						showSuccessAlert("Settings have been updated.");
 					},
-					error: function(error) {
-						swal({
-							title: "Oops!",
-							text: JSON.parse(error.responseText).message,
-							timer: 2000,
-							type: "error"
-						});
-					}
+					error: handleAjaxErrorAlert
 				});
 			});
 		},
-		error: function(error) {
-			$('.bottom-right').notify({
-				type: 'danger',
-				message: {text: JSON.parse(error.responseText).message},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
-		}
+		error: handleAjaxErrorAlert
 	});
 }
 
@@ -509,26 +414,12 @@ function saveWebsite() {
 				cancelSaveWebsite();
 				loadWebsites();
 
-				$('.bottom-right').notify({
-					type: 'success',
-					message: {text: "Website successfully edited."},
-					fadeOut: {enabled: true, delay: 3000}
-				}).show();
+				showSuccessAlert("Website successfully edited.")
 			},
-			error: function(error) {
-				$('.bottom-right').notify({
-					type: 'danger',
-					message: {text: JSON.parse(error.responseText).message},
-					fadeOut: {enabled: true, delay: 3000}
-				}).show();
-			}
+			error: handleAjaxErrorAlert
 		});
 	} else {
-		$('.bottom-right').notify({
-			type: 'danger',
-			message: {text: "Please fill in all fields to save this edited website."},
-			fadeOut: {enabled: true, delay: 3000}
-		}).show();
+		showErrorAlert("Please fill in all fields to continue.");
 	}
 }
 
@@ -552,16 +443,9 @@ function deleteWebsite(url) {
 			type: "DELETE",
 			success: function() {
 				loadWebsites();
-				swal({
-					title: "Deleted!",
-					text: "This website has been deleted.",
-					timer: 2000,
-					type: "success"
-				});
+				showSuccessAlert("Website successfully deleted.");
 			},
-			error: function(error) {
-				swal("Oops!", JSON.parse(error.responseText).message, "error");
-			}
+			error: handleAjaxErrorAlert
 		});
 	});
 }
@@ -578,26 +462,12 @@ function changeTitle() {
 				$(document).attr("title", "Administration | " + newTitle);
 				$('#navbar-title').text(newTitle);
 
-				$('.bottom-right').notify({
-					type: 'success',
-					message: {text: "Title successfully changed."},
-					fadeOut: {enabled: true, delay: 3000}
-				}).show();
+				showSuccessAlert("Settings have been updated.");
 			},
-			error: function(error) {
-				$('.bottom-right').notify({
-					type: 'danger',
-					message: {text: JSON.parse(error.responseText).message},
-					fadeOut: {enabled: true, delay: 3000}
-				}).show();
-			}
+			error: handleAjaxErrorAlert
 		});
 	} else {
-		$('.bottom-right').notify({
-			type: 'danger',
-			message: {text: "Please enter a valid title to change it."},
-			fadeOut: {enabled: true, delay: 3000}
-		}).show();
+		showErrorAlert("Please enter a valid title to continue.");
 	}
 }
 
@@ -612,26 +482,12 @@ function changePassword() {
 			success: function() {
 				$('#input-new-password').val('');
 
-				$('.bottom-right').notify({
-					type: 'success',
-					message: {text: "Password successfully changed."},
-					fadeOut: {enabled: true, delay: 3000}
-				}).show();
+				showSuccessAlert("Settings have been updated.");
 			},
-			error: function(error) {
-				$('.bottom-right').notify({
-					type: 'danger',
-					message: {text: JSON.parse(error.responseText).message},
-					fadeOut: {enabled: true, delay: 3000}
-				}).show();
-			}
+			error: handleAjaxErrorAlert
 		});
 	} else {
-		$('.bottom-right').notify({
-			type: 'danger',
-			message: {text: "Please enter a valid password to change it."},
-			fadeOut: {enabled: true, delay: 3000}
-		}).show();
+		showErrorAlert("Please enter a valid password to continue.");
 	}
 }
 
@@ -644,26 +500,12 @@ function changeInterval() {
 			type: "PUT",
 			data: {interval: newInterval},
 			success: function() {
-				$('.bottom-right').notify({
-					type: 'success',
-					message: {text: "Interval successfully changed."},
-					fadeOut: {enabled: true, delay: 3000}
-				}).show();
+				showSuccessAlert("Settings have been updated.");
 			},
-			error: function(error) {
-				$('.bottom-right').notify({
-					type: 'danger',
-					message: {text: JSON.parse(error.responseText).message},
-					fadeOut: {enabled: true, delay: 3000}
-				}).show();
-			}
+			error: handleAjaxErrorAlert
 		});
 	} else {
-		$('.bottom-right').notify({
-			type: 'danger',
-			message: {text: "Please enter a valid interval (numbers between 1 and 600) to change it."},
-			fadeOut: {enabled: true, delay: 3000}
-		}).show();
+		showErrorAlert("Please enter a valid interval (between 1 and 600 seconds) to continue.");
 	}
 }
 
@@ -676,26 +518,12 @@ function changeRedirects() {
 			type: "PUT",
 			data: {redirects: newRedirects},
 			success: function() {
-				$('.bottom-right').notify({
-					type: 'success',
-					message: {text: "Amount of redirects successfully changed."},
-					fadeOut: {enabled: true, delay: 3000}
-				}).show();
+				showSuccessAlert("Settings have been updated.");
 			},
-			error: function(error) {
-				$('.bottom-right').notify({
-					type: 'danger',
-					message: {text: JSON.parse(error.responseText).message},
-					fadeOut: {enabled: true, delay: 3000}
-				}).show();
-			}
+			error: handleAjaxErrorAlert
 		});
 	} else {
-		$('.bottom-right').notify({
-			type: 'danger',
-			message: {text: "Please enter a valid amount of redirects (number between 0 and 10) to change it."},
-			fadeOut: {enabled: true, delay: 3000}
-		}).show();
+		showErrorAlert("Please enter a valid amount of redirects (number between 0 and 10) to continue.");
 	}
 }
 
@@ -705,51 +533,15 @@ function changeCheckWhenOffline() {
 		type: "PUT",
 		data: {checkWhenOffline: !$('#input-new-checkWhenOffline').is(':checked')},
 		success: function() {
-			$('.bottom-right').notify({
-				type: 'success',
-				message: {text: "\"Run Checks when Offline\" setting successfully changed."},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
+			showSuccessAlert("Settings have been updated.");
 		},
-		error: function(error) {
-			$('.bottom-right').notify({
-				type: 'danger',
-				message: {text: JSON.parse(error.responseText).message},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
-		}
-	});
-}
-
-function changeCleanDatabase() {
-	$.ajax({
-		url: "/api/v1/settings/cleanDatabase",
-		type: "PUT",
-		data: {cleanDatabase: !$('#input-new-cleanDatabase').is(':checked')},
-		success: function() {
-			$('.bottom-right').notify({
-				type: 'success',
-				message: {text: "\"Clean Database automatically\" setting successfully changed."},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
-		},
-		error: function(error) {
-			$('.bottom-right').notify({
-				type: 'danger',
-				message: {text: JSON.parse(error.responseText).message},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
-		}
+		error: handleAjaxErrorAlert
 	});
 }
 
 function checkNow() {
 	if (!allowCheck) {
-		$('.bottom-right').notify({
-			type: 'danger',
-			message: {text: "Please wait a few seconds before trying this operation again."},
-			fadeOut: {enabled: true, delay: 3000}
-		}).show();
+		showErrorAlert("Please wait a few seconds before trying this operation again.");
 		return;
 	}
 
@@ -758,11 +550,7 @@ function checkNow() {
 		url: "/api/v1/action/check",
 		type: "GET",
 		success: function() {
-			$('.bottom-right').notify({
-				type: 'success',
-				message: {text: "Check triggered. Reload in three seconds."},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
+			showSuccessAlert("Please wait while new data is gathered...");
 			setTimeout(function() {
 				loadWebsites();
 			}, 3000);
@@ -771,11 +559,7 @@ function checkNow() {
 			}, 10000);
 		},
 		error: function(error) {
-			$('.bottom-right').notify({
-				type: 'danger',
-				message: {text: JSON.parse(error.responseText).message},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
+			handleAjaxErrorAlert(error);
 			allowCheck = true;
 		}
 	});
@@ -788,12 +572,6 @@ function logout() {
 		success: function() {
 			window.location.replace("/");
 		},
-		error: function(error) {
-			$('.bottom-right').notify({
-				type: 'danger',
-				message: {text: JSON.parse(error.responseText).message},
-				fadeOut: {enabled: true, delay: 3000}
-			}).show();
-		}
+		error: handleAjaxErrorAlert
 	});
 }

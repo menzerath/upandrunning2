@@ -5,6 +5,7 @@ import (
 	"github.com/mitsuse/pushbullet-go/requests"
 	"github.com/op/go-logging"
 	"gopkg.in/gomail.v2"
+	"time"
 )
 
 // Sends a Pushbullet-Push containing the given data to the saved API-key.
@@ -39,7 +40,10 @@ func sendMail(recipient string, name string, url string, newStatus string, oldSt
 	m.SetAddressHeader("From", mConf.From, GetConfiguration().Dynamic.Title)
 	m.SetHeader("To", recipient)
 	m.SetHeader("Subject", "Status Change: "+name)
-	m.SetBody("text/html", "Hello,<br /><br /><b>"+name+"</b>"+" ("+url+") just went from \""+oldStatus+"\" to <b>\""+newStatus+"\"</b>.<br /><br />Sincerely,<br />"+GetConfiguration().Dynamic.Title+"<br /><br /><small>This email was sent automatically, please do not respond to it.</small>")
+	m.SetBody("text/html", "Hello,<br /><br />"+
+		"<b>"+name+"</b>"+" ("+url+") went on <b>"+time.Now().Format("02.01.2006")+"</b> at <b>"+time.Now().Format("15:04:05")+"</b> from \""+oldStatus+"\" to \"<b>"+newStatus+"</b>\".<br /><br />"+
+		"Sincerely,<br />"+GetConfiguration().Dynamic.Title+"<br /><br />"+
+		"<small>This email was sent automatically, please do not respond to it.</small>")
 
 	d := gomail.NewPlainDialer(mConf.Host, mConf.Port, mConf.User, mConf.Password)
 

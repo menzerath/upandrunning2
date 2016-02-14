@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-const VERSION = "2.1.0"
+const VERSION = "2.1.1"
 
 var goVersion = runtime.Version()
 var goArch = runtime.GOOS + "_" + runtime.GOARCH
@@ -94,7 +94,6 @@ func serveRequests() {
 	router.PUT("/api/v1/settings/interval", routes.ApiSettingsInterval)
 	router.PUT("/api/v1/settings/redirects", routes.ApiSettingsRedirects)
 	router.PUT("/api/v1/settings/checkWhenOffline", routes.ApiSettingsCheckWhenOffline)
-	router.PUT("/api/v1/settings/cleanDatabase", routes.ApiSettingsCleanDatabase)
 
 	// Website Management
 	router.POST("/api/v1/websites/:url", routes.ApiWebsitesAdd)
@@ -113,8 +112,8 @@ func serveRequests() {
 		http.Error(w, "Error 404: Not Found", 404)
 	})
 
-	logging.MustGetLogger("").Debug("Listening on Port " + strconv.Itoa(lib.GetConfiguration().Port) + "...")
-	logging.MustGetLogger("").Fatal(http.ListenAndServe(":"+strconv.Itoa(lib.GetConfiguration().Port), router))
+	logging.MustGetLogger("").Debug("Listening on " + lib.GetConfiguration().Address + ":" + strconv.Itoa(lib.GetConfiguration().Port) + "...")
+	logging.MustGetLogger("").Fatal(http.ListenAndServe(lib.GetConfiguration().Address+":"+strconv.Itoa(lib.GetConfiguration().Port), router))
 }
 
 // Creates a timer to regularly check all Websites
@@ -145,9 +144,7 @@ func startCleaningTimer() {
 	timer := time.NewTimer(time.Hour * 24)
 	go func() {
 		<-timer.C
-		if lib.GetConfiguration().Dynamic.CleanDatabase == 1 {
-			lib.CleanDatabase()
-		}
+		lib.CleanDatabase()
 		startCleaningTimer()
 	}()
 }

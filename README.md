@@ -256,17 +256,6 @@ Notice: These APIs require authentication.
 **Required Parameters:**
 * `checkWhenOffline` - `true / false`
 
-#### Automatic Database-Cleaning
-`PUT` `/api/v1/settings/cleanDatabase`:  
-```json
-{
-	"requestSuccess": true,
-	"message": ""
-}
-```
-**Required Parameters:**
-* `cleanDatabase` - `true / false`
-
 ### Website Management
 Notice: These APIs require authentication.
 
@@ -365,13 +354,11 @@ Notice: These APIs require authentication.
 ### Used Software
 * [Bootstrap](https://github.com/twbs/bootstrap)
 	* [Bootswatch Theme: Paper](https://github.com/thomaspark/bootswatch)
-	* [Bootstrap Notify](https://github.com/goodybag/bootstrap-notify)
 * [Font Awesome](http://fontawesome.io)
 * [jQuery](https://jquery.com)
 	* [Chart.js](https://github.com/nnnick/Chart.js)
 	* [SweetAlert](https://github.com/t4t5/sweetalert)
 * Golang Libraries
-	* [go-colorable](https://github.com/mattn/go-colorable)
 	* [Go-MySQL-Driver](https://github.com/go-sql-driver/mysql)
 	* [Golang logging library](https://github.com/op/go-logging)
 	* [gomail](http://gopkg.in/gomail.v2)
