@@ -145,7 +145,7 @@ func startCleaningTimer() {
 	timer := time.NewTimer(time.Hour * 24)
 	go func() {
 		<-timer.C
-		if lib.GetConfiguration().Dynamic.CleanDatabase == 1 {
+		if lib.GetConfiguration().CheckLifetime > 0 {
 			lib.CleanDatabase()
 		}
 		startCleaningTimer()

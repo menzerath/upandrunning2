@@ -96,7 +96,7 @@ func prepareDatabase() {
 
 // Removes all check-results older than one month from the Database
 func CleanDatabase() {
-	res, err := db.Exec("DELETE FROM checks WHERE time <= NOW() - INTERVAL 31 DAY;")
+	res, err := db.Exec("DELETE FROM checks WHERE time <= NOW() - INTERVAL ? DAY;", config.CheckLifetime)
 	if err != nil {
 		logging.MustGetLogger("").Fatal("Unable to cleanup Database: ", err)
 		return

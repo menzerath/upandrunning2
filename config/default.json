@@ -15,5 +15,6 @@
 		"user": "myUser@mymail.com",
 		"password": "mySecretPassword",
 		"from": "upandrunning2@mymail.com"
-	}
+	},
+	"checkLifetime": 31
 }
