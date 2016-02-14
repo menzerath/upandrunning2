@@ -1,0 +1,24 @@
+build:
+  test:
+    image: golang:1.5.3
+    commands:
+      - go get
+      - go build
+      - go test
+  bundle:
+    image: golang:1.5.3
+    commands:
+      - go get github.com/mitchellh/gox
+      - mkdir dist
+      - gox --osarch="linux/386" --output="UpAndRunning2" ./...
+      - zip -r dist/linux_386.zip config/ public/ views/ README.md UpAndRunning2
+      - gox --osarch="linux/amd64" --output="UpAndRunning2" ./...
+      - zip -r dist/linux_amd64.zip config/ public/ views/ README.md UpAndRunning2
+      - gox --osarch="linux/arm" --output="UpAndRunning2" ./...
+      - zip -r dist/linux_arm.zip config/ public/ views/ README.md UpAndRunning2
+      - gox --osarch="windows/386" --output="UpAndRunning2" ./...
+      - zip -r dist/windows_386.zip config/ public/ views/ README.md UpAndRunning2.exe
+      - gox --osarch="windows/amd64" --output="UpAndRunning2" ./...
+      - zip -r dist/windows_amd64.zip config/ public/ views/ README.md UpAndRunning2.exe
+    when:
+      event: tag
