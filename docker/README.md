@@ -39,6 +39,9 @@ To do so, just add those environment-variables when creating the container like 
 docker run -d --name uar2 --link uar2-db:mysql -p 80:8080 -e UAR2_VARIABLE_NAME='CONTENT' marvinmenzerath/upandrunning2
 ```
 
+### Configurable Settings
+* `UAR2_CHECKLIFETIME` (e.g. `31`)
+
 ### Mailer
 If you want to use the built-in mailer, you will need to set those environment-variables:
 * `UAR2_MAILER_HOST` (e.g. `smtp.mymail.com`)

@@ -70,8 +70,13 @@ func ReadConfigurationFromFile(filePath string) {
 		config.Database.Password = os.Getenv("MYSQL_ENV_MYSQL_ROOT_PASSWORD")
 		config.Database.Database = "upandrunning"
 
+		i, err := strconv.Atoi(os.Getenv("UAR2_CHECKLIFETIME"))
+		if err == nil {
+			config.CheckLifetime = i
+		}
+
 		config.Mailer.Host = os.Getenv("UAR2_MAILER_HOST")
-		i, err := strconv.Atoi(os.Getenv("UAR2_MAILER_PORT"))
+		i, err = strconv.Atoi(os.Getenv("UAR2_MAILER_PORT"))
 		if err == nil {
 			config.Mailer.Port = i
 		}
