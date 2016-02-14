@@ -354,7 +354,6 @@ Notice: These APIs require authentication.
 ### Used Software
 * [Bootstrap](https://github.com/twbs/bootstrap)
 	* [Bootswatch Theme: Paper](https://github.com/thomaspark/bootswatch)
-	* [Bootstrap Notify](https://github.com/goodybag/bootstrap-notify)
 * [Font Awesome](http://fontawesome.io)
 * [jQuery](https://jquery.com)
 	* [Chart.js](https://github.com/nnnick/Chart.js)
