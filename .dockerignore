@@ -7,5 +7,5 @@ UpAndRunning2.iml
 
 # Application
 config/local*.json
-doc/
+docs/
 README.md
