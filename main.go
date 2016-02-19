@@ -23,7 +23,7 @@ func main() {
 	lib.SetupLogger()
 
 	// Welcome
-	logging.MustGetLogger("").Info("Welcome to UpAndRunning2 v%s [%s@%s]!", VERSION, goVersion, goArch)
+	logging.MustGetLogger("").Info("Welcome to UpAndRunning2 v" + VERSION + " [" + goVersion + "@" + goArch + "]!")
 
 	// Config
 	lib.ReadConfigurationFromFile("config/local.json")
