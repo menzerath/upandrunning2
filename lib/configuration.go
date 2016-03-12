@@ -62,8 +62,9 @@ type StaticConfiguration struct {
 
 // Reads a configuration-file from a specified path.
 func ReadConfigurationFromFile(filePath string) {
+	ReadDefaultConfiguration("config/default.json")
+
 	if os.Getenv("UAR2_IS_DOCKER") == "true" {
-		ReadDefaultConfiguration("config/default.json")
 		logging.MustGetLogger("").Info("Reading Configuration from Environment Variables...")
 
 		config.Database.Host = os.Getenv("MYSQL_PORT_3306_TCP_ADDR")
