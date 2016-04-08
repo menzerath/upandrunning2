@@ -20,12 +20,5 @@ _cgo_export.*
 _testmain.go
 
 *.exe
-*.test
-*.prof
 
-# IDE (IntelliJ IDEA)
-.idea/
-UpAndRunning2.iml
-
-# Application
-config/local*.json
+src
