@@ -2,7 +2,15 @@
 	"ImportPath": "github.com/MarvinMenzerath/UpAndRunning2",
 	"GoVersion": "go1.6",
 	"GodepVersion": "v62",
+	"Packages": [
+		"./..."
+	],
 	"Deps": [
+		{
+			"ImportPath": "github.com/asaskevich/govalidator",
+			"Comment": "v3-7-gd1e14c5",
+			"Rev": "d1e14c504700969ddf41264c7f3e084c7b99de59"
+		},
 		{
 			"ImportPath": "github.com/franela/goreq",
 			"Rev": "3ddeded65be21dacb5a2e2d0b95af9ff6862a2b5"
