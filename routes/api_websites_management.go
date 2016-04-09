@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"github.com/MarvinMenzerath/UpAndRunning2/lib"
+	"github.com/asaskevich/govalidator"
 	"github.com/julienschmidt/httprouter"
 	"github.com/op/go-logging"
 	"net/http"
@@ -26,6 +27,18 @@ func ApiWebsitesAdd(w http.ResponseWriter, r *http.Request, ps httprouter.Params
 	// Simple Validation
 	if name == "" || protocol == "" || url == "" || method == "" {
 		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit valid values.")
+		return
+	}
+	if protocol != "http" && protocol != "https" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid protocol.")
+		return
+	}
+	if !govalidator.IsURL(protocol + "://" + url) {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid url.")
+		return
+	}
+	if method != "HEAD" && method != "GET" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid check method.")
 		return
 	}
 
@@ -63,6 +76,10 @@ func ApiWebsitesEdit(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 	}
 	if protocol != "http" && protocol != "https" {
 		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid protocol.")
+		return
+	}
+	if !govalidator.IsURL(protocol + "://" + url) {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid url.")
 		return
 	}
 	if method != "HEAD" && method != "GET" {

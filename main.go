@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-const VERSION = "2.1.1"
+const VERSION = "2.1.2"
 
 var goVersion = runtime.Version()
 var goArch = runtime.GOOS + "_" + runtime.GOARCH
@@ -23,7 +23,7 @@ func main() {
 	lib.SetupLogger()
 
 	// Welcome
-	logging.MustGetLogger("").Info("Welcome to UpAndRunning2 v%s [%s@%s]!", VERSION, goVersion, goArch)
+	logging.MustGetLogger("").Info("Welcome to UpAndRunning2 v" + VERSION + " [" + goVersion + "@" + goArch + "]!")
 
 	// Config
 	lib.ReadConfigurationFromFile("config/local.json")
@@ -59,21 +59,30 @@ func main() {
 func serveRequests() {
 	router := httprouter.New()
 
-	// Index
-	router.GET("/", routes.ViewIndex)
-	router.GET("/status/:url", routes.ViewIndex)
-	router.GET("/results/:url", routes.ViewIndex)
-
-	// Admin
-	router.GET("/admin", routes.ViewAdmin)
-	router.GET("/admin/login", routes.ViewLogin)
-
-	// **********
-	// * API v1 *
-	// **********
-
-	// Just Text
+	// Default API-message
 	router.GET("/api", routes.ApiIndex)
+
+	// API
+	setupApi1(router)
+
+	// Web-Frontend
+	if lib.GetConfiguration().UseWebFrontend {
+		setupWebFrontend(router)
+	} else {
+		router.GET("/", routes.NoWebFrontendIndex)
+	}
+
+	// 404 Handler
+	router.NotFound = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "Error 404: Not Found", 404)
+	})
+
+	logging.MustGetLogger("").Debug("Listening on " + lib.GetConfiguration().Address + ":" + strconv.Itoa(lib.GetConfiguration().Port) + "...")
+	logging.MustGetLogger("").Fatal(http.ListenAndServe(lib.GetConfiguration().Address+":"+strconv.Itoa(lib.GetConfiguration().Port), router))
+}
+
+// Setup all routes for API v1
+func setupApi1(router *httprouter.Router) {
 	router.GET("/api/v1", routes.ApiIndexV1)
 
 	// Public Statistics
@@ -103,17 +112,21 @@ func serveRequests() {
 	router.PUT("/api/v1/websites/:url/visibility", routes.ApiWebsitesVisibility)
 	router.GET("/api/v1/websites/:url/notifications", routes.ApiWebsitesGetNotifications)
 	router.PUT("/api/v1/websites/:url/notifications", routes.ApiWebsitePutNotifications)
+}
+
+// Setup all routes for Web-Frontend
+func setupWebFrontend(router *httprouter.Router) {
+	// Index
+	router.GET("/", routes.ViewIndex)
+	router.GET("/status/:url", routes.ViewIndex)
+	router.GET("/results/:url", routes.ViewIndex)
+
+	// Admin
+	router.GET("/admin", routes.ViewAdmin)
+	router.GET("/admin/login", routes.ViewLogin)
 
 	// Static Files
 	router.ServeFiles("/public/*filepath", http.Dir("public"))
-
-	// 404 Handler
-	router.NotFound = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "Error 404: Not Found", 404)
-	})
-
-	logging.MustGetLogger("").Debug("Listening on " + lib.GetConfiguration().Address + ":" + strconv.Itoa(lib.GetConfiguration().Port) + "...")
-	logging.MustGetLogger("").Fatal(http.ListenAndServe(lib.GetConfiguration().Address+":"+strconv.Itoa(lib.GetConfiguration().Port), router))
 }
 
 // Creates a timer to regularly check all Websites

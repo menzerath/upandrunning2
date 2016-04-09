@@ -16,5 +16,6 @@
 		"password": "mySecretPassword",
 		"from": "upandrunning2@mymail.com"
 	},
-	"checkLifetime": 31
+	"checkLifetime": 31,
+	"useWebFrontend": true
 }

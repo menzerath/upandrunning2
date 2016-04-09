@@ -24,7 +24,7 @@ _testmain.go
 *.prof
 
 # IDE (IntelliJ IDEA)
-.idea
+.idea/
 UpAndRunning2.iml
 
 # Application

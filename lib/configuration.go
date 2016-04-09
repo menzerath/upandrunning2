@@ -14,13 +14,14 @@ var config *Configuration
 // The whole configuration.
 // Contains all other configuration-data.
 type Configuration struct {
-	Address       string
-	Port          int
-	Database      databaseConfiguration
-	Mailer        mailerConfiguration
-	Dynamic       dynamicConfiguration
-	Static        StaticConfiguration
-	CheckLifetime int
+	Address        string
+	Port           int
+	Database       databaseConfiguration
+	Mailer         mailerConfiguration
+	Dynamic        dynamicConfiguration
+	Static         StaticConfiguration
+	CheckLifetime  int
+	UseWebFrontend bool
 }
 
 // The database configuration.
@@ -61,8 +62,9 @@ type StaticConfiguration struct {
 
 // Reads a configuration-file from a specified path.
 func ReadConfigurationFromFile(filePath string) {
+	ReadDefaultConfiguration("config/default.json")
+
 	if os.Getenv("UAR2_IS_DOCKER") == "true" {
-		ReadDefaultConfiguration("config/default.json")
 		logging.MustGetLogger("").Info("Reading Configuration from Environment Variables...")
 
 		config.Database.Host = os.Getenv("MYSQL_PORT_3306_TCP_ADDR")
@@ -73,6 +75,11 @@ func ReadConfigurationFromFile(filePath string) {
 		i, err := strconv.Atoi(os.Getenv("UAR2_CHECKLIFETIME"))
 		if err == nil {
 			config.CheckLifetime = i
+		}
+
+		b, err := strconv.ParseBool(os.Getenv("UAR2_USEWEBFRONTEND"))
+		if err == nil {
+			config.UseWebFrontend = b
 		}
 
 		config.Mailer.Host = os.Getenv("UAR2_MAILER_HOST")

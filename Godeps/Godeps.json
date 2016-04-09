@@ -1,0 +1,62 @@
+{
+	"ImportPath": "github.com/MarvinMenzerath/UpAndRunning2",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v62",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/asaskevich/govalidator",
+			"Comment": "v3-7-gd1e14c5",
+			"Rev": "d1e14c504700969ddf41264c7f3e084c7b99de59"
+		},
+		{
+			"ImportPath": "github.com/franela/goreq",
+			"Rev": "3ddeded65be21dacb5a2e2d0b95af9ff6862a2b5"
+		},
+		{
+			"ImportPath": "github.com/go-sql-driver/mysql",
+			"Comment": "v1.2-191-g1421caf",
+			"Rev": "1421caf44f6464fd2ee8de694c7508ee13f92964"
+		},
+		{
+			"ImportPath": "github.com/julienschmidt/httprouter",
+			"Comment": "v1.1-29-g77366a4",
+			"Rev": "77366a47451a56bb3ba682481eed85b64fea14e8"
+		},
+		{
+			"ImportPath": "github.com/mitsuse/pushbullet-go",
+			"Comment": "v0.1.0",
+			"Rev": "5a1d8dd906e1c219bc93570340a0c76239a99dba"
+		},
+		{
+			"ImportPath": "github.com/mitsuse/pushbullet-go/requests",
+			"Comment": "v0.1.0",
+			"Rev": "5a1d8dd906e1c219bc93570340a0c76239a99dba"
+		},
+		{
+			"ImportPath": "github.com/mitsuse/pushbullet-go/responses",
+			"Comment": "v0.1.0",
+			"Rev": "5a1d8dd906e1c219bc93570340a0c76239a99dba"
+		},
+		{
+			"ImportPath": "github.com/op/go-logging",
+			"Comment": "v1-7-g970db52",
+			"Rev": "970db520ece77730c7e4724c61121037378659d9"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/bcrypt",
+			"Rev": "b8a0f4bb4040f8d884435cff35b9691e362cf00c"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/blowfish",
+			"Rev": "b8a0f4bb4040f8d884435cff35b9691e362cf00c"
+		},
+		{
+			"ImportPath": "gopkg.in/gomail.v2",
+			"Comment": "2.0.0-20-g4291610",
+			"Rev": "42916101524810bd3aed9a8b25e6bb58d8e3af82"
+		}
+	]
+}

@@ -61,13 +61,13 @@ func prepareDatabase() {
 		logging.MustGetLogger("").Fatal("Unable to create table 'websites': ", err)
 	}
 
-	// v2.1.0; Default Setup with v2.2.0
+	// Default Setup
 	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `checks` (`id` INT(11) NOT NULL AUTO_INCREMENT, `websiteId` INT(11) NOT NULL, `statusCode` INT(3) NOT NULL, `statusText` VARCHAR(50) NOT NULL, `responseTime` INT(6) NOT NULL, `time` DATETIME NOT NULL, PRIMARY KEY (`id`), FOREIGN KEY (`websiteId`) REFERENCES websites(`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
 	if err != nil {
 		logging.MustGetLogger("").Fatal("Unable to create table 'checks': ", err)
 	}
 
-	// v2.1.0; Default Setup with v2.2.0
+	// Default Setup
 	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `notifications` (`websiteId` int(11) NOT NULL, `pushbulletKey` varchar(300) NOT NULL DEFAULT '', `email` varchar(300) NOT NULL DEFAULT '', PRIMARY KEY (`websiteId`), UNIQUE KEY (`websiteId`), FOREIGN KEY (`websiteId`) REFERENCES websites(`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;")
 	if err != nil {
 		logging.MustGetLogger("").Fatal("Unable to create table 'notifications': ", err)
@@ -79,7 +79,7 @@ func prepareDatabase() {
 		logging.MustGetLogger("").Fatal("Unable to create table 'settings': ", err)
 	}
 
-	// v2.1.0
+	// v2.1.0; remove in v2.2.x
 	_, err = db.Exec("ALTER TABLE `websites` DROP `status`, DROP `responseTime`, DROP `time`, DROP `lastFailStatus`, DROP `lastFailTime`, DROP `ups`, DROP `downs`, DROP `totalChecks`, DROP `avgAvail`;")
 	if mysqlError, ok := err.(*mysql.MySQLError); ok {
 		if mysqlError.Number != 1091 { // Columns do not exist: no need to remove them
@@ -87,7 +87,7 @@ func prepareDatabase() {
 		}
 	}
 
-	// v2.1.0
+	// v2.1.0; remove in v2.2.x
 	_, err = db.Exec("DELETE FROM settings WHERE name = 'pushbullet_key';")
 	if err != nil {
 		logging.MustGetLogger("").Warning("Unable to delete unneccessary row: ", err)

@@ -143,8 +143,7 @@ function showWebsiteDetails(website) {
 			delete data['websiteData'];
 			swal({
 				title: website,
-				text: '<pre>' + JSON.stringify(data, null, '\t') + '</pre>',
-				html: true,
+				html: '<pre>' + JSON.stringify(data, null, '\t') + '</pre>',
 				confirmButtonText: "Close"
 			});
 		},
@@ -174,9 +173,8 @@ function showWebsiteResponseTimes(website) {
 
 			swal({
 				title: website,
-				text: '<canvas id="graph-responsetime" height="200" width="800"></canvas>',
-				html: true,
-				customClass: "swal-wide",
+				html: '<canvas id="graph-responsetime" height="200" width="800"></canvas>',
+				width: 900,
 				confirmButtonText: "Close"
 			});
 
@@ -313,27 +311,26 @@ function editNotificationPushbullet(url) {
 		success: function(data) {
 			swal({
 				title: "Pushbullet",
-				text: "Please enter a valid <b>Pushbullet-API Key</b> in order to recieve push-messages.<br />Leave this field blank if you do not want this kind of notification.",
-				html: true,
-				type: "input",
-				inputPlaceholder: "API key",
-				inputValue: data.notifications.pushbulletKey,
+				html: "Please enter a valid <b>Pushbullet-API Key</b> in order to receive push-messages.<br />Leave this field blank if you do not want this kind of notification.<br /><br /><input class='form-control' type='text' id='input-pushbullet' placeholder='API key' value=" + data.notifications.pushbulletKey + ">",
 				showCancelButton: true,
 				confirmButtonText: "Save",
 				closeOnConfirm: false
-			}, function(inputValue) {
-				if (inputValue === false) return;
+			}).then(function(isConfirm) {
+				if (isConfirm) {
+					var inputValue = $('#input-pushbullet').val();
+					if (inputValue === false) return;
 
-				$.ajax({
-					url: "/api/v1/websites/" + url + "/notifications",
-					type: "PUT",
-					data: {pushbulletKey: inputValue.trim(), email: data.notifications.email},
-					success: function() {
-						loadWebsites();
-						showSuccessAlert("Settings have been updated.");
-					},
-					error: handleAjaxErrorAlert
-				});
+					$.ajax({
+						url: "/api/v1/websites/" + url + "/notifications",
+						type: "PUT",
+						data: {pushbulletKey: inputValue.trim(), email: data.notifications.email},
+						success: function() {
+							loadWebsites();
+							showSuccessAlert("Settings have been updated.");
+						},
+						error: handleAjaxErrorAlert
+					});
+				}
 			});
 		},
 		error: handleAjaxErrorAlert
@@ -349,27 +346,26 @@ function editNotificationEmail(url) {
 		success: function(data) {
 			swal({
 				title: "Email",
-				text: "Please enter a valid <b>email address</b> in order to recieve email-notifications.<br />Leave this field blank if you do not want this kind of notification.",
-				html: true,
-				type: "input",
-				inputPlaceholder: "email address",
-				inputValue: data.notifications.email,
+				html: "Please enter a valid <b>email address</b> in order to receive email-notifications.<br />Leave this field blank if you do not want this kind of notification.<br /><br /><input class='form-control' type='text' id='input-email' placeholder='email address' value=" + data.notifications.email + ">",
 				showCancelButton: true,
 				confirmButtonText: "Save",
 				closeOnConfirm: false
-			}, function(inputValue) {
-				if (inputValue === false) return;
+			}).then(function(isConfirm) {
+				if (isConfirm) {
+					var inputValue = $('#input-email').val();
+					if (inputValue === false) return;
 
-				$.ajax({
-					url: "/api/v1/websites/" + url + "/notifications",
-					type: "PUT",
-					data: {pushbulletKey: data.notifications.pushbulletKey, email: inputValue.trim()},
-					success: function() {
-						loadWebsites();
-						showSuccessAlert("Settings have been updated.");
-					},
-					error: handleAjaxErrorAlert
-				});
+					$.ajax({
+						url: "/api/v1/websites/" + url + "/notifications",
+						type: "PUT",
+						data: {pushbulletKey: data.notifications.pushbulletKey, email: inputValue.trim()},
+						success: function() {
+							loadWebsites();
+							showSuccessAlert("Settings have been updated.");
+						},
+						error: handleAjaxErrorAlert
+					});
+				}
 			});
 		},
 		error: handleAjaxErrorAlert
@@ -437,16 +433,18 @@ function deleteWebsite(url) {
 		confirmButtonColor: "#DD6B55",
 		confirmButtonText: "Yes",
 		closeOnConfirm: false
-	}, function() {
-		$.ajax({
-			url: "/api/v1/websites/" + url,
-			type: "DELETE",
-			success: function() {
-				loadWebsites();
-				showSuccessAlert("Website successfully deleted.");
-			},
-			error: handleAjaxErrorAlert
-		});
+	}).then(function(isConfirm) {
+		if (isConfirm) {
+			$.ajax({
+				url: "/api/v1/websites/" + url,
+				type: "DELETE",
+				success: function() {
+					loadWebsites();
+					showSuccessAlert("Website successfully deleted.");
+				},
+				error: handleAjaxErrorAlert
+			});
+		}
 	});
 }
 

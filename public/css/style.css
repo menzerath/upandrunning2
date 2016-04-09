@@ -49,11 +49,6 @@ pre {
 	cursor: pointer;
 }
 
-.swal-wide {
-	margin-left: -450px !important;
-	width: 900px !important;
-}
-
 .close {
 	font-size: 22px;
 	font-weight: 300;
