@@ -1,5 +1,4 @@
 # UpAndRunning2
-[![Build Status](https://drone.io/github.com/MarvinMenzerath/UpAndRunning2/status.png)](https://drone.io/github.com/MarvinMenzerath/UpAndRunning2/latest)
 [![Docker Layers](https://badge.imagelayers.io/marvinmenzerath/upandrunning2:latest.svg)](https://imagelayers.io/?images=marvinmenzerath/upandrunning2:latest)
 
 UpAndRunning2 is a lightweight Go application which **monitors all of your websites**, offers a simple **JSON-REST-API** and user-defined **notifications**.
