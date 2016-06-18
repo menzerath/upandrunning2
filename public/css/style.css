@@ -37,6 +37,10 @@ pre {
 	display: none;
 }
 
+#graph-responsetime {
+	margin-bottom: 1em;
+}
+
 .form-horizontal .control-label {
 	padding-top: 10px;
 }
