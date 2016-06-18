@@ -315,8 +315,8 @@ function editNotificationPushbullet(url) {
 				showCancelButton: true,
 				confirmButtonText: "Save",
 				closeOnConfirm: false
-			}).then(function(isConfirm) {
-				if (isConfirm) {
+			}).then(
+				function(result) {
 					var inputValue = $('#input-pushbullet').val();
 					if (inputValue === false) return;
 
@@ -330,8 +330,10 @@ function editNotificationPushbullet(url) {
 						},
 						error: handleAjaxErrorAlert
 					});
+				},
+				function(dismiss) {
 				}
-			});
+			);
 		},
 		error: handleAjaxErrorAlert
 	});
@@ -350,8 +352,8 @@ function editNotificationEmail(url) {
 				showCancelButton: true,
 				confirmButtonText: "Save",
 				closeOnConfirm: false
-			}).then(function(isConfirm) {
-				if (isConfirm) {
+			}).then(
+				function(result) {
 					var inputValue = $('#input-email').val();
 					if (inputValue === false) return;
 
@@ -365,8 +367,10 @@ function editNotificationEmail(url) {
 						},
 						error: handleAjaxErrorAlert
 					});
+				},
+				function(dismiss) {
 				}
-			});
+			);
 		},
 		error: handleAjaxErrorAlert
 	});
@@ -433,8 +437,8 @@ function deleteWebsite(url) {
 		confirmButtonColor: "#DD6B55",
 		confirmButtonText: "Yes",
 		closeOnConfirm: false
-	}).then(function(isConfirm) {
-		if (isConfirm) {
+	}).then(
+		function(result) {
 			$.ajax({
 				url: "/api/v1/websites/" + url,
 				type: "DELETE",
@@ -444,8 +448,10 @@ function deleteWebsite(url) {
 				},
 				error: handleAjaxErrorAlert
 			});
+		},
+		function(dismiss) {
 		}
-	});
+	);
 }
 
 function changeTitle() {
