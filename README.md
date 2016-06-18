@@ -13,6 +13,9 @@ UpAndRunning2 is a lightweight Go application which **monitors all of your websi
 * [Screenshots](docs/screenshots/index.md)
 * [Credits](docs/credits.md)
 
+## Additional Software
+* [Terminal Client](https://github.com/MarvinMenzerath/UpAndRunning2-Terminal-Client)
+
 ## License
 The MIT License (MIT)
 
