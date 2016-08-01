@@ -14,11 +14,12 @@ func sendPush(apiKey string, name string, url string, newStatus string, oldStatu
 
 	pb := pushbullet.New(apiKey)
 
-	push := requests.NewNote()
+	push := requests.NewLink()
 	push.Title = GetConfiguration().Dynamic.Title + " - Status Change"
-	push.Body = name + " (" + url + ") went from \"" + oldStatus + "\" to \"" + newStatus + "\"."
+	push.Body = name + " went from \"" + oldStatus + "\" to \"" + newStatus + "\"."
+	push.Url = url
 
-	_, err := pb.PostPushesNote(push)
+	_, err := pb.PostPushesLink(push)
 	if err != nil {
 		logging.MustGetLogger("").Error("Unable to send Push: ", err)
 	}
