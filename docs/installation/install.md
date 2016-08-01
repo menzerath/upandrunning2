@@ -1,7 +1,7 @@
 # Installation
 Looking for the Docker Guide? Click [here](docker.md).
 
-* Download and extract all the files in a directory.
+* Download and extract all files into a directory.
 * Prepare your MySQL-Server: create a new user and a new database.
 * Copy `config/default.json` to `config/local.json` and change this file to your needs.
 * Run the application using a systemd-script or just type `./UpAndRunning2`.
