@@ -313,10 +313,9 @@ function editNotificationPushbullet(url) {
 				title: "Pushbullet",
 				html: "Please enter a valid <b>Pushbullet-API Key</b> in order to receive push-messages.<br />Leave this field blank if you do not want this kind of notification.<br /><br /><input class='form-control' type='text' id='input-pushbullet' placeholder='API key' value=" + data.notifications.pushbulletKey + ">",
 				showCancelButton: true,
-				confirmButtonText: "Save",
-				closeOnConfirm: false
+				confirmButtonText: "Save"
 			}).then(
-				function(result) {
+				function() {
 					var inputValue = $('#input-pushbullet').val();
 					if (inputValue === false) return;
 
@@ -350,10 +349,9 @@ function editNotificationEmail(url) {
 				title: "Email",
 				html: "Please enter a valid <b>email address</b> in order to receive email-notifications.<br />Leave this field blank if you do not want this kind of notification.<br /><br /><input class='form-control' type='text' id='input-email' placeholder='email address' value=" + data.notifications.email + ">",
 				showCancelButton: true,
-				confirmButtonText: "Save",
-				closeOnConfirm: false
+				confirmButtonText: "Save"
 			}).then(
-				function(result) {
+				function() {
 					var inputValue = $('#input-email').val();
 					if (inputValue === false) return;
 
@@ -435,10 +433,9 @@ function deleteWebsite(url) {
 		type: "warning",
 		showCancelButton: true,
 		confirmButtonColor: "#DD6B55",
-		confirmButtonText: "Yes",
-		closeOnConfirm: false
+		confirmButtonText: "Yes"
 	}).then(
-		function(result) {
+		function() {
 			$.ajax({
 				url: "/api/v1/websites/" + url,
 				type: "DELETE",
