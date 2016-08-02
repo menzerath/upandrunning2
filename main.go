@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-const VERSION = "2.1.3"
+const VERSION = "2.2.0"
 
 var goVersion = runtime.Version()
 var goArch = runtime.GOOS + "_" + runtime.GOARCH
