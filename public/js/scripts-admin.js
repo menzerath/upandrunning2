@@ -62,7 +62,7 @@ $(document).ready(function() {
 
 function loadWebsites() {
 	$.ajax({
-		url: "/api/v1/websites",
+		url: "/api/v2/websites",
 		type: "GET",
 		success: function(data) {
 			loadedWebsiteData = data.websites;
@@ -136,7 +136,7 @@ function showWebsiteDetails(website) {
 	}
 
 	$.ajax({
-		url: "/api/v1/websites/" + website + "/status",
+		url: "/api/v2/websites/" + website + "/status",
 		type: "GET",
 		success: function(data) {
 			delete data['requestSuccess'];
@@ -161,7 +161,7 @@ function showWebsiteResponseTimes(website) {
 	}
 
 	$.ajax({
-		url: "/api/v1/websites/" + website + "/results?limit=100",
+		url: "/api/v2/websites/" + website + "/results?limit=100",
 		type: "GET",
 		success: function(data) {
 			var chartValuesResponseTimes = [];
@@ -235,7 +235,7 @@ function addWebsite() {
 
 	if (name.trim() && protocol.trim() && url.trim() && method.trim()) {
 		$.ajax({
-			url: "/api/v1/websites/" + url,
+			url: "/api/v2/websites/" + url,
 			type: "POST",
 			data: {name: name, protocol: protocol, url: url, checkMethod: method},
 			success: function() {
@@ -256,7 +256,7 @@ function addWebsite() {
 
 function enableWebsite(url) {
 	$.ajax({
-		url: "/api/v1/websites/" + url + "/enabled",
+		url: "/api/v2/websites/" + url + "/enabled",
 		type: "PUT",
 		data: {enabled: true},
 		success: function() {
@@ -268,7 +268,7 @@ function enableWebsite(url) {
 
 function disableWebsite(url) {
 	$.ajax({
-		url: "/api/v1/websites/" + url + "/enabled",
+		url: "/api/v2/websites/" + url + "/enabled",
 		type: "PUT",
 		data: {enabled: false},
 		success: function() {
@@ -280,7 +280,7 @@ function disableWebsite(url) {
 
 function visibleWebsite(url) {
 	$.ajax({
-		url: "/api/v1/websites/" + url + "/visibility",
+		url: "/api/v2/websites/" + url + "/visibility",
 		type: "PUT",
 		data: {visible: true},
 		success: function() {
@@ -292,7 +292,7 @@ function visibleWebsite(url) {
 
 function invisibleWebsite(url) {
 	$.ajax({
-		url: "/api/v1/websites/" + url + "/visibility",
+		url: "/api/v2/websites/" + url + "/visibility",
 		type: "PUT",
 		data: {visible: false},
 		success: function() {
@@ -306,7 +306,7 @@ function editNotificationPushbullet(url) {
 	if (!url.trim()) return;
 
 	$.ajax({
-		url: "/api/v1/websites/" + url + "/notifications",
+		url: "/api/v2/websites/" + url + "/notifications",
 		type: "GET",
 		success: function(data) {
 			swal({
@@ -320,7 +320,7 @@ function editNotificationPushbullet(url) {
 					if (inputValue === false) return;
 
 					$.ajax({
-						url: "/api/v1/websites/" + url + "/notifications",
+						url: "/api/v2/websites/" + url + "/notifications",
 						type: "PUT",
 						data: {pushbulletKey: inputValue.trim(), email: data.notifications.email},
 						success: function() {
@@ -342,7 +342,7 @@ function editNotificationEmail(url) {
 	if (!url.trim()) return;
 
 	$.ajax({
-		url: "/api/v1/websites/" + url + "/notifications",
+		url: "/api/v2/websites/" + url + "/notifications",
 		type: "GET",
 		success: function(data) {
 			swal({
@@ -356,7 +356,7 @@ function editNotificationEmail(url) {
 					if (inputValue === false) return;
 
 					$.ajax({
-						url: "/api/v1/websites/" + url + "/notifications",
+						url: "/api/v2/websites/" + url + "/notifications",
 						type: "PUT",
 						data: {pushbulletKey: data.notifications.pushbulletKey, email: inputValue.trim()},
 						success: function() {
@@ -405,7 +405,7 @@ function saveWebsite() {
 
 	if (name.trim() && protocol.trim() && url.trim() && method.trim()) {
 		$.ajax({
-			url: "/api/v1/websites/" + editUrl,
+			url: "/api/v2/websites/" + editUrl,
 			type: "PUT",
 			data: {name: name, protocol: protocol, url: url, checkMethod: method},
 			success: function() {
@@ -437,7 +437,7 @@ function deleteWebsite(url) {
 	}).then(
 		function() {
 			$.ajax({
-				url: "/api/v1/websites/" + url,
+				url: "/api/v2/websites/" + url,
 				type: "DELETE",
 				success: function() {
 					loadWebsites();
@@ -456,7 +456,7 @@ function changeTitle() {
 
 	if (newTitle.trim()) {
 		$.ajax({
-			url: "/api/v1/settings/title",
+			url: "/api/v2/settings/title",
 			type: "PUT",
 			data: {title: newTitle},
 			success: function() {
@@ -477,7 +477,7 @@ function changePassword() {
 
 	if (newPassword.trim()) {
 		$.ajax({
-			url: "/api/v1/settings/password",
+			url: "/api/v2/settings/password",
 			type: "PUT",
 			data: {password: newPassword},
 			success: function() {
@@ -497,7 +497,7 @@ function changeInterval() {
 
 	if (newInterval.trim() && !(isNaN(newInterval) || newInterval < 1 || newInterval > 600)) {
 		$.ajax({
-			url: "/api/v1/settings/interval",
+			url: "/api/v2/settings/interval",
 			type: "PUT",
 			data: {interval: newInterval},
 			success: function() {
@@ -515,7 +515,7 @@ function changeRedirects() {
 
 	if (newRedirects.trim() && !(isNaN(newRedirects) || newRedirects < 0 || newRedirects > 10)) {
 		$.ajax({
-			url: "/api/v1/settings/redirects",
+			url: "/api/v2/settings/redirects",
 			type: "PUT",
 			data: {redirects: newRedirects},
 			success: function() {
@@ -530,7 +530,7 @@ function changeRedirects() {
 
 function changeCheckWhenOffline() {
 	$.ajax({
-		url: "/api/v1/settings/checkWhenOffline",
+		url: "/api/v2/settings/checkWhenOffline",
 		type: "PUT",
 		data: {checkWhenOffline: !$('#input-new-checkWhenOffline').is(':checked')},
 		success: function() {
@@ -548,7 +548,7 @@ function checkNow() {
 
 	allowCheck = false;
 	$.ajax({
-		url: "/api/v1/action/check",
+		url: "/api/v2/action/check",
 		type: "GET",
 		success: function() {
 			showSuccessAlert("Please wait while new data is gathered...");
@@ -568,7 +568,7 @@ function checkNow() {
 
 function logout() {
 	$.ajax({
-		url: "/api/v1/auth/logout",
+		url: "/api/v2/auth/logout",
 		type: "GET",
 		success: function() {
 			window.location.replace("/");

@@ -24,7 +24,7 @@ function showInformation(website) {
 	}
 
 	$.ajax({
-		url: "/api/v1/websites/" + website + "/status",
+		url: "/api/v2/websites/" + website + "/status",
 		type: "GET",
 		success: function(data) {
 			var dataString = '<div class="well"><legend>More Information</legend>';
@@ -74,7 +74,7 @@ function showResponseTimeGraph(website) {
 	}
 
 	$.ajax({
-		url: "/api/v1/websites/" + website + "/results?limit=100",
+		url: "/api/v2/websites/" + website + "/results?limit=100",
 		type: "GET",
 		success: function(data) {
 			var chartValuesResponseTimes = [];
@@ -150,7 +150,7 @@ function hideResponseTime() {
 
 function loadWebsiteData() {
 	$.ajax({
-		url: "/api/v1/websites",
+		url: "/api/v2/websites",
 		type: "GET",
 		success: function(data) {
 			loadedWebsiteData = data.websites;
