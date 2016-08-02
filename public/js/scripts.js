@@ -167,14 +167,15 @@ function loadWebsiteData() {
 					newEntry += ' <span class="label label-danger">' + loadedWebsiteData[i].status + '</span> ';
 				}
 
-				newEntry += '</td><td> <span class="label label-primary label-action" onclick="showInformation(\'' + loadedWebsiteData[i].url + '\')" title="More"><span class="fa fa-info"></span></span> ' +
+				newEntry += '</td><td>' + loadedWebsiteData[i].responseTime + '</td>';
+				newEntry += '<td> <span class="label label-primary label-action" onclick="showInformation(\'' + loadedWebsiteData[i].url + '\')" title="More"><span class="fa fa-info"></span></span> ' +
 					'<span class="label label-primary label-action" onclick="showResponseTimeGraph(\'' + loadedWebsiteData[i].url + '\')" title="Response Times"><span class="fa fa-line-chart"></span></span> </td>';
 
 				if (loadedWebsiteData[i].status.indexOf("2") == 0 || loadedWebsiteData[i].status.indexOf("3") == 0) {
 					dataStringUp += '<tr><td>' + countUp + '</td>' + newEntry + '</tr>';
 					countUp++;
 				} else {
-					dataStringDown += '<tr><td>' + countDown+ '</td>' + newEntry + '</tr>';
+					dataStringDown += '<tr><td>' + countDown + '</td>' + newEntry + '</tr>';
 					countDown++;
 				}
 			}
