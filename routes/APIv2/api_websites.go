@@ -37,7 +37,7 @@ func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		url        string
 		statusCode string
 		statusText string
-		responseTime string
+		responseTime int
 	)
 
 	for rows.Next() {
@@ -60,7 +60,7 @@ func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 			return
 		}
 
-		websites = append(websites, BasicWebsite{name, protocol, url, statusCode + " - " + statusText, responseTime})
+		websites = append(websites, BasicWebsite{name, protocol, url, statusCode + " - " + statusText, strconv.Itoa(responseTime) + " ms"})
 	}
 
 	// Send Response
@@ -102,7 +102,7 @@ func ApiWebsitesDetailed(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		checkMethod   string
 		statusCode    string
 		statusText    string
-		responseTime string
+		responseTime int
 		time          string
 		notifications EnabledNotifications
 	)
@@ -155,7 +155,7 @@ func ApiWebsitesDetailed(w http.ResponseWriter, r *http.Request, ps httprouter.P
 			notifications.Email = false
 		}
 
-		websites = append(websites, DetailedWebsite{id, name, enabled, visible, protocol, url, checkMethod, statusCode + " - " + statusText, responseTime, time, notifications})
+		websites = append(websites, DetailedWebsite{id, name, enabled, visible, protocol, url, checkMethod, statusCode + " - " + statusText, strconv.Itoa(responseTime) + " ms", time, notifications})
 	}
 
 	// Send Response
