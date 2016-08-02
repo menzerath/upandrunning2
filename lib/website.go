@@ -29,6 +29,7 @@ func (w *Website) RunCheck(secondTry bool) {
 		if secondTry {
 			newStatusText = "Host not found"
 			newStatusCode = 0
+			requestDuration = 0
 
 			// On Timeout: allow second try
 			if serr, ok := err.(*goreq.Error); ok {
