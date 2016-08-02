@@ -31,12 +31,12 @@ func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Add every Website
 	websites := []BasicWebsite{}
 	var (
-		id         int
-		name       string
-		protocol   string
-		url        string
-		statusCode string
-		statusText string
+		id           int
+		name         string
+		protocol     string
+		url          string
+		statusCode   string
+		statusText   string
 		responseTime int
 	)
 
@@ -102,7 +102,7 @@ func ApiWebsitesDetailed(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		checkMethod   string
 		statusCode    string
 		statusText    string
-		responseTime int
+		responseTime  int
 		time          string
 		notifications EnabledNotifications
 	)
