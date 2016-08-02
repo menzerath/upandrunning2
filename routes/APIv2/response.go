@@ -43,6 +43,7 @@ type BasicWebsite struct {
 	Protocol string `json:"protocol"`
 	Url      string `json:"url"`
 	Status   string `json:"status"`
+	ResponseTime string `json:"responseTime"`
 }
 
 // Contains the Website's basic data such as id, name and url.
@@ -93,6 +94,7 @@ type DetailedWebsite struct {
 	Url                  string               `json:"url"`
 	CheckMethod          string               `json:"checkMethod"`
 	Status               string               `json:"status"`
+	ResponseTime string `json:"responseTime"`
 	Time                 string               `json:"time"`
 	EnabledNotifications EnabledNotifications `json:"notifications"`
 }

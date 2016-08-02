@@ -37,6 +37,7 @@ func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		url        string
 		statusCode string
 		statusText string
+		responseTime string
 	)
 
 	for rows.Next() {
@@ -48,7 +49,7 @@ func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		}
 
 		// Query the database for status data
-		err = db.QueryRow("SELECT statusCode, statusText FROM checks WHERE websiteId = ? ORDER BY id DESC LIMIT 1;", id).Scan(&statusCode, &statusText)
+		err = db.QueryRow("SELECT statusCode, statusText, responseTime FROM checks WHERE websiteId = ? ORDER BY id DESC LIMIT 1;", id).Scan(&statusCode, &statusText, &responseTime)
 		switch {
 		case err == sql.ErrNoRows:
 			statusCode = "0"
@@ -59,7 +60,7 @@ func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 			return
 		}
 
-		websites = append(websites, BasicWebsite{name, protocol, url, statusCode + " - " + statusText})
+		websites = append(websites, BasicWebsite{name, protocol, url, statusCode + " - " + statusText, responseTime})
 	}
 
 	// Send Response
@@ -101,6 +102,7 @@ func ApiWebsitesDetailed(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		checkMethod   string
 		statusCode    string
 		statusText    string
+		responseTime string
 		time          string
 		notifications EnabledNotifications
 	)
@@ -114,7 +116,7 @@ func ApiWebsitesDetailed(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		}
 
 		// Query the database for status data
-		err = db.QueryRow("SELECT statusCode, statusText, time FROM checks WHERE websiteId = ? ORDER BY id DESC LIMIT 1;", id).Scan(&statusCode, &statusText, &time)
+		err = db.QueryRow("SELECT statusCode, statusText, responseTime, time FROM checks WHERE websiteId = ? ORDER BY id DESC LIMIT 1;", id).Scan(&statusCode, &statusText, &responseTime, &time)
 		switch {
 		case err == sql.ErrNoRows:
 			statusCode = "0"
@@ -153,7 +155,7 @@ func ApiWebsitesDetailed(w http.ResponseWriter, r *http.Request, ps httprouter.P
 			notifications.Email = false
 		}
 
-		websites = append(websites, DetailedWebsite{id, name, enabled, visible, protocol, url, checkMethod, statusCode + " - " + statusText, time, notifications})
+		websites = append(websites, DetailedWebsite{id, name, enabled, visible, protocol, url, checkMethod, statusCode + " - " + statusText, responseTime, time, notifications})
 	}
 
 	// Send Response
