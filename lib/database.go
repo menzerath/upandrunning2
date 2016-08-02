@@ -78,20 +78,6 @@ func prepareDatabase() {
 	if err != nil {
 		logging.MustGetLogger("").Fatal("Unable to create table 'settings': ", err)
 	}
-
-	// v2.1.0; remove in v2.2.x
-	_, err = db.Exec("ALTER TABLE `websites` DROP `status`, DROP `responseTime`, DROP `time`, DROP `lastFailStatus`, DROP `lastFailTime`, DROP `ups`, DROP `downs`, DROP `totalChecks`, DROP `avgAvail`;")
-	if mysqlError, ok := err.(*mysql.MySQLError); ok {
-		if mysqlError.Number != 1091 { // Columns do not exist: no need to remove them
-			logging.MustGetLogger("").Warning("Unable to drop unneccessary columns: ", err)
-		}
-	}
-
-	// v2.1.0; remove in v2.2.x
-	_, err = db.Exec("DELETE FROM settings WHERE name = 'pushbullet_key';")
-	if err != nil {
-		logging.MustGetLogger("").Warning("Unable to delete unneccessary row: ", err)
-	}
 }
 
 // Removes all check-results older than one month from the Database
