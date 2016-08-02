@@ -1,4 +1,4 @@
-package routes
+package APIv1
 
 import (
 	"database/sql"

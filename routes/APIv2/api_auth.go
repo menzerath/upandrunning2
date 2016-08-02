@@ -1,4 +1,4 @@
-package routes
+package APIv2
 
 import (
 	"github.com/MarvinMenzerath/UpAndRunning2/lib"
