@@ -1,6 +1,4 @@
 # UpAndRunning2
-[![Docker Layers](https://badge.imagelayers.io/marvinmenzerath/upandrunning2:latest.svg)](https://imagelayers.io/?images=marvinmenzerath/upandrunning2:latest)
-
 UpAndRunning2 is a lightweight Go application which **monitors all of your websites**, offers a simple **JSON-REST-API** and user-defined **notifications**.
 
 ## Documentation
@@ -10,6 +8,7 @@ UpAndRunning2 is a lightweight Go application which **monitors all of your websi
 	* [Docker Guide](docs/installation/docker.md)
 * [API](docs/api/index.md)
 	* [v1](docs/api/v1.md)
+	* [v2](docs/api/v2.md)
 * [Screenshots](docs/screenshots/index.md)
 * [Credits](docs/credits.md)
 
