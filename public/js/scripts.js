@@ -167,8 +167,20 @@ function loadWebsiteData() {
 					newEntry += ' <span class="label label-danger">' + loadedWebsiteData[i].status + '</span> ';
 				}
 
-				newEntry += '</td><td>' + loadedWebsiteData[i].responseTime + '</td>';
-				newEntry += '<td> <span class="label label-primary label-action" onclick="showInformation(\'' + loadedWebsiteData[i].url + '\')" title="More"><span class="fa fa-info"></span></span> ' +
+				newEntry += '</td><td>';
+
+				var responseTime = loadedWebsiteData[i].responseTime.split(' ')[0];
+				if (responseTime == 0 || responseTime > 500) {
+					newEntry += ' <span class="label label-danger">' + loadedWebsiteData[i].responseTime + '</span> ';
+				} else if (responseTime > 100) {
+					newEntry += ' <span class="label label-warning">' + loadedWebsiteData[i].responseTime + '</span> ';
+				} else if (responseTime > 1) {
+					newEntry += ' <span class="label label-success">' + loadedWebsiteData[i].responseTime + '</span> ';
+				} else {
+					newEntry += ' <span class="label label-info">' + loadedWebsiteData[i].responseTime + '</span> ';
+				}
+
+				newEntry += '</td><td> <span class="label label-primary label-action" onclick="showInformation(\'' + loadedWebsiteData[i].url + '\')" title="More"><span class="fa fa-info"></span></span> ' +
 					'<span class="label label-primary label-action" onclick="showResponseTimeGraph(\'' + loadedWebsiteData[i].url + '\')" title="Response Times"><span class="fa fa-line-chart"></span></span> </td>';
 
 				if (loadedWebsiteData[i].status.indexOf("2") == 0 || loadedWebsiteData[i].status.indexOf("3") == 0) {
