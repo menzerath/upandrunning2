@@ -112,6 +112,7 @@ function loadWebsites() {
 
 				dataString += '<td><span class="label label-default label-action" onclick="showWebsiteDetails(\'' + loadedWebsiteData[i].url + '\')" title="More"><span class="fa fa-info"></span></span> ' +
 					'<span class="label label-default label-action" onclick="showWebsiteResponseTimes(\'' + loadedWebsiteData[i].url + '\')" title="Response Times"><span class="fa fa-line-chart"></span></span> ' +
+					'<span class="label label-info label-action" onclick="checkWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Check Now"><span class="fa fa-repeat"></span></span> ' +
 					'<span class="label label-primary label-action" onclick="editWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Edit"><span class="fa fa-pencil"></span></span> ' +
 					'<span class="label label-danger label-action" onclick="deleteWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Delete"><span class="fa fa-trash"></span></span></td></tr>';
 			}
@@ -451,6 +452,21 @@ function deleteWebsite(url) {
 	);
 }
 
+function checkWebsite(url) {
+	if (!url.trim()) return;
+	$.ajax({
+		url: "/api/v2/websites/" + url + "/check",
+		type: "GET",
+		success: function() {
+			loadWebsites();
+		},
+		error: function(error) {
+			handleAjaxErrorAlert(error);
+			allowCheck = true;
+		}
+	});
+}
+
 function changeTitle() {
 	var newTitle = $('#input-new-title').val();
 
@@ -537,32 +553,6 @@ function changeCheckWhenOffline() {
 			showSuccessAlert("Settings have been updated.");
 		},
 		error: handleAjaxErrorAlert
-	});
-}
-
-function checkNow() {
-	if (!allowCheck) {
-		showErrorAlert("Please wait a few seconds before trying this operation again.");
-		return;
-	}
-
-	allowCheck = false;
-	$.ajax({
-		url: "/api/v2/action/check",
-		type: "GET",
-		success: function() {
-			showSuccessAlert("Please wait while new data is gathered...");
-			setTimeout(function() {
-				loadWebsites();
-			}, 3000);
-			setTimeout(function() {
-				allowCheck = true;
-			}, 10000);
-		},
-		error: function(error) {
-			handleAjaxErrorAlert(error);
-			allowCheck = true;
-		}
 	});
 }
 
