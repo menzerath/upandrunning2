@@ -126,9 +126,6 @@ func setupApi2(router *httprouter.Router) {
 	router.GET("/api/v2/websites/:url/status", APIv2.ApiWebsitesStatus)
 	router.GET("/api/v2/websites/:url/results", APIv2.ApiWebsitesResults)
 
-	// Actions
-	router.GET("/api/v2/action/check", APIv2.ApiActionCheck)
-
 	// Authentication
 	router.POST("/api/v2/auth/login", APIv2.ApiAuthLogin)
 	router.GET("/api/v2/auth/logout", APIv2.ApiAuthLogout)
@@ -148,6 +145,7 @@ func setupApi2(router *httprouter.Router) {
 	router.PUT("/api/v2/websites/:url/visibility", APIv2.ApiWebsitesVisibility)
 	router.GET("/api/v2/websites/:url/notifications", APIv2.ApiWebsitesGetNotifications)
 	router.PUT("/api/v2/websites/:url/notifications", APIv2.ApiWebsitePutNotifications)
+	router.GET("/api/v2/websites/:url/check", APIv2.ApiWebsiteCheck)
 }
 
 // Setup all routes for Web-Frontend
@@ -175,7 +173,7 @@ func startCheckTimer() {
 	}()
 }
 
-// Creates a timer to check all Websites when triggered through the API
+// Creates a timer to check all Websites when triggered through the API (v1 only)
 func startCheckNowTimer() {
 	timer := time.NewTimer(time.Second * 1)
 	go func() {

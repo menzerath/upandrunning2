@@ -360,3 +360,42 @@ func ApiWebsitePutNotifications(w http.ResponseWriter, r *http.Request, ps httpr
 
 	SendJsonMessage(w, http.StatusOK, true, "")
 }
+
+// Triggers a check of all enabled Websites.
+func ApiWebsiteCheck(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if !lib.IsLoggedIn(r) {
+		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
+		return
+	}
+
+	// Get data from Request
+	r.ParseForm()
+	url := ps.ByName("url")
+
+	// Simple Validation
+	if url == "" {
+		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value.")
+		return
+	}
+
+	// Query the Database
+	db := lib.GetDatabase()
+	var website lib.Website
+	err := db.QueryRow("SELECT id, protocol, url, checkMethod FROM websites WHERE enabled = 1 AND url = ?;", url).Scan(&website.Id, &website.Protocol, &website.Url, &website.CheckMethod)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			SendJsonMessage(w, http.StatusNotFound, false, "Unable to process your Request: Could not find Website.")
+			return
+		} else {
+			logging.MustGetLogger("").Error("Unable to get Website's notification settings: ", err)
+			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
+			return
+		}
+	} else {
+		// Run the requested check
+		logging.MustGetLogger("").Info("Checking requested Website (" + website.Url + ").")
+		website.RunCheck(false)
+		SendJsonMessage(w, http.StatusOK, true, "")
+	}
+}
