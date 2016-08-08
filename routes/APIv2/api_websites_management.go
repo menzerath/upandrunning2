@@ -381,7 +381,7 @@ func ApiWebsiteCheck(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 	// Query the Database
 	db := lib.GetDatabase()
 	var website lib.Website
-	err := db.QueryRow("SELECT id, protocol, url, checkMethod FROM websites WHERE enabled = 1 AND url = ?;", url).Scan(&website.Id, &website.Protocol, &website.Url, &website.CheckMethod)
+	err := db.QueryRow("SELECT id, protocol, url, checkMethod FROM websites WHERE url = ?;", url).Scan(&website.Id, &website.Protocol, &website.Url, &website.CheckMethod)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
