@@ -105,9 +105,14 @@ function loadWebsites() {
 					dataString += '<td><span class="label label-info-inactive label-action" onclick="editNotificationPushbullet(\'' + loadedWebsiteData[i].url + '\')" title="Pushbullet"><span class="fa fa-bell"></span></span> ';
 				}
 				if (loadedWebsiteData[i].notifications.email) {
-					dataString += '<span class="label label-info label-info label-action" onclick="editNotificationEmail(\'' + loadedWebsiteData[i].url + '\')" title="Email"><span class="fa fa-envelope"></span></span></td>';
+					dataString += '<span class="label label-info label-info label-action" onclick="editNotificationEmail(\'' + loadedWebsiteData[i].url + '\')" title="Email"><span class="fa fa-envelope"></span></span> ';
 				} else {
-					dataString += '<span class="label label-info-inactive label-info label-action" onclick="editNotificationEmail(\'' + loadedWebsiteData[i].url + '\')" title="Email"><span class="fa fa-envelope"></span></span></td>';
+					dataString += '<span class="label label-info-inactive label-info label-action" onclick="editNotificationEmail(\'' + loadedWebsiteData[i].url + '\')" title="Email"><span class="fa fa-envelope"></span></span> ';
+				}
+				if (loadedWebsiteData[i].notifications.telegram) {
+					dataString += '<span class="label label-info label-info label-action" onclick="editNotificationTelegram(\'' + loadedWebsiteData[i].url + '\')" title="Telegram"><span class="fa fa-paper-plane"></span></span></td>';
+				} else {
+					dataString += '<span class="label label-info-inactive label-info label-action" onclick="editNotificationTelegram(\'' + loadedWebsiteData[i].url + '\')" title="Telegram"><span class="fa fa-paper-plane"></span></span></td>';
 				}
 
 				dataString += '<td><span class="label label-default label-action" onclick="showWebsiteDetails(\'' + loadedWebsiteData[i].url + '\')" title="More"><span class="fa fa-info"></span></span> ' +
@@ -323,7 +328,7 @@ function editNotificationPushbullet(url) {
 					$.ajax({
 						url: "/api/v2/websites/" + url + "/notifications",
 						type: "PUT",
-						data: {pushbulletKey: inputValue.trim(), email: data.notifications.email},
+						data: {pushbulletKey: inputValue.trim(), email: data.notifications.email, telegramId: data.notifications.telegramId},
 						success: function() {
 							loadWebsites();
 							showSuccessAlert("Settings have been updated.");
@@ -359,7 +364,43 @@ function editNotificationEmail(url) {
 					$.ajax({
 						url: "/api/v2/websites/" + url + "/notifications",
 						type: "PUT",
-						data: {pushbulletKey: data.notifications.pushbulletKey, email: inputValue.trim()},
+						data: {pushbulletKey: data.notifications.pushbulletKey, email: inputValue.trim(), telegramId: data.notifications.telegramId},
+						success: function() {
+							loadWebsites();
+							showSuccessAlert("Settings have been updated.");
+						},
+						error: handleAjaxErrorAlert
+					});
+				},
+				function(dismiss) {
+				}
+			);
+		},
+		error: handleAjaxErrorAlert
+	});
+}
+
+function editNotificationTelegram(url) {
+	if (!url.trim()) return;
+
+	$.ajax({
+		url: "/api/v2/websites/" + url + "/notifications",
+		type: "GET",
+		success: function(data) {
+			swal({
+				title: "Telegram",
+				html: "Please enter a valid <b>Telegram user-id</b> in order to receive Telegram-messages.<br />Leave this field blank if you do not want this kind of notification.<br /><br /><input class='form-control' type='text' id='input-telegram' placeholder='Telegram user id' value=" + data.notifications.telegramId + ">",
+				showCancelButton: true,
+				confirmButtonText: "Save"
+			}).then(
+				function() {
+					var inputValue = $('#input-telegram').val();
+					if (inputValue === false) return;
+
+					$.ajax({
+						url: "/api/v2/websites/" + url + "/notifications",
+						type: "PUT",
+						data: {pushbulletKey: data.notifications.pushbulletKey, email: data.notifications.email, telegramId: inputValue.trim()},
 						success: function() {
 							loadWebsites();
 							showSuccessAlert("Settings have been updated.");
