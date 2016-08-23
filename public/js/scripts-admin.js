@@ -508,27 +508,6 @@ function checkWebsite(url) {
 	});
 }
 
-function changeTitle() {
-	var newTitle = $('#input-new-title').val();
-
-	if (newTitle.trim()) {
-		$.ajax({
-			url: "/api/v2/settings/title",
-			type: "PUT",
-			data: {title: newTitle},
-			success: function() {
-				$(document).attr("title", "Administration | " + newTitle);
-				$('#navbar-title').text(newTitle);
-
-				showSuccessAlert("Settings have been updated.");
-			},
-			error: handleAjaxErrorAlert
-		});
-	} else {
-		showErrorAlert("Please enter a valid title to continue.");
-	}
-}
-
 function changePassword() {
 	var newPassword = $('#input-new-password').val();
 

@@ -8,37 +8,6 @@ import (
 	"strconv"
 )
 
-// Updates the application's title in the database.
-func ApiSettingsTitle(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	if !lib.IsLoggedIn(r) {
-		SendJsonMessage(w, http.StatusUnauthorized, false, "Unauthorized.")
-		return
-	}
-
-	// Get data from Request
-	r.ParseForm()
-	value := r.Form.Get("title")
-
-	// Simple Validation
-	if value == "" {
-		SendJsonMessage(w, http.StatusBadRequest, false, "Unable to process your Request: Submit a valid value.")
-		return
-	}
-
-	// Update Database-Row
-	db := lib.GetDatabase()
-	_, err := db.Exec("UPDATE settings SET value = ? WHERE name = 'title';", value)
-	if err != nil {
-		logging.MustGetLogger("").Error("Unable to change Application-Title: ", err)
-		SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
-		return
-	}
-
-	// Update Configuration
-	lib.GetConfiguration().Dynamic.Title = value
-	SendJsonMessage(w, http.StatusOK, true, "")
-}
-
 // Updates the user's password in the database.
 func ApiSettingsPassword(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if !lib.IsLoggedIn(r) {

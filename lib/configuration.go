@@ -17,12 +17,10 @@ type Configuration struct {
 	Address           string
 	Port              int
 	Database          databaseConfiguration
-	Mailer            mailerConfiguration
+	Application       applicationConfiguration
+	Notification      notificationConfiguration
 	Dynamic           dynamicConfiguration
 	Static            StaticConfiguration
-	CheckLifetime     int
-	UseWebFrontend    bool
-	TelegramBotApiKey string
 }
 
 // The database configuration.
@@ -33,6 +31,18 @@ type databaseConfiguration struct {
 	Password        string
 	Database        string
 	ConnectionLimit int
+}
+
+type applicationConfiguration struct {
+	Title             string
+	CheckLifetime     int
+	UseWebFrontend    bool
+}
+
+// The notification configuration.
+type notificationConfiguration struct {
+	Mailer mailerConfiguration
+	TelegramBotApiKey string
 }
 
 // The mailer configuration.
@@ -47,7 +57,6 @@ type mailerConfiguration struct {
 // A dynamic Configuration.
 // Used to store data, which may be changed through the API.
 type dynamicConfiguration struct {
-	Title                string
 	Interval             int
 	Redirects            int
 	RunChecksWhenOffline int
@@ -73,26 +82,28 @@ func ReadConfigurationFromFile(filePath string) {
 		config.Database.Password = os.Getenv("MYSQL_ENV_MYSQL_ROOT_PASSWORD")
 		config.Database.Database = "upandrunning"
 
-		config.Mailer.Host = os.Getenv("UAR2_MAILER_HOST")
-		i, err := strconv.Atoi(os.Getenv("UAR2_MAILER_PORT"))
-		if err == nil {
-			config.Mailer.Port = i
-		}
-		config.Mailer.User = os.Getenv("UAR2_MAILER_USER")
-		config.Mailer.Password = os.Getenv("UAR2_MAILER_PASSWORD")
-		config.Mailer.From = os.Getenv("UAR2_MAILER_FROM")
+		config.Application.Title = os.Getenv("UAR2_APPLICATION_TITLE")
 
-		i, err = strconv.Atoi(os.Getenv("UAR2_CHECKLIFETIME"))
+		i, err := strconv.Atoi(os.Getenv("UAR2_CHECKLIFETIME"))
 		if err == nil {
-			config.CheckLifetime = i
+			config.Application.CheckLifetime = i
 		}
 
 		b, err := strconv.ParseBool(os.Getenv("UAR2_USEWEBFRONTEND"))
 		if err == nil {
-			config.UseWebFrontend = b
+			config.Application.UseWebFrontend = b
 		}
 
-		config.TelegramBotApiKey = os.Getenv("UAR2_TELEGRAMBOTAPIKEY")
+		config.Notification.Mailer.Host = os.Getenv("UAR2_MAILER_HOST")
+		i, err = strconv.Atoi(os.Getenv("UAR2_MAILER_PORT"))
+		if err == nil {
+			config.Notification.Mailer.Port = i
+		}
+		config.Notification.Mailer.User = os.Getenv("UAR2_MAILER_USER")
+		config.Notification.Mailer.Password = os.Getenv("UAR2_MAILER_PASSWORD")
+		config.Notification.Mailer.From = os.Getenv("UAR2_MAILER_FROM")
+
+		config.Notification.TelegramBotApiKey = os.Getenv("UAR2_TELEGRAMBOTAPIKEY")
 
 		return
 	}
@@ -126,24 +137,13 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	logging.MustGetLogger("").Info("Reading Configuration from Database...")
 
 	var (
-		title                string
 		interval             int
 		redirects            int
 		runChecksWhenOffline int
 	)
 
-	// Title
-	err := db.QueryRow("SELECT value FROM settings where name = 'title';").Scan(&title)
-	if err != nil {
-		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('title', 'UpAndRunning2');")
-		if err != nil {
-			logging.MustGetLogger("").Fatal("Unable to insert 'title'-setting: ", err)
-		}
-		title = "UpAndRunning"
-	}
-
 	// Interval
-	err = db.QueryRow("SELECT value FROM settings where name = 'interval';").Scan(&interval)
+	err := db.QueryRow("SELECT value FROM settings where name = 'interval';").Scan(&interval)
 	if err != nil {
 		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('interval', 60);")
 		if err != nil {
@@ -172,7 +172,6 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 		runChecksWhenOffline = 1
 	}
 
-	config.Dynamic.Title = title
 	config.Dynamic.Interval = interval
 	config.Dynamic.Redirects = redirects
 	config.Dynamic.RunChecksWhenOffline = runChecksWhenOffline

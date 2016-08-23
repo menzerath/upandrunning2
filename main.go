@@ -70,7 +70,7 @@ func serveRequests() {
 	setupApi2(router)
 
 	// Web-Frontend
-	if lib.GetConfiguration().UseWebFrontend {
+	if lib.GetConfiguration().Application.UseWebFrontend {
 		setupWebFrontend(router)
 	} else {
 		router.GET("/", routes.NoWebFrontendIndex)
@@ -102,7 +102,6 @@ func setupApi1(router *httprouter.Router) {
 	router.GET("/api/v1/auth/logout", APIv1.ApiAuthLogout)
 
 	// Settings
-	router.PUT("/api/v1/settings/title", APIv1.ApiSettingsTitle)
 	router.PUT("/api/v1/settings/password", APIv1.ApiSettingsPassword)
 	router.PUT("/api/v1/settings/interval", APIv1.ApiSettingsInterval)
 	router.PUT("/api/v1/settings/redirects", APIv1.ApiSettingsRedirects)
@@ -132,7 +131,6 @@ func setupApi2(router *httprouter.Router) {
 	router.GET("/api/v2/auth/logout", APIv2.ApiAuthLogout)
 
 	// Settings
-	router.PUT("/api/v2/settings/title", APIv2.ApiSettingsTitle)
 	router.PUT("/api/v2/settings/password", APIv2.ApiSettingsPassword)
 	router.PUT("/api/v2/settings/interval", APIv2.ApiSettingsInterval)
 	router.PUT("/api/v2/settings/redirects", APIv2.ApiSettingsRedirects)

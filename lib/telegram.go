@@ -11,11 +11,11 @@ var Bot *telebot.Bot
 var SendOptions = telebot.SendOptions{DisableWebPagePreview: true, ParseMode: telebot.ModeMarkdown}
 
 func RunTelegramBot() {
-	if GetConfiguration().TelegramBotApiKey == "" {
+	if GetConfiguration().Notification.TelegramBotApiKey == "" {
 		return
 	}
 
-	bot, err := telebot.NewBot(GetConfiguration().TelegramBotApiKey)
+	bot, err := telebot.NewBot(GetConfiguration().Notification.TelegramBotApiKey)
 	if err != nil {
 		logging.MustGetLogger("").Error("Unable to start Telegram-Bot: ", err)
 		return

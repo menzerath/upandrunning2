@@ -17,7 +17,7 @@ func NoWebFrontendIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 // Renders the main-page
 func ViewIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Parse template-files
-	data := SiteData{lib.GetConfiguration().Dynamic.Title}
+	data := SiteData{lib.GetConfiguration().Application.Title}
 	t, err := template.ParseFiles("views/index.html", "views/partials/styles.html", "views/partials/footer.html", "views/partials/scripts.html")
 
 	if t != nil {
@@ -38,7 +38,7 @@ func ViewLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 
 	// Parse template-files
-	data := SiteData{lib.GetConfiguration().Dynamic.Title}
+	data := SiteData{lib.GetConfiguration().Application.Title}
 	t, err := template.ParseFiles("views/login.html", "views/partials/styles.html", "views/partials/footer.html", "views/partials/scripts.html")
 
 	if t != nil {
@@ -66,7 +66,7 @@ func ViewAdmin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		dynCheckWhenOffline = "checked"
 	}
 
-	data := AdminSiteData{c.Dynamic.Title, c.Dynamic.Interval, c.Dynamic.Redirects, dynCheckWhenOffline, c.Static.Version, runtime.Version(), runtime.GOOS + "_" + runtime.GOARCH}
+	data := AdminSiteData{c.Application.Title, c.Dynamic.Interval, c.Dynamic.Redirects, dynCheckWhenOffline, c.Static.Version, runtime.Version(), runtime.GOOS + "_" + runtime.GOARCH}
 	t, err := template.ParseFiles("views/admin.html", "views/partials/styles.html", "views/partials/footer.html", "views/partials/scripts.html")
 
 	if t != nil {

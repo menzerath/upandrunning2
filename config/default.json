@@ -9,14 +9,19 @@
 		"database": "myDatabase",
 		"connectionLimit": 10
 	},
-	"mailer": {
-		"host": "smtp.mymail.com",
-		"port": 587,
-		"user": "myUser@mymail.com",
-		"password": "mySecretPassword",
-		"from": "upandrunning2@mymail.com"
+	"application": {
+		"title": "UpAndRunning2",
+		"checkLifetime": 31,
+		"useWebFrontend": true
 	},
-	"checkLifetime": 31,
-	"useWebFrontend": true,
-	"telegramBotApiKey": ""
+	"notification": {
+		"mailer": {
+			"host": "smtp.mymail.com",
+			"port": 587,
+			"user": "myUser@mymail.com",
+			"password": "mySecretPassword",
+			"from": "upandrunning2@mymail.com"
+		},
+		"telegramBotApiKey": ""
+	}
 }
