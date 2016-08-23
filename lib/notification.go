@@ -72,5 +72,5 @@ func sendTelegramMessage(userId int, name string, url string, newStatus string, 
 		statusEmoji = "\U0000274C"
 	}
 
-	Bot.SendMessage(telebot.User{ID: userId}, "*Status Change: "+statusEmoji+" "+name+"*\n`"+url+"` went from `"+oldStatus+"` to `"+newStatus+"`.", &SendOptions)
+	Bot.SendMessage(telebot.User{ID: userId}, "*Status Change: "+name+"* "+statusEmoji+"\n`"+url+"` went from `"+oldStatus+"` to `"+newStatus+"`.", &SendOptions)
 }
