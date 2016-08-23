@@ -4,7 +4,9 @@ import (
 	"github.com/mitsuse/pushbullet-go"
 	"github.com/mitsuse/pushbullet-go/requests"
 	"github.com/op/go-logging"
+	"github.com/tucnak/telebot"
 	"gopkg.in/gomail.v2"
+	"strings"
 	"time"
 )
 
@@ -51,4 +53,24 @@ func sendMail(recipient string, name string, url string, newStatus string, oldSt
 	if err := d.DialAndSend(m); err != nil {
 		logging.MustGetLogger("").Error("Unable to send email: ", err)
 	}
+}
+
+func sendTelegramMessage(userId int, name string, url string, newStatus string, oldStatus string) {
+	if GetConfiguration().TelegramBotApiKey == "" {
+		logging.MustGetLogger("").Warning("Not sending Telegram-message because of missing configuration.")
+		return
+	}
+
+	logging.MustGetLogger("").Debug("Sending Telegram-message about \"" + url + "\"...")
+
+	statusEmoji := "\U00002757"
+	if strings.HasPrefix(newStatus, "2") {
+		statusEmoji = "\U00002714"
+	} else if strings.HasPrefix(newStatus, "3") {
+		statusEmoji = "\U000026A0"
+	} else if strings.HasPrefix(newStatus, "4") || strings.HasPrefix(newStatus, "5") {
+		statusEmoji = "\U0000274C"
+	}
+
+	Bot.SendMessage(telebot.User{ID: userId}, "*Status Change: "+statusEmoji+" "+name+"*\n`"+url+"` went from `"+oldStatus+"` to `"+newStatus+"`.", &SendOptions)
 }

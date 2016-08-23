@@ -47,6 +47,7 @@ func main() {
 	// Additional Libraries
 	goreq.SetConnectTimeout(5 * time.Second)
 	lib.InitHttpStatusCodeMap()
+	go lib.RunTelegramBot()
 
 	// Start Checking and Serving
 	startCheckTimer()

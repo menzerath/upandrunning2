@@ -14,14 +14,15 @@ var config *Configuration
 // The whole configuration.
 // Contains all other configuration-data.
 type Configuration struct {
-	Address        string
-	Port           int
-	Database       databaseConfiguration
-	Mailer         mailerConfiguration
-	Dynamic        dynamicConfiguration
-	Static         StaticConfiguration
-	CheckLifetime  int
-	UseWebFrontend bool
+	Address           string
+	Port              int
+	Database          databaseConfiguration
+	Mailer            mailerConfiguration
+	Dynamic           dynamicConfiguration
+	Static            StaticConfiguration
+	CheckLifetime     int
+	UseWebFrontend    bool
+	TelegramBotApiKey string
 }
 
 // The database configuration.
@@ -72,7 +73,16 @@ func ReadConfigurationFromFile(filePath string) {
 		config.Database.Password = os.Getenv("MYSQL_ENV_MYSQL_ROOT_PASSWORD")
 		config.Database.Database = "upandrunning"
 
-		i, err := strconv.Atoi(os.Getenv("UAR2_CHECKLIFETIME"))
+		config.Mailer.Host = os.Getenv("UAR2_MAILER_HOST")
+		i, err := strconv.Atoi(os.Getenv("UAR2_MAILER_PORT"))
+		if err == nil {
+			config.Mailer.Port = i
+		}
+		config.Mailer.User = os.Getenv("UAR2_MAILER_USER")
+		config.Mailer.Password = os.Getenv("UAR2_MAILER_PASSWORD")
+		config.Mailer.From = os.Getenv("UAR2_MAILER_FROM")
+
+		i, err = strconv.Atoi(os.Getenv("UAR2_CHECKLIFETIME"))
 		if err == nil {
 			config.CheckLifetime = i
 		}
@@ -82,14 +92,7 @@ func ReadConfigurationFromFile(filePath string) {
 			config.UseWebFrontend = b
 		}
 
-		config.Mailer.Host = os.Getenv("UAR2_MAILER_HOST")
-		i, err = strconv.Atoi(os.Getenv("UAR2_MAILER_PORT"))
-		if err == nil {
-			config.Mailer.Port = i
-		}
-		config.Mailer.User = os.Getenv("UAR2_MAILER_USER")
-		config.Mailer.Password = os.Getenv("UAR2_MAILER_PASSWORD")
-		config.Mailer.From = os.Getenv("UAR2_MAILER_FROM")
+		config.TelegramBotApiKey = os.Getenv("UAR2_TELEGRAMBOTAPIKEY")
 
 		return
 	}

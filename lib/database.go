@@ -2,7 +2,7 @@ package lib
 
 import (
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-sql-driver/mysql"
 	"github.com/op/go-logging"
 	"strconv"
 )
@@ -68,7 +68,7 @@ func prepareDatabase() {
 	}
 
 	// Default Setup
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `notifications` (`websiteId` int(11) NOT NULL, `pushbulletKey` varchar(300) NOT NULL DEFAULT '', `email` varchar(300) NOT NULL DEFAULT '', PRIMARY KEY (`websiteId`), UNIQUE KEY (`websiteId`), FOREIGN KEY (`websiteId`) REFERENCES websites(`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;")
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `notifications` (`websiteId` int(11) NOT NULL, `pushbulletKey` varchar(300) NOT NULL DEFAULT '', `email` varchar(300) NOT NULL DEFAULT '', `telegramId` varchar(300) NOT NULL DEFAULT '', PRIMARY KEY (`websiteId`), UNIQUE KEY (`websiteId`), FOREIGN KEY (`websiteId`) REFERENCES websites(`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;")
 	if err != nil {
 		logging.MustGetLogger("").Fatal("Unable to create table 'notifications': ", err)
 	}
@@ -77,6 +77,14 @@ func prepareDatabase() {
 	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `settings` (`id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(20) NOT NULL, `value` varchar(1024) NOT NULL, PRIMARY KEY (`id`), UNIQUE KEY (`name`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
 	if err != nil {
 		logging.MustGetLogger("").Fatal("Unable to create table 'settings': ", err)
+	}
+
+	// v2.2.0
+	_, err = db.Exec("ALTER TABLE `notifications` ADD `telegramId` VARCHAR(300) NOT NULL DEFAULT '' AFTER `email`;")
+	if mysqlError, ok := err.(*mysql.MySQLError); ok {
+		if mysqlError.Number != 1060 { // Column exists: no need to add it
+			logging.MustGetLogger("").Warning("Unable to add column: ", err)
+		}
 	}
 }
 
