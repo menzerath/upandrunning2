@@ -50,8 +50,8 @@ func main() {
 	go lib.RunTelegramBot()
 
 	// Start Checking and Serving
+	checkAllSites()
 	startCheckTimer()
-	startCheckNowTimer()
 	startCleaningTimer()
 	serveRequests()
 
@@ -94,9 +94,6 @@ func setupApi1(router *httprouter.Router) {
 	router.GET("/api/v1/websites/:url/status", APIv1.ApiWebsitesStatus)
 	router.GET("/api/v1/websites/:url/results", APIv1.ApiWebsitesResults)
 
-	// Actions
-	router.GET("/api/v1/action/check", APIv1.ApiActionCheck)
-
 	// Authentication
 	router.POST("/api/v1/auth/login", APIv1.ApiAuthLogin)
 	router.GET("/api/v1/auth/logout", APIv1.ApiAuthLogout)
@@ -104,8 +101,6 @@ func setupApi1(router *httprouter.Router) {
 	// Settings
 	router.PUT("/api/v1/settings/password", APIv1.ApiSettingsPassword)
 	router.PUT("/api/v1/settings/interval", APIv1.ApiSettingsInterval)
-	router.PUT("/api/v1/settings/redirects", APIv1.ApiSettingsRedirects)
-	router.PUT("/api/v1/settings/checkWhenOffline", APIv1.ApiSettingsCheckWhenOffline)
 
 	// Website Management
 	router.POST("/api/v1/websites/:url", APIv1.ApiWebsitesAdd)
@@ -133,8 +128,6 @@ func setupApi2(router *httprouter.Router) {
 	// Settings
 	router.PUT("/api/v2/settings/password", APIv2.ApiSettingsPassword)
 	router.PUT("/api/v2/settings/interval", APIv2.ApiSettingsInterval)
-	router.PUT("/api/v2/settings/redirects", APIv2.ApiSettingsRedirects)
-	router.PUT("/api/v2/settings/checkWhenOffline", APIv2.ApiSettingsCheckWhenOffline)
 
 	// Website Management
 	router.POST("/api/v2/websites/:url", APIv2.ApiWebsitesAdd)
@@ -172,19 +165,6 @@ func startCheckTimer() {
 	}()
 }
 
-// Creates a timer to check all Websites when triggered through the API (v1 only)
-func startCheckNowTimer() {
-	timer := time.NewTimer(time.Second * 1)
-	go func() {
-		<-timer.C
-		if lib.GetConfiguration().Dynamic.CheckNow {
-			checkAllSites()
-			lib.GetConfiguration().Dynamic.CheckNow = false
-		}
-		startCheckNowTimer()
-	}()
-}
-
 // Creates a timer to remove old check-results from the Database
 func startCleaningTimer() {
 	timer := time.NewTimer(time.Hour * 24)
@@ -198,7 +178,7 @@ func startCleaningTimer() {
 // Checks all enabled Websites
 func checkAllSites() {
 	// Check for internet-connection
-	if lib.GetConfiguration().Dynamic.RunChecksWhenOffline == 0 {
+	if lib.GetConfiguration().Application.RunCheckIfOffline {
 		res, err := goreq.Request{Uri: "https://google.com", Method: "HEAD", UserAgent: "UpAndRunning2 (https://github.com/MarvinMenzerath/UpAndRunning2)", MaxRedirects: 1, Timeout: 5 * time.Second}.Do()
 		if err != nil {
 			logging.MustGetLogger("").Warning("Did not check Websites because of missing internet-connection: ", err)

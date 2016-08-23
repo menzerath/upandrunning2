@@ -35,6 +35,8 @@ type databaseConfiguration struct {
 
 type applicationConfiguration struct {
 	Title             string
+	RedirectsToFollow int
+	RunCheckIfOffline bool
 	CheckLifetime     int
 	UseWebFrontend    bool
 }
@@ -58,9 +60,6 @@ type mailerConfiguration struct {
 // Used to store data, which may be changed through the API.
 type dynamicConfiguration struct {
 	Interval             int
-	Redirects            int
-	RunChecksWhenOffline int
-	CheckNow             bool
 }
 
 // Static data about (e.g.) the application's version.
@@ -138,8 +137,6 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 
 	var (
 		interval             int
-		redirects            int
-		runChecksWhenOffline int
 	)
 
 	// Interval
@@ -152,31 +149,7 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 		interval = 60
 	}
 
-	// Redirects
-	err = db.QueryRow("SELECT value FROM settings where name = 'redirects';").Scan(&redirects)
-	if err != nil {
-		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('redirects', 0);")
-		if err != nil {
-			logging.MustGetLogger("").Fatal("Unable to insert 'redirects'-setting: ", err)
-		}
-		redirects = 0
-	}
-
-	// Run Checks when offline
-	err = db.QueryRow("SELECT value FROM settings where name = 'check_when_offline';").Scan(&runChecksWhenOffline)
-	if err != nil {
-		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('check_when_offline', 1);")
-		if err != nil {
-			logging.MustGetLogger("").Fatal("Unable to insert 'check_when_offline'-setting: ", err)
-		}
-		runChecksWhenOffline = 1
-	}
-
 	config.Dynamic.Interval = interval
-	config.Dynamic.Redirects = redirects
-	config.Dynamic.RunChecksWhenOffline = runChecksWhenOffline
-
-	config.Dynamic.CheckNow = true
 }
 
 // Allows to replace the current StaticConfiguration.

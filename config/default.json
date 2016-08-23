@@ -11,6 +11,8 @@
 	},
 	"application": {
 		"title": "UpAndRunning2",
+		"redirectsToFollow": 0,
+		"runCheckIfOffline": true,
 		"checkLifetime": 31,
 		"useWebFrontend": true
 	},
