@@ -14,6 +14,3 @@
 	* [GoReq](https://github.com/franela/goreq)
 	* [HttpRouter](https://github.com/julienschmidt/httprouter)
 	* [pushbullet-go](https://github.com/mitsuse/pushbullet-go)
-
-## Application Icon
-[Icon](https://www.iconfinder.com/icons/328014/back_on_top_top_up_upload_icon) created by [Aha-Soft Team](http://www.aha-soft.com) - [CC BY 2.5 License](http://creativecommons.org/licenses/by/2.5/)
