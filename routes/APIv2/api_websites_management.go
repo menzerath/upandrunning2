@@ -268,10 +268,11 @@ func ApiWebsitesGetNotifications(w http.ResponseWriter, r *http.Request, ps http
 	var (
 		cPushbulletKey string
 		cEmail         string
+		cTelegramId    string
 	)
 	db := lib.GetDatabase()
 	var resp WebsiteNotificationsResponse
-	err := db.QueryRow("SELECT pushbulletKey, email FROM notifications, websites WHERE notifications.websiteId = websites.id AND url = ?;", value).Scan(&cPushbulletKey, &cEmail)
+	err := db.QueryRow("SELECT pushbulletKey, email, telegramId FROM notifications, websites WHERE notifications.websiteId = websites.id AND url = ?;", value).Scan(&cPushbulletKey, &cEmail, &cTelegramId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// Check if Website exists
@@ -281,14 +282,14 @@ func ApiWebsitesGetNotifications(w http.ResponseWriter, r *http.Request, ps http
 				SendJsonMessage(w, http.StatusNotFound, false, "Unable to process your Request: Could not find Website.")
 				return
 			}
-			resp = WebsiteNotificationsResponse{true, Notifications{"", ""}}
+			resp = WebsiteNotificationsResponse{true, Notifications{"", "", ""}}
 		} else {
 			logging.MustGetLogger("").Error("Unable to get Website's notification settings: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
 			return
 		}
 	} else {
-		resp = WebsiteNotificationsResponse{true, Notifications{cPushbulletKey, cEmail}}
+		resp = WebsiteNotificationsResponse{true, Notifications{cPushbulletKey, cEmail, cTelegramId}}
 	}
 
 	// Send Response
@@ -313,6 +314,7 @@ func ApiWebsitePutNotifications(w http.ResponseWriter, r *http.Request, ps httpr
 	url := ps.ByName("url")
 	pushbulletKey := r.Form.Get("pushbulletKey")
 	email := r.Form.Get("email")
+	telegramId := r.Form.Get("telegramId")
 
 	// Simple Validation
 	if url == "" {
@@ -324,9 +326,10 @@ func ApiWebsitePutNotifications(w http.ResponseWriter, r *http.Request, ps httpr
 	var (
 		cPushbulletKey string
 		cEmail         string
+		cTelegramId    string
 	)
 	db := lib.GetDatabase()
-	err := db.QueryRow("SELECT pushbulletKey, email FROM notifications, websites WHERE notifications.websiteId = websites.id AND url = ?;", url).Scan(&cPushbulletKey, &cEmail)
+	err := db.QueryRow("SELECT pushbulletKey, email, telegramId FROM notifications, websites WHERE notifications.websiteId = websites.id AND url = ?;", url).Scan(&cPushbulletKey, &cEmail, &cTelegramId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// no settings found --> Insert
@@ -337,7 +340,7 @@ func ApiWebsitePutNotifications(w http.ResponseWriter, r *http.Request, ps httpr
 				return
 			}
 
-			_, err = db.Exec("INSERT INTO notifications (websiteId, pushbulletKey, email) VALUES (?, ?, ?);", id, pushbulletKey, email)
+			_, err = db.Exec("INSERT INTO notifications (websiteId, pushbulletKey, email, telegramId) VALUES (?, ?, ?, ?);", id, pushbulletKey, email, telegramId)
 			if err != nil {
 				logging.MustGetLogger("").Error("Unable to insert Website's notification settings: ", err)
 				SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())
@@ -350,7 +353,7 @@ func ApiWebsitePutNotifications(w http.ResponseWriter, r *http.Request, ps httpr
 		}
 	} else {
 		// existing settings found --> Update
-		_, err = db.Exec("UPDATE notifications, websites SET pushbulletKey = ?, email = ? WHERE notifications.websiteId = websites.id AND url = ?;", pushbulletKey, email, url)
+		_, err = db.Exec("UPDATE notifications, websites SET pushbulletKey = ?, email = ?, telegramId = ? WHERE notifications.websiteId = websites.id AND url = ?;", pushbulletKey, email, telegramId, url)
 		if err != nil {
 			logging.MustGetLogger("").Error("Unable to update Website's notification settings: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request: "+err.Error())

@@ -103,12 +103,14 @@ type DetailedWebsite struct {
 type Notifications struct {
 	PushbulletKey string `json:"pushbulletKey"`
 	Email         string `json:"email"`
+	TelegramId    string `json:"telegramId"`
 }
 
 // Contains whether a notification-type is enabled or not.
 type EnabledNotifications struct {
 	Pushbullet bool `json:"pushbullet"`
 	Email      bool `json:"email"`
+	Telegram   bool `json:"telegram"`
 }
 
 // *************

@@ -132,12 +132,14 @@ func ApiWebsitesDetailed(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		var (
 			tmpPushbullet string
 			tmpEmail      string
+			tmpTelegram   string
 		)
-		err = db.QueryRow("SELECT pushbulletKey, email FROM notifications WHERE websiteId = ?;", id).Scan(&tmpPushbullet, &tmpEmail)
+		err = db.QueryRow("SELECT pushbulletKey, email, telegramId FROM notifications WHERE websiteId = ?;", id).Scan(&tmpPushbullet, &tmpEmail, &tmpTelegram)
 		switch {
 		case err == sql.ErrNoRows:
 			notifications.Pushbullet = false
 			notifications.Email = false
+			notifications.Telegram = false
 		case err != nil:
 			logging.MustGetLogger("").Error("Unable to fetch Website's status: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
@@ -153,6 +155,11 @@ func ApiWebsitesDetailed(w http.ResponseWriter, r *http.Request, ps httprouter.P
 			notifications.Email = true
 		} else {
 			notifications.Email = false
+		}
+		if tmpTelegram != "" {
+			notifications.Telegram = true
+		} else {
+			notifications.Telegram = false
 		}
 
 		websites = append(websites, DetailedWebsite{id, name, enabled, visible, protocol, url, checkMethod, statusCode + " - " + statusText, strconv.Itoa(responseTime) + " ms", time, notifications})
