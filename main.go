@@ -87,29 +87,10 @@ func serveRequests() {
 
 // Setup all routes for API v1
 func setupApi1(router *httprouter.Router) {
-	router.GET("/api/v1", APIv1.ApiIndexVersion)
-
-	// Public Statistics
-	router.GET("/api/v1/websites", APIv1.ApiWebsites)
-	router.GET("/api/v1/websites/:url/status", APIv1.ApiWebsitesStatus)
-	router.GET("/api/v1/websites/:url/results", APIv1.ApiWebsitesResults)
-
-	// Authentication
-	router.POST("/api/v1/auth/login", APIv1.ApiAuthLogin)
-	router.GET("/api/v1/auth/logout", APIv1.ApiAuthLogout)
-
-	// Settings
-	router.PUT("/api/v1/settings/password", APIv1.ApiSettingsPassword)
-	router.PUT("/api/v1/settings/interval", APIv1.ApiSettingsInterval)
-
-	// Website Management
-	router.POST("/api/v1/websites/:url", APIv1.ApiWebsitesAdd)
-	router.PUT("/api/v1/websites/:url", APIv1.ApiWebsitesEdit)
-	router.DELETE("/api/v1/websites/:url", APIv1.ApiWebsitesDelete)
-	router.PUT("/api/v1/websites/:url/enabled", APIv1.ApiWebsitesEnabled)
-	router.PUT("/api/v1/websites/:url/visibility", APIv1.ApiWebsitesVisibility)
-	router.GET("/api/v1/websites/:url/notifications", APIv1.ApiWebsitesGetNotifications)
-	router.PUT("/api/v1/websites/:url/notifications", APIv1.ApiWebsitePutNotifications)
+	router.GET("/api/v1/*all", APIv1.ApiIndexVersion)
+	router.POST("/api/v1/*all", APIv1.ApiIndexVersion)
+	router.PUT("/api/v1/*all", APIv1.ApiIndexVersion)
+	router.DELETE("/api/v1/*all", APIv1.ApiIndexVersion)
 }
 
 // Setup all routes for API v2
