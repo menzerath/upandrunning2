@@ -27,12 +27,6 @@ $(document).ready(function() {
 		}
 	});
 
-	$('#input-new-title').keypress(function(event) {
-		if (event.keyCode == 13) {
-			changeTitle();
-		}
-	});
-
 	$('#input-new-password').keypress(function(event) {
 		if (event.keyCode == 13) {
 			changePassword();
@@ -43,16 +37,6 @@ $(document).ready(function() {
 		if (event.keyCode == 13) {
 			changeInterval();
 		}
-	});
-
-	$('#input-new-redirects').keypress(function(event) {
-		if (event.keyCode == 13) {
-			changeRedirects();
-		}
-	});
-
-	$('#input-new-checkWhenOffline').mouseup(function() {
-		changeCheckWhenOffline();
 	});
 
 	loadWebsites();
@@ -544,36 +528,6 @@ function changeInterval() {
 	} else {
 		showErrorAlert("Please enter a valid interval (between 1 and 600 seconds) to continue.");
 	}
-}
-
-function changeRedirects() {
-	var newRedirects = $('#input-new-redirects').val();
-
-	if (newRedirects.trim() && !(isNaN(newRedirects) || newRedirects < 0 || newRedirects > 10)) {
-		$.ajax({
-			url: "/api/v2/settings/redirects",
-			type: "PUT",
-			data: {redirects: newRedirects},
-			success: function() {
-				showSuccessAlert("Settings have been updated.");
-			},
-			error: handleAjaxErrorAlert
-		});
-	} else {
-		showErrorAlert("Please enter a valid amount of redirects (number between 0 and 10) to continue.");
-	}
-}
-
-function changeCheckWhenOffline() {
-	$.ajax({
-		url: "/api/v2/settings/checkWhenOffline",
-		type: "PUT",
-		data: {checkWhenOffline: !$('#input-new-checkWhenOffline').is(':checked')},
-		success: function() {
-			showSuccessAlert("Settings have been updated.");
-		},
-		error: handleAjaxErrorAlert
-	});
 }
 
 function logout() {
