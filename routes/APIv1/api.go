@@ -1,10 +1,10 @@
 package APIv1
 
 import (
-	"github.com/julienschmidt/httprouter"
-	"net/http"
 	"encoding/json"
+	"github.com/julienschmidt/httprouter"
 	"github.com/op/go-logging"
+	"net/http"
 )
 
 // Sends a simple welcome-message to the user.

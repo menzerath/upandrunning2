@@ -27,11 +27,11 @@ type SiteData struct {
 
 // Contains the application's data, which will be used on admin-pages.
 type AdminSiteData struct {
-	Title            string
-	Interval         int
-	AppVersion       string
-	GoVersion        string
-	GoArch           string
+	Title      string
+	Interval   int
+	AppVersion string
+	GoVersion  string
+	GoArch     string
 }
 
 // *************

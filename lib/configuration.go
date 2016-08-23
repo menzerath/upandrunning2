@@ -14,13 +14,13 @@ var config *Configuration
 // The whole configuration.
 // Contains all other configuration-data.
 type Configuration struct {
-	Address           string
-	Port              int
-	Database          databaseConfiguration
-	Application       applicationConfiguration
-	Notification      notificationConfiguration
-	Dynamic           dynamicConfiguration
-	Static            StaticConfiguration
+	Address      string
+	Port         int
+	Database     databaseConfiguration
+	Application  applicationConfiguration
+	Notification notificationConfiguration
+	Dynamic      dynamicConfiguration
+	Static       StaticConfiguration
 }
 
 // The database configuration.
@@ -43,7 +43,7 @@ type applicationConfiguration struct {
 
 // The notification configuration.
 type notificationConfiguration struct {
-	Mailer mailerConfiguration
+	Mailer            mailerConfiguration
 	TelegramBotApiKey string
 }
 
@@ -59,7 +59,7 @@ type mailerConfiguration struct {
 // A dynamic Configuration.
 // Used to store data, which may be changed through the API.
 type dynamicConfiguration struct {
-	Interval             int
+	Interval int
 }
 
 // Static data about (e.g.) the application's version.
@@ -136,7 +136,7 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	logging.MustGetLogger("").Info("Reading Configuration from Database...")
 
 	var (
-		interval             int
+		interval int
 	)
 
 	// Interval
