@@ -83,12 +83,22 @@ func ReadConfigurationFromFile(filePath string) {
 
 		config.Application.Title = os.Getenv("UAR2_APPLICATION_TITLE")
 
-		i, err := strconv.Atoi(os.Getenv("UAR2_CHECKLIFETIME"))
+		i, err := strconv.Atoi(os.Getenv("UAR2_REDIRECTSTOFOLLOW"))
+		if err == nil {
+			config.Application.RedirectsToFollow = i
+		}
+
+		b, err := strconv.ParseBool(os.Getenv("UAR2_CHECKIFOFFLINE"))
+		if err == nil {
+			config.Application.RunCheckIfOffline = b
+		}
+
+		i, err = strconv.Atoi(os.Getenv("UAR2_CHECKLIFETIME"))
 		if err == nil {
 			config.Application.CheckLifetime = i
 		}
 
-		b, err := strconv.ParseBool(os.Getenv("UAR2_USEWEBFRONTEND"))
+		b, err = strconv.ParseBool(os.Getenv("UAR2_USEWEBFRONTEND"))
 		if err == nil {
 			config.Application.UseWebFrontend = b
 		}

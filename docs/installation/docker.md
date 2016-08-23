@@ -42,6 +42,8 @@ docker run -d --name uar2 --link uar2-db:mysql -p 80:8080 -e UAR2_VARIABLE_NAME=
 
 ### Configurable Settings
 * `UAR2_APPLICATION_TITLE` (e.g. `UpAndRunning2`)
+* `UAR2_REDIRECTSTOFOLLOW` (e.g. `3`)
+* `UAR2_CHECKIFOFFLINE` (e.g. `true`)
 * `UAR2_CHECKLIFETIME` (e.g. `31`)
 * `UAR2_USEWEBFRONTEND` (e.g. `true`)
 * `UAR2_TELEGRAMBOTAPIKEY` (e.g. `123456`)
