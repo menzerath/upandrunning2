@@ -13,6 +13,7 @@
 * Get notifications via
 	* Email
 	* Pushbullet
+	* Telegram
 
 ## Some Details on the Check-Algorithm
 UpAndRunning2 checks the response it gets from a simple HTTP-HEAD-request to the specified url.  
