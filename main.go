@@ -159,7 +159,7 @@ func startCleaningTimer() {
 // Checks all enabled Websites
 func checkAllSites() {
 	// Check for internet-connection
-	if lib.GetConfiguration().Application.RunCheckIfOffline {
+	if !lib.GetConfiguration().Application.RunCheckIfOffline {
 		res, err := goreq.Request{Uri: "https://google.com", Method: "HEAD", UserAgent: "UpAndRunning2 (https://github.com/MarvinMenzerath/UpAndRunning2)", MaxRedirects: 1, Timeout: 5 * time.Second}.Do()
 		if err != nil {
 			logging.MustGetLogger("").Warning("Did not check Websites because of missing internet-connection: ", err)
