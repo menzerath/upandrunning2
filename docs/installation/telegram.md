@@ -6,3 +6,12 @@ Receiving Telegram-notifications using the built-in Telegram-bot is quite easy b
 * Start a conversation with the newly created bot to receive your personal user-id.
 * Set this user-id as notification-target for the selected websites.
 * Done!
+
+## Available commands
+You can use the following commands when chatting with your Telegram-bot:
+
+| Command   | Description                                                     |
+|-----------|-----------------------------------------------------------------|
+| `/start`  | Start a conversation and allow the bot to send messages to you. |
+| `/id`     | Receive your user-id.                                           |
+| `/server` | Get some information about the bot's server.                    |
