@@ -170,11 +170,11 @@ function loadWebsiteData() {
 				newEntry += '</td><td>';
 
 				var responseTime = loadedWebsiteData[i].responseTime.split(' ')[0];
-				if (responseTime == 0 || responseTime > 500) {
+				if (responseTime == 0 || responseTime >= 500) {
 					newEntry += ' <span class="label label-danger">' + loadedWebsiteData[i].responseTime + '</span> ';
-				} else if (responseTime > 100) {
+				} else if (responseTime >= 100) {
 					newEntry += ' <span class="label label-warning">' + loadedWebsiteData[i].responseTime + '</span> ';
-				} else if (responseTime > 1) {
+				} else if (responseTime >= 1) {
 					newEntry += ' <span class="label label-success">' + loadedWebsiteData[i].responseTime + '</span> ';
 				} else {
 					newEntry += ' <span class="label label-info">' + loadedWebsiteData[i].responseTime + '</span> ';
