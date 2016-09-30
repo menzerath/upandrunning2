@@ -626,7 +626,7 @@ func (b *Bot) AnswerCallbackQuery(callback *Callback, response *CallbackResponse
 // Usually File objects does not contain any FilePath so you need to perform additional request
 func (b *Bot) GetFile(fileID string) (File, error) {
 	params := map[string]string{
-		"file_id":   fileID,
+		"file_id": fileID,
 	}
 	responseJSON, err := sendCommand("getFile", b.Token, params)
 	if err != nil {
@@ -657,5 +657,5 @@ func (b *Bot) GetFileDirectURL(fileID string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return "https://api.telegram.org/file/bot"+b.Token+"/"+f.FilePath, nil
+	return "https://api.telegram.org/file/bot" + b.Token + "/" + f.FilePath, nil
 }
