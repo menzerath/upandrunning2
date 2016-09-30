@@ -1,5 +1,6 @@
 # Docker Guide
-[![Docker Layers](https://badge.imagelayers.io/marvinmenzerath/upandrunning2:latest.svg)](https://imagelayers.io/?images=marvinmenzerath/upandrunning2:latest)
+[![Docker Version](https://images.microbadger.com/badges/version/marvinmenzerath/upandrunning2.svg)](http://microbadger.com/images/marvinmenzerath/upandrunning2)
+[![Docker Layers](https://images.microbadger.com/badges/image/marvinmenzerath/upandrunning2.svg)](http://microbadger.com/images/marvinmenzerath/upandrunning2)
 
 You can use the small and always up-to-date Docker-image from [Docker Hub](https://hub.docker.com/r/marvinmenzerath/upandrunning2/) to deploy UpAndRunning2 quickly and easily.
 
@@ -40,7 +41,12 @@ docker run -d --name uar2 --link uar2-db:mysql -p 80:8080 -e UAR2_VARIABLE_NAME=
 ```
 
 ### Configurable Settings
+* `UAR2_APPLICATION_TITLE` (e.g. `UpAndRunning2`)
+* `UAR2_REDIRECTSTOFOLLOW` (e.g. `3`)
+* `UAR2_CHECKIFOFFLINE` (e.g. `true`)
 * `UAR2_CHECKLIFETIME` (e.g. `31`)
+* `UAR2_USEWEBFRONTEND` (e.g. `true`)
+* `UAR2_TELEGRAMBOTAPIKEY` (e.g. `123456`)
 
 ### Mailer
 If you want to use the built-in mailer, you will need to set those environment-variables:

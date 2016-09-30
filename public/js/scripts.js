@@ -24,7 +24,7 @@ function showInformation(website) {
 	}
 
 	$.ajax({
-		url: "/api/v1/websites/" + website + "/status",
+		url: "/api/v2/websites/" + website + "/status",
 		type: "GET",
 		success: function(data) {
 			var dataString = '<div class="well"><legend>More Information</legend>';
@@ -74,7 +74,7 @@ function showResponseTimeGraph(website) {
 	}
 
 	$.ajax({
-		url: "/api/v1/websites/" + website + "/results?limit=100",
+		url: "/api/v2/websites/" + website + "/results?limit=100",
 		type: "GET",
 		success: function(data) {
 			var chartValuesResponseTimes = [];
@@ -150,7 +150,7 @@ function hideResponseTime() {
 
 function loadWebsiteData() {
 	$.ajax({
-		url: "/api/v1/websites",
+		url: "/api/v2/websites",
 		type: "GET",
 		success: function(data) {
 			loadedWebsiteData = data.websites;
@@ -167,6 +167,19 @@ function loadWebsiteData() {
 					newEntry += ' <span class="label label-danger">' + loadedWebsiteData[i].status + '</span> ';
 				}
 
+				newEntry += '</td><td>';
+
+				var responseTime = loadedWebsiteData[i].responseTime.split(' ')[0];
+				if (responseTime == 0 || responseTime >= 500) {
+					newEntry += ' <span class="label label-danger">' + loadedWebsiteData[i].responseTime + '</span> ';
+				} else if (responseTime >= 100) {
+					newEntry += ' <span class="label label-warning">' + loadedWebsiteData[i].responseTime + '</span> ';
+				} else if (responseTime >= 1) {
+					newEntry += ' <span class="label label-success">' + loadedWebsiteData[i].responseTime + '</span> ';
+				} else {
+					newEntry += ' <span class="label label-info">' + loadedWebsiteData[i].responseTime + '</span> ';
+				}
+
 				newEntry += '</td><td> <span class="label label-primary label-action" onclick="showInformation(\'' + loadedWebsiteData[i].url + '\')" title="More"><span class="fa fa-info"></span></span> ' +
 					'<span class="label label-primary label-action" onclick="showResponseTimeGraph(\'' + loadedWebsiteData[i].url + '\')" title="Response Times"><span class="fa fa-line-chart"></span></span> </td>';
 
@@ -174,7 +187,7 @@ function loadWebsiteData() {
 					dataStringUp += '<tr><td>' + countUp + '</td>' + newEntry + '</tr>';
 					countUp++;
 				} else {
-					dataStringDown += '<tr><td>' + countDown+ '</td>' + newEntry + '</tr>';
+					dataStringDown += '<tr><td>' + countDown + '</td>' + newEntry + '</tr>';
 					countDown++;
 				}
 			}

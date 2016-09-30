@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   enable-background="new 0 0 26 26"
+   height="26px"
+   id="Layer_1"
+   version="1.1"
+   viewBox="0 0 26 26"
+   width="26px">
+   <g
+     id="g3337"
+     transform="matrix(1.006153,0,0,0.99984618,-0.04628304,-0.4979234)"><polygon
+       points="0.046,24.418 2.13,26.502 12.967,15.666 23.803,26.502 25.887,24.418 12.967,11.498 "
+       id="polygon3339"
+       style="fill:#231f20"
+       transform="matrix(0.92307693,0,0,1,0.99742309,-1.0001539)" /><polygon
+       points="12.967,4.666 23.803,15.502 25.887,13.418 12.967,0.498 0.046,13.418 2.13,15.502 "
+       id="polygon3341"
+       style="fill:#231f20"
+       transform="matrix(0.92307693,0,0,1,0.99742309,0.9984615)" /></g></svg>

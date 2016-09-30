@@ -1,4 +1,4 @@
-# HttpRouter [![Build Status](https://travis-ci.org/julienschmidt/httprouter.svg?branch=master)](https://travis-ci.org/julienschmidt/httprouter) [![Coverage](http://gocover.io/_badge/github.com/julienschmidt/httprouter?0)](http://gocover.io/github.com/julienschmidt/httprouter) [![GoDoc](https://godoc.org/github.com/julienschmidt/httprouter?status.svg)](http://godoc.org/github.com/julienschmidt/httprouter)
+# HttpRouter [![Build Status](https://travis-ci.org/julienschmidt/httprouter.svg?branch=master)](https://travis-ci.org/julienschmidt/httprouter) [![Coverage](https://gocover.io/_badge/github.com/julienschmidt/httprouter?1)](https://gocover.io/github.com/julienschmidt/httprouter) [![GoDoc](https://godoc.org/github.com/julienschmidt/httprouter?status.svg)](http://godoc.org/github.com/julienschmidt/httprouter)
 
 HttpRouter is a lightweight high performance HTTP request router (also called *multiplexer* or just *mux* for short) for [Go](https://golang.org/).
 
@@ -185,60 +185,46 @@ Another quick example: Basic Authentication (RFC 2617) for handles:
 package main
 
 import (
-    "bytes"
-    "encoding/base64"
-    "fmt"
-    "github.com/julienschmidt/httprouter"
-    "net/http"
-    "log"
-    "strings"
+	"fmt"
+	"log"
+	"net/http"
+
+	"github.com/julienschmidt/httprouter"
 )
 
-func BasicAuth(h httprouter.Handle, user, pass []byte) httprouter.Handle {
+func BasicAuth(h httprouter.Handle, requiredUser, requiredPassword string) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		const basicAuthPrefix string = "Basic "
-
 		// Get the Basic Authentication credentials
-		auth := r.Header.Get("Authorization")
-		if strings.HasPrefix(auth, basicAuthPrefix) {
-			// Check credentials
-			payload, err := base64.StdEncoding.DecodeString(auth[len(basicAuthPrefix):])
-			if err == nil {
-				pair := bytes.SplitN(payload, []byte(":"), 2)
-				if len(pair) == 2 &&
-					bytes.Equal(pair[0], user) &&
-					bytes.Equal(pair[1], pass) {
+		user, password, hasAuth := r.BasicAuth()
 
-					// Delegate request to the given handle
-					h(w, r, ps)
-					return
-				}
-			}
+		if hasAuth && user == requiredUser && password == requiredPassword {
+			// Delegate request to the given handle
+			h(w, r, ps)
+		} else {
+			// Request Basic Authentication otherwise
+			w.Header().Set("WWW-Authenticate", "Basic realm=Restricted")
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		}
-
-		// Request Basic Authentication otherwise
-		w.Header().Set("WWW-Authenticate", "Basic realm=Restricted")
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 	}
 }
 
 func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-    fmt.Fprint(w, "Not protected!\n")
+	fmt.Fprint(w, "Not protected!\n")
 }
 
 func Protected(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-    fmt.Fprint(w, "Protected!\n")
+	fmt.Fprint(w, "Protected!\n")
 }
 
 func main() {
-    user := []byte("gordon")
-    pass := []byte("secret!")
-    
-    router := httprouter.New()
-    router.GET("/", Index)
-    router.GET("/protected/", BasicAuth(Protected, user, pass))
+	user := "gordon"
+	pass := "secret!"
 
-    log.Fatal(http.ListenAndServe(":8080", router))
+	router := httprouter.New()
+	router.GET("/", Index)
+	router.GET("/protected/", BasicAuth(Protected, user, pass))
+
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
 ```
 

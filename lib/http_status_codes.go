@@ -1,5 +1,10 @@
 package lib
 
+import (
+	"github.com/op/go-logging"
+	"strconv"
+)
+
 var httpCodes map[int]string
 
 // Init the httpCodes-map.
@@ -59,5 +64,10 @@ func InitHttpStatusCodeMap() {
 
 // Returns a HTTP-status-code-string representing the given HTTP-status-code.
 func GetHttpStatus(code int) string {
-	return httpCodes[code]
+	if val, ok := httpCodes[code]; ok {
+		return val
+	} else {
+		logging.MustGetLogger("").Warning("Unknown HTTP-status-code: " + strconv.Itoa(code))
+		return "Unknown"
+	}
 }

@@ -1,4 +1,4 @@
-FROM alpine:3.3
+FROM alpine:3.4
 MAINTAINER Marvin Menzerath <github@marvin-menzerath.de>
 
 ENV UAR2_IS_DOCKER true

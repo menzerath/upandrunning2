@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/MarvinMenzerath/UpAndRunning2/lib"
 	"github.com/MarvinMenzerath/UpAndRunning2/routes"
+	"github.com/MarvinMenzerath/UpAndRunning2/routes/APIv1"
+	"github.com/MarvinMenzerath/UpAndRunning2/routes/APIv2"
 	"github.com/franela/goreq"
 	"github.com/julienschmidt/httprouter"
 	"github.com/op/go-logging"
@@ -12,7 +14,7 @@ import (
 	"time"
 )
 
-const VERSION = "2.1.3"
+const VERSION = "2.2.0"
 
 var goVersion = runtime.Version()
 var goArch = runtime.GOOS + "_" + runtime.GOARCH
@@ -45,10 +47,11 @@ func main() {
 	// Additional Libraries
 	goreq.SetConnectTimeout(5 * time.Second)
 	lib.InitHttpStatusCodeMap()
+	go lib.RunTelegramBot()
 
 	// Start Checking and Serving
+	checkAllSites()
 	startCheckTimer()
-	startCheckNowTimer()
 	startCleaningTimer()
 	serveRequests()
 
@@ -64,9 +67,10 @@ func serveRequests() {
 
 	// API
 	setupApi1(router)
+	setupApi2(router)
 
 	// Web-Frontend
-	if lib.GetConfiguration().UseWebFrontend {
+	if lib.GetConfiguration().Application.UseWebFrontend {
 		setupWebFrontend(router)
 	} else {
 		router.GET("/", routes.NoWebFrontendIndex)
@@ -83,35 +87,38 @@ func serveRequests() {
 
 // Setup all routes for API v1
 func setupApi1(router *httprouter.Router) {
-	router.GET("/api/v1", routes.ApiIndexV1)
+	router.GET("/api/v1/*all", APIv1.ApiIndexVersion)
+	router.POST("/api/v1/*all", APIv1.ApiIndexVersion)
+	router.PUT("/api/v1/*all", APIv1.ApiIndexVersion)
+	router.DELETE("/api/v1/*all", APIv1.ApiIndexVersion)
+}
+
+// Setup all routes for API v2
+func setupApi2(router *httprouter.Router) {
+	router.GET("/api/v2", APIv2.ApiIndexVersion)
 
 	// Public Statistics
-	router.GET("/api/v1/websites", routes.ApiWebsites)
-	router.GET("/api/v1/websites/:url/status", routes.ApiWebsitesStatus)
-	router.GET("/api/v1/websites/:url/results", routes.ApiWebsitesResults)
-
-	// Actions
-	router.GET("/api/v1/action/check", routes.ApiActionCheck)
+	router.GET("/api/v2/websites", APIv2.ApiWebsites)
+	router.GET("/api/v2/websites/:url/status", APIv2.ApiWebsitesStatus)
+	router.GET("/api/v2/websites/:url/results", APIv2.ApiWebsitesResults)
 
 	// Authentication
-	router.POST("/api/v1/auth/login", routes.ApiAuthLogin)
-	router.GET("/api/v1/auth/logout", routes.ApiAuthLogout)
+	router.POST("/api/v2/auth/login", APIv2.ApiAuthLogin)
+	router.GET("/api/v2/auth/logout", APIv2.ApiAuthLogout)
 
 	// Settings
-	router.PUT("/api/v1/settings/title", routes.ApiSettingsTitle)
-	router.PUT("/api/v1/settings/password", routes.ApiSettingsPassword)
-	router.PUT("/api/v1/settings/interval", routes.ApiSettingsInterval)
-	router.PUT("/api/v1/settings/redirects", routes.ApiSettingsRedirects)
-	router.PUT("/api/v1/settings/checkWhenOffline", routes.ApiSettingsCheckWhenOffline)
+	router.PUT("/api/v2/settings/password", APIv2.ApiSettingsPassword)
+	router.PUT("/api/v2/settings/interval", APIv2.ApiSettingsInterval)
 
 	// Website Management
-	router.POST("/api/v1/websites/:url", routes.ApiWebsitesAdd)
-	router.PUT("/api/v1/websites/:url", routes.ApiWebsitesEdit)
-	router.DELETE("/api/v1/websites/:url", routes.ApiWebsitesDelete)
-	router.PUT("/api/v1/websites/:url/enabled", routes.ApiWebsitesEnabled)
-	router.PUT("/api/v1/websites/:url/visibility", routes.ApiWebsitesVisibility)
-	router.GET("/api/v1/websites/:url/notifications", routes.ApiWebsitesGetNotifications)
-	router.PUT("/api/v1/websites/:url/notifications", routes.ApiWebsitePutNotifications)
+	router.POST("/api/v2/websites/:url", APIv2.ApiWebsitesAdd)
+	router.PUT("/api/v2/websites/:url", APIv2.ApiWebsitesEdit)
+	router.DELETE("/api/v2/websites/:url", APIv2.ApiWebsitesDelete)
+	router.PUT("/api/v2/websites/:url/enabled", APIv2.ApiWebsitesEnabled)
+	router.PUT("/api/v2/websites/:url/visibility", APIv2.ApiWebsitesVisibility)
+	router.GET("/api/v2/websites/:url/notifications", APIv2.ApiWebsitesGetNotifications)
+	router.PUT("/api/v2/websites/:url/notifications", APIv2.ApiWebsitePutNotifications)
+	router.GET("/api/v2/websites/:url/check", APIv2.ApiWebsiteCheck)
 }
 
 // Setup all routes for Web-Frontend
@@ -139,19 +146,6 @@ func startCheckTimer() {
 	}()
 }
 
-// Creates a timer to check all Websites when triggered through the API
-func startCheckNowTimer() {
-	timer := time.NewTimer(time.Second * 1)
-	go func() {
-		<-timer.C
-		if lib.GetConfiguration().Dynamic.CheckNow {
-			checkAllSites()
-			lib.GetConfiguration().Dynamic.CheckNow = false
-		}
-		startCheckNowTimer()
-	}()
-}
-
 // Creates a timer to remove old check-results from the Database
 func startCleaningTimer() {
 	timer := time.NewTimer(time.Hour * 24)
@@ -165,7 +159,7 @@ func startCleaningTimer() {
 // Checks all enabled Websites
 func checkAllSites() {
 	// Check for internet-connection
-	if lib.GetConfiguration().Dynamic.RunChecksWhenOffline == 0 {
+	if !lib.GetConfiguration().Application.RunCheckIfOffline {
 		res, err := goreq.Request{Uri: "https://google.com", Method: "HEAD", UserAgent: "UpAndRunning2 (https://github.com/MarvinMenzerath/UpAndRunning2)", MaxRedirects: 1, Timeout: 5 * time.Second}.Do()
 		if err != nil {
 			logging.MustGetLogger("").Warning("Did not check Websites because of missing internet-connection: ", err)

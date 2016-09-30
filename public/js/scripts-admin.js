@@ -27,12 +27,6 @@ $(document).ready(function() {
 		}
 	});
 
-	$('#input-new-title').keypress(function(event) {
-		if (event.keyCode == 13) {
-			changeTitle();
-		}
-	});
-
 	$('#input-new-password').keypress(function(event) {
 		if (event.keyCode == 13) {
 			changePassword();
@@ -45,16 +39,6 @@ $(document).ready(function() {
 		}
 	});
 
-	$('#input-new-redirects').keypress(function(event) {
-		if (event.keyCode == 13) {
-			changeRedirects();
-		}
-	});
-
-	$('#input-new-checkWhenOffline').mouseup(function() {
-		changeCheckWhenOffline();
-	});
-
 	loadWebsites();
 
 	setInterval(loadWebsites, 60 * 1000);
@@ -62,7 +46,7 @@ $(document).ready(function() {
 
 function loadWebsites() {
 	$.ajax({
-		url: "/api/v1/websites",
+		url: "/api/v2/websites",
 		type: "GET",
 		success: function(data) {
 			loadedWebsiteData = data.websites;
@@ -105,13 +89,19 @@ function loadWebsites() {
 					dataString += '<td><span class="label label-info-inactive label-action" onclick="editNotificationPushbullet(\'' + loadedWebsiteData[i].url + '\')" title="Pushbullet"><span class="fa fa-bell"></span></span> ';
 				}
 				if (loadedWebsiteData[i].notifications.email) {
-					dataString += '<span class="label label-info label-info label-action" onclick="editNotificationEmail(\'' + loadedWebsiteData[i].url + '\')" title="Email"><span class="fa fa-envelope"></span></span></td>';
+					dataString += '<span class="label label-info label-info label-action" onclick="editNotificationEmail(\'' + loadedWebsiteData[i].url + '\')" title="Email"><span class="fa fa-envelope"></span></span> ';
 				} else {
-					dataString += '<span class="label label-info-inactive label-info label-action" onclick="editNotificationEmail(\'' + loadedWebsiteData[i].url + '\')" title="Email"><span class="fa fa-envelope"></span></span></td>';
+					dataString += '<span class="label label-info-inactive label-info label-action" onclick="editNotificationEmail(\'' + loadedWebsiteData[i].url + '\')" title="Email"><span class="fa fa-envelope"></span></span> ';
+				}
+				if (loadedWebsiteData[i].notifications.telegram) {
+					dataString += '<span class="label label-info label-info label-action" onclick="editNotificationTelegram(\'' + loadedWebsiteData[i].url + '\')" title="Telegram"><span class="fa fa-paper-plane"></span></span></td>';
+				} else {
+					dataString += '<span class="label label-info-inactive label-info label-action" onclick="editNotificationTelegram(\'' + loadedWebsiteData[i].url + '\')" title="Telegram"><span class="fa fa-paper-plane"></span></span></td>';
 				}
 
 				dataString += '<td><span class="label label-default label-action" onclick="showWebsiteDetails(\'' + loadedWebsiteData[i].url + '\')" title="More"><span class="fa fa-info"></span></span> ' +
 					'<span class="label label-default label-action" onclick="showWebsiteResponseTimes(\'' + loadedWebsiteData[i].url + '\')" title="Response Times"><span class="fa fa-line-chart"></span></span> ' +
+					'<span class="label label-info label-action" onclick="checkWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Check Now"><span class="fa fa-repeat"></span></span> ' +
 					'<span class="label label-primary label-action" onclick="editWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Edit"><span class="fa fa-pencil"></span></span> ' +
 					'<span class="label label-danger label-action" onclick="deleteWebsite(\'' + loadedWebsiteData[i].url + '\')" title="Delete"><span class="fa fa-trash"></span></span></td></tr>';
 			}
@@ -136,7 +126,7 @@ function showWebsiteDetails(website) {
 	}
 
 	$.ajax({
-		url: "/api/v1/websites/" + website + "/status",
+		url: "/api/v2/websites/" + website + "/status",
 		type: "GET",
 		success: function(data) {
 			delete data['requestSuccess'];
@@ -161,7 +151,7 @@ function showWebsiteResponseTimes(website) {
 	}
 
 	$.ajax({
-		url: "/api/v1/websites/" + website + "/results?limit=100",
+		url: "/api/v2/websites/" + website + "/results?limit=100",
 		type: "GET",
 		success: function(data) {
 			var chartValuesResponseTimes = [];
@@ -235,7 +225,7 @@ function addWebsite() {
 
 	if (name.trim() && protocol.trim() && url.trim() && method.trim()) {
 		$.ajax({
-			url: "/api/v1/websites/" + url,
+			url: "/api/v2/websites/" + url,
 			type: "POST",
 			data: {name: name, protocol: protocol, url: url, checkMethod: method},
 			success: function() {
@@ -256,7 +246,7 @@ function addWebsite() {
 
 function enableWebsite(url) {
 	$.ajax({
-		url: "/api/v1/websites/" + url + "/enabled",
+		url: "/api/v2/websites/" + url + "/enabled",
 		type: "PUT",
 		data: {enabled: true},
 		success: function() {
@@ -268,7 +258,7 @@ function enableWebsite(url) {
 
 function disableWebsite(url) {
 	$.ajax({
-		url: "/api/v1/websites/" + url + "/enabled",
+		url: "/api/v2/websites/" + url + "/enabled",
 		type: "PUT",
 		data: {enabled: false},
 		success: function() {
@@ -280,7 +270,7 @@ function disableWebsite(url) {
 
 function visibleWebsite(url) {
 	$.ajax({
-		url: "/api/v1/websites/" + url + "/visibility",
+		url: "/api/v2/websites/" + url + "/visibility",
 		type: "PUT",
 		data: {visible: true},
 		success: function() {
@@ -292,7 +282,7 @@ function visibleWebsite(url) {
 
 function invisibleWebsite(url) {
 	$.ajax({
-		url: "/api/v1/websites/" + url + "/visibility",
+		url: "/api/v2/websites/" + url + "/visibility",
 		type: "PUT",
 		data: {visible: false},
 		success: function() {
@@ -306,24 +296,27 @@ function editNotificationPushbullet(url) {
 	if (!url.trim()) return;
 
 	$.ajax({
-		url: "/api/v1/websites/" + url + "/notifications",
+		url: "/api/v2/websites/" + url + "/notifications",
 		type: "GET",
 		success: function(data) {
 			swal({
 				title: "Pushbullet",
 				html: "Please enter a valid <b>Pushbullet-API Key</b> in order to receive push-messages.<br />Leave this field blank if you do not want this kind of notification.<br /><br /><input class='form-control' type='text' id='input-pushbullet' placeholder='API key' value=" + data.notifications.pushbulletKey + ">",
 				showCancelButton: true,
-				confirmButtonText: "Save",
-				closeOnConfirm: false
+				confirmButtonText: "Save"
 			}).then(
-				function(result) {
+				function() {
 					var inputValue = $('#input-pushbullet').val();
 					if (inputValue === false) return;
 
 					$.ajax({
-						url: "/api/v1/websites/" + url + "/notifications",
+						url: "/api/v2/websites/" + url + "/notifications",
 						type: "PUT",
-						data: {pushbulletKey: inputValue.trim(), email: data.notifications.email},
+						data: {
+							pushbulletKey: inputValue.trim(),
+							email: data.notifications.email,
+							telegramId: data.notifications.telegramId
+						},
 						success: function() {
 							loadWebsites();
 							showSuccessAlert("Settings have been updated.");
@@ -343,24 +336,67 @@ function editNotificationEmail(url) {
 	if (!url.trim()) return;
 
 	$.ajax({
-		url: "/api/v1/websites/" + url + "/notifications",
+		url: "/api/v2/websites/" + url + "/notifications",
 		type: "GET",
 		success: function(data) {
 			swal({
 				title: "Email",
 				html: "Please enter a valid <b>email address</b> in order to receive email-notifications.<br />Leave this field blank if you do not want this kind of notification.<br /><br /><input class='form-control' type='text' id='input-email' placeholder='email address' value=" + data.notifications.email + ">",
 				showCancelButton: true,
-				confirmButtonText: "Save",
-				closeOnConfirm: false
+				confirmButtonText: "Save"
 			}).then(
-				function(result) {
+				function() {
 					var inputValue = $('#input-email').val();
 					if (inputValue === false) return;
 
 					$.ajax({
-						url: "/api/v1/websites/" + url + "/notifications",
+						url: "/api/v2/websites/" + url + "/notifications",
 						type: "PUT",
-						data: {pushbulletKey: data.notifications.pushbulletKey, email: inputValue.trim()},
+						data: {
+							pushbulletKey: data.notifications.pushbulletKey,
+							email: inputValue.trim(),
+							telegramId: data.notifications.telegramId
+						},
+						success: function() {
+							loadWebsites();
+							showSuccessAlert("Settings have been updated.");
+						},
+						error: handleAjaxErrorAlert
+					});
+				},
+				function(dismiss) {
+				}
+			);
+		},
+		error: handleAjaxErrorAlert
+	});
+}
+
+function editNotificationTelegram(url) {
+	if (!url.trim()) return;
+
+	$.ajax({
+		url: "/api/v2/websites/" + url + "/notifications",
+		type: "GET",
+		success: function(data) {
+			swal({
+				title: "Telegram",
+				html: "Please enter a valid <b>Telegram user-id</b> in order to receive Telegram-messages.<br />Leave this field blank if you do not want this kind of notification.<br /><br /><input class='form-control' type='text' id='input-telegram' placeholder='Telegram user id' value=" + data.notifications.telegramId + ">",
+				showCancelButton: true,
+				confirmButtonText: "Save"
+			}).then(
+				function() {
+					var inputValue = $('#input-telegram').val();
+					if (inputValue === false) return;
+
+					$.ajax({
+						url: "/api/v2/websites/" + url + "/notifications",
+						type: "PUT",
+						data: {
+							pushbulletKey: data.notifications.pushbulletKey,
+							email: data.notifications.email,
+							telegramId: inputValue.trim()
+						},
 						success: function() {
 							loadWebsites();
 							showSuccessAlert("Settings have been updated.");
@@ -407,7 +443,7 @@ function saveWebsite() {
 
 	if (name.trim() && protocol.trim() && url.trim() && method.trim()) {
 		$.ajax({
-			url: "/api/v1/websites/" + editUrl,
+			url: "/api/v2/websites/" + editUrl,
 			type: "PUT",
 			data: {name: name, protocol: protocol, url: url, checkMethod: method},
 			success: function() {
@@ -435,12 +471,11 @@ function deleteWebsite(url) {
 		type: "warning",
 		showCancelButton: true,
 		confirmButtonColor: "#DD6B55",
-		confirmButtonText: "Yes",
-		closeOnConfirm: false
+		confirmButtonText: "Yes"
 	}).then(
-		function(result) {
+		function() {
 			$.ajax({
-				url: "/api/v1/websites/" + url,
+				url: "/api/v2/websites/" + url,
 				type: "DELETE",
 				success: function() {
 					loadWebsites();
@@ -454,25 +489,19 @@ function deleteWebsite(url) {
 	);
 }
 
-function changeTitle() {
-	var newTitle = $('#input-new-title').val();
-
-	if (newTitle.trim()) {
-		$.ajax({
-			url: "/api/v1/settings/title",
-			type: "PUT",
-			data: {title: newTitle},
-			success: function() {
-				$(document).attr("title", "Administration | " + newTitle);
-				$('#navbar-title').text(newTitle);
-
-				showSuccessAlert("Settings have been updated.");
-			},
-			error: handleAjaxErrorAlert
-		});
-	} else {
-		showErrorAlert("Please enter a valid title to continue.");
-	}
+function checkWebsite(url) {
+	if (!url.trim()) return;
+	$.ajax({
+		url: "/api/v2/websites/" + url + "/check",
+		type: "GET",
+		success: function() {
+			loadWebsites();
+		},
+		error: function(error) {
+			handleAjaxErrorAlert(error);
+			allowCheck = true;
+		}
+	});
 }
 
 function changePassword() {
@@ -480,7 +509,7 @@ function changePassword() {
 
 	if (newPassword.trim()) {
 		$.ajax({
-			url: "/api/v1/settings/password",
+			url: "/api/v2/settings/password",
 			type: "PUT",
 			data: {password: newPassword},
 			success: function() {
@@ -500,7 +529,7 @@ function changeInterval() {
 
 	if (newInterval.trim() && !(isNaN(newInterval) || newInterval < 1 || newInterval > 600)) {
 		$.ajax({
-			url: "/api/v1/settings/interval",
+			url: "/api/v2/settings/interval",
 			type: "PUT",
 			data: {interval: newInterval},
 			success: function() {
@@ -513,65 +542,9 @@ function changeInterval() {
 	}
 }
 
-function changeRedirects() {
-	var newRedirects = $('#input-new-redirects').val();
-
-	if (newRedirects.trim() && !(isNaN(newRedirects) || newRedirects < 0 || newRedirects > 10)) {
-		$.ajax({
-			url: "/api/v1/settings/redirects",
-			type: "PUT",
-			data: {redirects: newRedirects},
-			success: function() {
-				showSuccessAlert("Settings have been updated.");
-			},
-			error: handleAjaxErrorAlert
-		});
-	} else {
-		showErrorAlert("Please enter a valid amount of redirects (number between 0 and 10) to continue.");
-	}
-}
-
-function changeCheckWhenOffline() {
-	$.ajax({
-		url: "/api/v1/settings/checkWhenOffline",
-		type: "PUT",
-		data: {checkWhenOffline: !$('#input-new-checkWhenOffline').is(':checked')},
-		success: function() {
-			showSuccessAlert("Settings have been updated.");
-		},
-		error: handleAjaxErrorAlert
-	});
-}
-
-function checkNow() {
-	if (!allowCheck) {
-		showErrorAlert("Please wait a few seconds before trying this operation again.");
-		return;
-	}
-
-	allowCheck = false;
-	$.ajax({
-		url: "/api/v1/action/check",
-		type: "GET",
-		success: function() {
-			showSuccessAlert("Please wait while new data is gathered...");
-			setTimeout(function() {
-				loadWebsites();
-			}, 3000);
-			setTimeout(function() {
-				allowCheck = true;
-			}, 10000);
-		},
-		error: function(error) {
-			handleAjaxErrorAlert(error);
-			allowCheck = true;
-		}
-	});
-}
-
 function logout() {
 	$.ajax({
-		url: "/api/v1/auth/logout",
+		url: "/api/v2/auth/logout",
 		type: "GET",
 		success: function() {
 			window.location.replace("/");

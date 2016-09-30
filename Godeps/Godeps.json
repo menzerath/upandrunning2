@@ -1,10 +1,7 @@
 {
 	"ImportPath": "github.com/MarvinMenzerath/UpAndRunning2",
-	"GoVersion": "go1.6",
+	"GoVersion": "go1.7",
 	"GodepVersion": "v74",
-	"Packages": [
-		"./..."
-	],
 	"Deps": [
 		{
 			"ImportPath": "github.com/asaskevich/govalidator",
@@ -17,13 +14,17 @@
 		},
 		{
 			"ImportPath": "github.com/go-sql-driver/mysql",
-			"Comment": "v1.2-196-g3654d25",
-			"Rev": "3654d25ec346ee8ce71a68431025458d52a38ac0"
+			"Comment": "v1.2-198-g0b58b37",
+			"Rev": "0b58b37b664c21f3010e836f1b931e1d0b0b0685"
 		},
 		{
 			"ImportPath": "github.com/julienschmidt/httprouter",
-			"Comment": "v1.1-31-gfb79d6a",
-			"Rev": "fb79d6a91d3e4a9ecb6d945b218d78fc0d9b1939"
+			"Comment": "v1.1-34-gd8ff598",
+			"Rev": "d8ff598a019f2c7bad0980917a588193cf26666e"
+		},
+		{
+			"ImportPath": "github.com/mitchellh/hashstructure",
+			"Rev": "b098c52ef6beab8cd82bc4a32422cf54b890e8fa"
 		},
 		{
 			"ImportPath": "github.com/mitsuse/pushbullet-go",
@@ -46,12 +47,17 @@
 			"Rev": "970db520ece77730c7e4724c61121037378659d9"
 		},
 		{
+			"ImportPath": "github.com/tucnak/telebot",
+			"Comment": "v1.0-68-gce7114a",
+			"Rev": "ce7114afe66a2b1fe4f5c783313b2b0b480f331d"
+		},
+		{
 			"ImportPath": "golang.org/x/crypto/bcrypt",
-			"Rev": "bc89c496413265e715159bdc8478ee9a92fdc265"
+			"Rev": "a20de3fa94e069ec699987416679230d72e030a3"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/blowfish",
-			"Rev": "bc89c496413265e715159bdc8478ee9a92fdc265"
+			"Rev": "a20de3fa94e069ec699987416679230d72e030a3"
 		},
 		{
 			"ImportPath": "gopkg.in/gomail.v2",

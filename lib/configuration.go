@@ -14,14 +14,13 @@ var config *Configuration
 // The whole configuration.
 // Contains all other configuration-data.
 type Configuration struct {
-	Address        string
-	Port           int
-	Database       databaseConfiguration
-	Mailer         mailerConfiguration
-	Dynamic        dynamicConfiguration
-	Static         StaticConfiguration
-	CheckLifetime  int
-	UseWebFrontend bool
+	Address      string
+	Port         int
+	Database     databaseConfiguration
+	Application  applicationConfiguration
+	Notification notificationConfiguration
+	Dynamic      dynamicConfiguration
+	Static       StaticConfiguration
 }
 
 // The database configuration.
@@ -32,6 +31,20 @@ type databaseConfiguration struct {
 	Password        string
 	Database        string
 	ConnectionLimit int
+}
+
+type applicationConfiguration struct {
+	Title             string
+	RedirectsToFollow int
+	RunCheckIfOffline bool
+	CheckLifetime     int
+	UseWebFrontend    bool
+}
+
+// The notification configuration.
+type notificationConfiguration struct {
+	Mailer            mailerConfiguration
+	TelegramBotApiKey string
 }
 
 // The mailer configuration.
@@ -46,11 +59,7 @@ type mailerConfiguration struct {
 // A dynamic Configuration.
 // Used to store data, which may be changed through the API.
 type dynamicConfiguration struct {
-	Title                string
-	Interval             int
-	Redirects            int
-	RunChecksWhenOffline int
-	CheckNow             bool
+	Interval int
 }
 
 // Static data about (e.g.) the application's version.
@@ -72,24 +81,38 @@ func ReadConfigurationFromFile(filePath string) {
 		config.Database.Password = os.Getenv("MYSQL_ENV_MYSQL_ROOT_PASSWORD")
 		config.Database.Database = "upandrunning"
 
-		i, err := strconv.Atoi(os.Getenv("UAR2_CHECKLIFETIME"))
+		config.Application.Title = os.Getenv("UAR2_APPLICATION_TITLE")
+
+		i, err := strconv.Atoi(os.Getenv("UAR2_REDIRECTSTOFOLLOW"))
 		if err == nil {
-			config.CheckLifetime = i
+			config.Application.RedirectsToFollow = i
 		}
 
-		b, err := strconv.ParseBool(os.Getenv("UAR2_USEWEBFRONTEND"))
+		b, err := strconv.ParseBool(os.Getenv("UAR2_CHECKIFOFFLINE"))
 		if err == nil {
-			config.UseWebFrontend = b
+			config.Application.RunCheckIfOffline = b
 		}
 
-		config.Mailer.Host = os.Getenv("UAR2_MAILER_HOST")
+		i, err = strconv.Atoi(os.Getenv("UAR2_CHECKLIFETIME"))
+		if err == nil {
+			config.Application.CheckLifetime = i
+		}
+
+		b, err = strconv.ParseBool(os.Getenv("UAR2_USEWEBFRONTEND"))
+		if err == nil {
+			config.Application.UseWebFrontend = b
+		}
+
+		config.Notification.Mailer.Host = os.Getenv("UAR2_MAILER_HOST")
 		i, err = strconv.Atoi(os.Getenv("UAR2_MAILER_PORT"))
 		if err == nil {
-			config.Mailer.Port = i
+			config.Notification.Mailer.Port = i
 		}
-		config.Mailer.User = os.Getenv("UAR2_MAILER_USER")
-		config.Mailer.Password = os.Getenv("UAR2_MAILER_PASSWORD")
-		config.Mailer.From = os.Getenv("UAR2_MAILER_FROM")
+		config.Notification.Mailer.User = os.Getenv("UAR2_MAILER_USER")
+		config.Notification.Mailer.Password = os.Getenv("UAR2_MAILER_PASSWORD")
+		config.Notification.Mailer.From = os.Getenv("UAR2_MAILER_FROM")
+
+		config.Notification.TelegramBotApiKey = os.Getenv("UAR2_TELEGRAMBOTAPIKEY")
 
 		return
 	}
@@ -123,24 +146,11 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 	logging.MustGetLogger("").Info("Reading Configuration from Database...")
 
 	var (
-		title                string
-		interval             int
-		redirects            int
-		runChecksWhenOffline int
+		interval int
 	)
 
-	// Title
-	err := db.QueryRow("SELECT value FROM settings where name = 'title';").Scan(&title)
-	if err != nil {
-		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('title', 'UpAndRunning2');")
-		if err != nil {
-			logging.MustGetLogger("").Fatal("Unable to insert 'title'-setting: ", err)
-		}
-		title = "UpAndRunning"
-	}
-
 	// Interval
-	err = db.QueryRow("SELECT value FROM settings where name = 'interval';").Scan(&interval)
+	err := db.QueryRow("SELECT value FROM settings where name = 'interval';").Scan(&interval)
 	if err != nil {
 		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('interval', 60);")
 		if err != nil {
@@ -149,32 +159,7 @@ func ReadConfigurationFromDatabase(db *sql.DB) {
 		interval = 60
 	}
 
-	// Redirects
-	err = db.QueryRow("SELECT value FROM settings where name = 'redirects';").Scan(&redirects)
-	if err != nil {
-		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('redirects', 0);")
-		if err != nil {
-			logging.MustGetLogger("").Fatal("Unable to insert 'redirects'-setting: ", err)
-		}
-		redirects = 0
-	}
-
-	// Run Checks when offline
-	err = db.QueryRow("SELECT value FROM settings where name = 'check_when_offline';").Scan(&runChecksWhenOffline)
-	if err != nil {
-		_, err = db.Exec("INSERT INTO settings (name, value) VALUES ('check_when_offline', 1);")
-		if err != nil {
-			logging.MustGetLogger("").Fatal("Unable to insert 'check_when_offline'-setting: ", err)
-		}
-		runChecksWhenOffline = 1
-	}
-
-	config.Dynamic.Title = title
 	config.Dynamic.Interval = interval
-	config.Dynamic.Redirects = redirects
-	config.Dynamic.RunChecksWhenOffline = runChecksWhenOffline
-
-	config.Dynamic.CheckNow = true
 }
 
 // Allows to replace the current StaticConfiguration.

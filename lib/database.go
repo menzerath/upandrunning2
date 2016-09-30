@@ -68,7 +68,7 @@ func prepareDatabase() {
 	}
 
 	// Default Setup
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `notifications` (`websiteId` int(11) NOT NULL, `pushbulletKey` varchar(300) NOT NULL DEFAULT '', `email` varchar(300) NOT NULL DEFAULT '', PRIMARY KEY (`websiteId`), UNIQUE KEY (`websiteId`), FOREIGN KEY (`websiteId`) REFERENCES websites(`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;")
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS `notifications` (`websiteId` int(11) NOT NULL, `pushbulletKey` varchar(300) NOT NULL DEFAULT '', `email` varchar(300) NOT NULL DEFAULT '', `telegramId` varchar(300) NOT NULL DEFAULT '', PRIMARY KEY (`websiteId`), UNIQUE KEY (`websiteId`), FOREIGN KEY (`websiteId`) REFERENCES websites(`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;")
 	if err != nil {
 		logging.MustGetLogger("").Fatal("Unable to create table 'notifications': ", err)
 	}
@@ -79,35 +79,29 @@ func prepareDatabase() {
 		logging.MustGetLogger("").Fatal("Unable to create table 'settings': ", err)
 	}
 
-	// v2.1.0; remove in v2.2.x
-	_, err = db.Exec("ALTER TABLE `websites` DROP `status`, DROP `responseTime`, DROP `time`, DROP `lastFailStatus`, DROP `lastFailTime`, DROP `ups`, DROP `downs`, DROP `totalChecks`, DROP `avgAvail`;")
+	// v2.2.0
+	_, err = db.Exec("ALTER TABLE `notifications` ADD `telegramId` VARCHAR(300) NOT NULL DEFAULT '' AFTER `email`;")
 	if mysqlError, ok := err.(*mysql.MySQLError); ok {
-		if mysqlError.Number != 1091 { // Columns do not exist: no need to remove them
-			logging.MustGetLogger("").Warning("Unable to drop unneccessary columns: ", err)
+		if mysqlError.Number != 1060 { // Column exists: no need to add it
+			logging.MustGetLogger("").Warning("Unable to add column: ", err)
 		}
-	}
-
-	// v2.1.0; remove in v2.2.x
-	_, err = db.Exec("DELETE FROM settings WHERE name = 'pushbullet_key';")
-	if err != nil {
-		logging.MustGetLogger("").Warning("Unable to delete unneccessary row: ", err)
 	}
 }
 
 // Removes all check-results older than one month from the Database
 func CleanDatabase() {
-	if config.CheckLifetime <= 0 {
+	if config.Application.CheckLifetime <= 0 {
 		return
 	}
 
-	res, err := db.Exec("DELETE FROM checks WHERE time <= NOW() - INTERVAL ? DAY;", config.CheckLifetime)
+	res, err := db.Exec("DELETE FROM checks WHERE time <= NOW() - INTERVAL ? DAY;", config.Application.CheckLifetime)
 	if err != nil {
 		logging.MustGetLogger("").Fatal("Unable to cleanup Database: ", err)
 		return
 	}
 
 	rowsAffected, _ := res.RowsAffected()
-	logging.MustGetLogger("").Info("Cleaned " + strconv.FormatInt(rowsAffected, 10) + " rows from the Database (older than " + strconv.Itoa(config.CheckLifetime) + " days).")
+	logging.MustGetLogger("").Info("Cleaned " + strconv.FormatInt(rowsAffected, 10) + " rows from the Database (older than " + strconv.Itoa(config.Application.CheckLifetime) + " days).")
 }
 
 // Returns the current Database-object.

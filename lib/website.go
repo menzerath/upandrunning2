@@ -20,15 +20,16 @@ type Website struct {
 func (w *Website) RunCheck(secondTry bool) {
 	// Request new Status
 	var requestStartTime = time.Now()
-	res, err := goreq.Request{Uri: w.Protocol + "://" + w.Url, Method: w.CheckMethod, UserAgent: "UpAndRunning2/" + GetConfiguration().Static.Version + " (https://github.com/MarvinMenzerath/UpAndRunning2)", MaxRedirects: GetConfiguration().Dynamic.Redirects, Timeout: 5 * time.Second}.Do()
+	res, err := goreq.Request{Uri: w.Protocol + "://" + w.Url, Method: w.CheckMethod, UserAgent: "UpAndRunning2/" + GetConfiguration().Static.Version + " (https://github.com/MarvinMenzerath/UpAndRunning2)", MaxRedirects: GetConfiguration().Application.RedirectsToFollow, Timeout: 5 * time.Second}.Do()
 	var requestDuration = time.Now().Sub(requestStartTime).Nanoseconds() / 1000000
 
 	var newStatusText string
 	var newStatusCode int
-	if err != nil {
+	if err != nil || res.Body == nil {
 		if secondTry {
 			newStatusText = "Host not found"
 			newStatusCode = 0
+			requestDuration = 0
 
 			// On Timeout: allow second try
 			if serr, ok := err.(*goreq.Error); ok {
@@ -63,13 +64,14 @@ func (w *Website) sendNotifications(newStatusCode int, newStatusText string) {
 	var (
 		pushbulletKey string
 		email         string
+		telegramId    string
 		name          string
 		oldStatusCode string
 		oldStatusText string
 	)
 
 	db := GetDatabase()
-	err := db.QueryRow("SELECT pushbulletKey, email FROM notifications WHERE websiteId = ?", w.Id).Scan(&pushbulletKey, &email)
+	err := db.QueryRow("SELECT pushbulletKey, email, telegramId FROM notifications WHERE websiteId = ?", w.Id).Scan(&pushbulletKey, &email, &telegramId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return
@@ -78,7 +80,7 @@ func (w *Website) sendNotifications(newStatusCode int, newStatusText string) {
 	}
 
 	// Check for empty result
-	if pushbulletKey == "" && email == "" {
+	if pushbulletKey == "" && email == "" && telegramId == "" {
 		return
 	}
 
@@ -104,6 +106,12 @@ func (w *Website) sendNotifications(newStatusCode int, newStatusText string) {
 		}
 		if email != "" {
 			sendMail(email, name, w.Url, newStatus, oldStatus)
+		}
+		if telegramId != "" {
+			intTelegramId, err := strconv.Atoi(telegramId)
+			if err == nil {
+				sendTelegramMessage(intTelegramId, name, w.Url, newStatus, oldStatus)
+			}
 		}
 	}
 }

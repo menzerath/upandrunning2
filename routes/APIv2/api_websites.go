@@ -1,4 +1,4 @@
-package routes
+package APIv2
 
 import (
 	"database/sql"
@@ -31,12 +31,13 @@ func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Add every Website
 	websites := []BasicWebsite{}
 	var (
-		id         int
-		name       string
-		protocol   string
-		url        string
-		statusCode string
-		statusText string
+		id           int
+		name         string
+		protocol     string
+		url          string
+		statusCode   string
+		statusText   string
+		responseTime int
 	)
 
 	for rows.Next() {
@@ -48,7 +49,7 @@ func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		}
 
 		// Query the database for status data
-		err = db.QueryRow("SELECT statusCode, statusText FROM checks WHERE websiteId = ? ORDER BY id DESC LIMIT 1;", id).Scan(&statusCode, &statusText)
+		err = db.QueryRow("SELECT statusCode, statusText, responseTime FROM checks WHERE websiteId = ? ORDER BY id DESC LIMIT 1;", id).Scan(&statusCode, &statusText, &responseTime)
 		switch {
 		case err == sql.ErrNoRows:
 			statusCode = "0"
@@ -59,7 +60,7 @@ func ApiWebsites(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 			return
 		}
 
-		websites = append(websites, BasicWebsite{name, protocol, url, statusCode + " - " + statusText})
+		websites = append(websites, BasicWebsite{name, protocol, url, statusCode + " - " + statusText, strconv.Itoa(responseTime) + " ms"})
 	}
 
 	// Send Response
@@ -101,6 +102,7 @@ func ApiWebsitesDetailed(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		checkMethod   string
 		statusCode    string
 		statusText    string
+		responseTime  int
 		time          string
 		notifications EnabledNotifications
 	)
@@ -114,7 +116,7 @@ func ApiWebsitesDetailed(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		}
 
 		// Query the database for status data
-		err = db.QueryRow("SELECT statusCode, statusText, time FROM checks WHERE websiteId = ? ORDER BY id DESC LIMIT 1;", id).Scan(&statusCode, &statusText, &time)
+		err = db.QueryRow("SELECT statusCode, statusText, responseTime, time FROM checks WHERE websiteId = ? ORDER BY id DESC LIMIT 1;", id).Scan(&statusCode, &statusText, &responseTime, &time)
 		switch {
 		case err == sql.ErrNoRows:
 			statusCode = "0"
@@ -130,12 +132,14 @@ func ApiWebsitesDetailed(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		var (
 			tmpPushbullet string
 			tmpEmail      string
+			tmpTelegram   string
 		)
-		err = db.QueryRow("SELECT pushbulletKey, email FROM notifications WHERE websiteId = ?;", id).Scan(&tmpPushbullet, &tmpEmail)
+		err = db.QueryRow("SELECT pushbulletKey, email, telegramId FROM notifications WHERE websiteId = ?;", id).Scan(&tmpPushbullet, &tmpEmail, &tmpTelegram)
 		switch {
 		case err == sql.ErrNoRows:
 			notifications.Pushbullet = false
 			notifications.Email = false
+			notifications.Telegram = false
 		case err != nil:
 			logging.MustGetLogger("").Error("Unable to fetch Website's status: ", err)
 			SendJsonMessage(w, http.StatusInternalServerError, false, "Unable to process your Request.")
@@ -152,8 +156,13 @@ func ApiWebsitesDetailed(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		} else {
 			notifications.Email = false
 		}
+		if tmpTelegram != "" {
+			notifications.Telegram = true
+		} else {
+			notifications.Telegram = false
+		}
 
-		websites = append(websites, DetailedWebsite{id, name, enabled, visible, protocol, url, checkMethod, statusCode + " - " + statusText, time, notifications})
+		websites = append(websites, DetailedWebsite{id, name, enabled, visible, protocol, url, checkMethod, statusCode + " - " + statusText, strconv.Itoa(responseTime) + " ms", time, notifications})
 	}
 
 	// Send Response

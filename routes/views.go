@@ -9,10 +9,15 @@ import (
 	"runtime"
 )
 
+// Sends a simple welcome-message to the user.
+func NoWebFrontendIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	SendJsonMessage(w, http.StatusOK, true, "Welcome to UpAndRunning2! Currently the Web-Frontend is disabled, but you can still use our simple API.")
+}
+
 // Renders the main-page
 func ViewIndex(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Parse template-files
-	data := SiteData{lib.GetConfiguration().Dynamic.Title}
+	data := SiteData{lib.GetConfiguration().Application.Title}
 	t, err := template.ParseFiles("views/index.html", "views/partials/styles.html", "views/partials/footer.html", "views/partials/scripts.html")
 
 	if t != nil {
@@ -33,7 +38,7 @@ func ViewLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 
 	// Parse template-files
-	data := SiteData{lib.GetConfiguration().Dynamic.Title}
+	data := SiteData{lib.GetConfiguration().Application.Title}
 	t, err := template.ParseFiles("views/login.html", "views/partials/styles.html", "views/partials/footer.html", "views/partials/scripts.html")
 
 	if t != nil {
@@ -56,12 +61,7 @@ func ViewAdmin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// Parse template-files
 	c := lib.GetConfiguration()
 
-	dynCheckWhenOffline := ""
-	if c.Dynamic.RunChecksWhenOffline == 1 {
-		dynCheckWhenOffline = "checked"
-	}
-
-	data := AdminSiteData{c.Dynamic.Title, c.Dynamic.Interval, c.Dynamic.Redirects, dynCheckWhenOffline, c.Static.Version, runtime.Version(), runtime.GOOS + "_" + runtime.GOARCH}
+	data := AdminSiteData{c.Application.Title, c.Dynamic.Interval, c.Static.Version, runtime.Version(), runtime.GOOS + "_" + runtime.GOARCH}
 	t, err := template.ParseFiles("views/admin.html", "views/partials/styles.html", "views/partials/footer.html", "views/partials/scripts.html")
 
 	if t != nil {
