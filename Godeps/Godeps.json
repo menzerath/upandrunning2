@@ -48,16 +48,16 @@
 		},
 		{
 			"ImportPath": "github.com/tucnak/telebot",
-			"Comment": "v1.0-64-g6217b8a",
-			"Rev": "6217b8a41bc645355da1d847e8edbf085e361691"
+			"Comment": "v1.0-68-gce7114a",
+			"Rev": "ce7114afe66a2b1fe4f5c783313b2b0b480f331d"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/bcrypt",
-			"Rev": "bc89c496413265e715159bdc8478ee9a92fdc265"
+			"Rev": "a20de3fa94e069ec699987416679230d72e030a3"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/blowfish",
-			"Rev": "bc89c496413265e715159bdc8478ee9a92fdc265"
+			"Rev": "a20de3fa94e069ec699987416679230d72e030a3"
 		},
 		{
 			"ImportPath": "gopkg.in/gomail.v2",
