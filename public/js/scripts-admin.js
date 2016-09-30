@@ -312,7 +312,11 @@ function editNotificationPushbullet(url) {
 					$.ajax({
 						url: "/api/v2/websites/" + url + "/notifications",
 						type: "PUT",
-						data: {pushbulletKey: inputValue.trim(), email: data.notifications.email, telegramId: data.notifications.telegramId},
+						data: {
+							pushbulletKey: inputValue.trim(),
+							email: data.notifications.email,
+							telegramId: data.notifications.telegramId
+						},
 						success: function() {
 							loadWebsites();
 							showSuccessAlert("Settings have been updated.");
@@ -348,7 +352,11 @@ function editNotificationEmail(url) {
 					$.ajax({
 						url: "/api/v2/websites/" + url + "/notifications",
 						type: "PUT",
-						data: {pushbulletKey: data.notifications.pushbulletKey, email: inputValue.trim(), telegramId: data.notifications.telegramId},
+						data: {
+							pushbulletKey: data.notifications.pushbulletKey,
+							email: inputValue.trim(),
+							telegramId: data.notifications.telegramId
+						},
 						success: function() {
 							loadWebsites();
 							showSuccessAlert("Settings have been updated.");
@@ -384,7 +392,11 @@ function editNotificationTelegram(url) {
 					$.ajax({
 						url: "/api/v2/websites/" + url + "/notifications",
 						type: "PUT",
-						data: {pushbulletKey: data.notifications.pushbulletKey, email: data.notifications.email, telegramId: inputValue.trim()},
+						data: {
+							pushbulletKey: data.notifications.pushbulletKey,
+							email: data.notifications.email,
+							telegramId: inputValue.trim()
+						},
 						success: function() {
 							loadWebsites();
 							showSuccessAlert("Settings have been updated.");
