@@ -300,7 +300,7 @@ function editNotificationPushbullet(url) {
 		type: "GET",
 		success: function(data) {
 			swal({
-				title: "Pushbullet",
+				title: "<i class='fa fa-bell'></i> Pushbullet",
 				html: "Please enter a valid <b>Pushbullet-API Key</b> in order to receive push-messages.<br />Leave this field blank if you do not want this kind of notification.<br /><br /><input class='form-control' type='text' id='input-pushbullet' placeholder='API key' value=" + data.notifications.pushbulletKey + ">",
 				showCancelButton: true,
 				confirmButtonText: "Save"
@@ -340,7 +340,7 @@ function editNotificationEmail(url) {
 		type: "GET",
 		success: function(data) {
 			swal({
-				title: "Email",
+				title: "<i class='fa fa-envelope'></i> Email",
 				html: "Please enter a valid <b>email address</b> in order to receive email-notifications.<br />Leave this field blank if you do not want this kind of notification.<br /><br /><input class='form-control' type='text' id='input-email' placeholder='email address' value=" + data.notifications.email + ">",
 				showCancelButton: true,
 				confirmButtonText: "Save"
@@ -380,7 +380,7 @@ function editNotificationTelegram(url) {
 		type: "GET",
 		success: function(data) {
 			swal({
-				title: "Telegram",
+				title: "<i class='fa fa-telegram'></i> Telegram",
 				html: "Please enter a valid <b>Telegram user-id</b> in order to receive Telegram-messages.<br />Leave this field blank if you do not want this kind of notification.<br /><br /><input class='form-control' type='text' id='input-telegram' placeholder='Telegram user id' value=" + data.notifications.telegramId + ">",
 				showCancelButton: true,
 				confirmButtonText: "Save"
