@@ -94,9 +94,9 @@ function loadWebsites() {
 					dataString += '<span class="label label-info-inactive label-info label-action" onclick="editNotificationEmail(\'' + loadedWebsiteData[i].url + '\')" title="Email"><span class="fa fa-envelope"></span></span> ';
 				}
 				if (loadedWebsiteData[i].notifications.telegram) {
-					dataString += '<span class="label label-info label-info label-action" onclick="editNotificationTelegram(\'' + loadedWebsiteData[i].url + '\')" title="Telegram"><span class="fa fa-paper-plane"></span></span></td>';
+					dataString += '<span class="label label-info label-info label-action" onclick="editNotificationTelegram(\'' + loadedWebsiteData[i].url + '\')" title="Telegram"><span class="fa fa-telegram"></span></span></td>';
 				} else {
-					dataString += '<span class="label label-info-inactive label-info label-action" onclick="editNotificationTelegram(\'' + loadedWebsiteData[i].url + '\')" title="Telegram"><span class="fa fa-paper-plane"></span></span></td>';
+					dataString += '<span class="label label-info-inactive label-info label-action" onclick="editNotificationTelegram(\'' + loadedWebsiteData[i].url + '\')" title="Telegram"><span class="fa fa-telegram"></span></span></td>';
 				}
 
 				dataString += '<td><span class="label label-default label-action" onclick="showWebsiteDetails(\'' + loadedWebsiteData[i].url + '\')" title="More"><span class="fa fa-info"></span></span> ' +
