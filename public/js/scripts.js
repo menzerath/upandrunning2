@@ -193,18 +193,18 @@ function loadWebsiteData() {
 			}
 
 			if (dataStringUp === '') {
-				dataStringUp = '<tr><td colspan="4">No Websites found.</td></tr>';
+				dataStringUp = '<tr><td colspan="5">No Websites found.</td></tr>';
 			}
 			if (dataStringDown === '') {
-				dataStringDown = '<tr><td colspan="4">No Websites found.</td></tr>';
+				dataStringDown = '<tr><td colspan="5">No Websites found.</td></tr>';
 			}
 
 			$('#table-websites-up').html(dataStringUp);
 			$('#table-websites-down').html(dataStringDown);
 		},
 		error: function(error) {
-			$('#table-websites-up').html('<tr><td colspan="4">An Error occurred: ' + JSON.parse(error.responseText).message + '</td></tr>');
-			$('#table-websites-down').html('<tr><td colspan="4">An Error occurred: ' + JSON.parse(error.responseText).message + '</td></tr>');
+			$('#table-websites-up').html('<tr><td colspan="5">An Error occurred: ' + JSON.parse(error.responseText).message + '</td></tr>');
+			$('#table-websites-down').html('<tr><td colspan="5">An Error occurred: ' + JSON.parse(error.responseText).message + '</td></tr>');
 		}
 	});
 }
