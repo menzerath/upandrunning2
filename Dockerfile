@@ -1,7 +1,5 @@
-FROM alpine:3.4
+FROM alpine:3.5
 MAINTAINER Marvin Menzerath <github@marvin-menzerath.de>
-
-ENV UAR2_IS_DOCKER true
 
 WORKDIR /app/upandrunning2/
 COPY . /app/upandrunning2/
