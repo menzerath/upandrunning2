@@ -24,7 +24,7 @@ docker run -d --name uar2 --link uar2-db:mysql -v /srv/uar2/config/:/app/upandru
 If you do not want to use a linked database-container, just skip the `--link uar2-db:mysql` part and remember to add a correct database-configuration in your local config-file.
 
 To make use of the mounted config-directory, you need to:
-* pull a recent copy of the [`default.json`-file](https://github.com/MarvinMenzerath/UpAndRunning2/blob/master/config/default.json)
+* pull a recent copy of the [`default.json`-file](../../config/default.json)
 * create a copy of it called `local.json`
 * and make your custom changes in this file
 
