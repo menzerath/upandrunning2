@@ -6,4 +6,5 @@ COPY . /app/upandrunning2/
 RUN chmod +x ./docker/build.sh && sync && ./docker/build.sh
 
 EXPOSE 8080
+VOLUME /app/upandrunning2/config/
 ENTRYPOINT ["./UpAndRunning2"]
