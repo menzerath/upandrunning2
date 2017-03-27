@@ -8,7 +8,7 @@ set -e
 export GOPATH=/tmp/go
 export PATH=${PATH}:${GOPATH}/bin
 
-apk -U --no-progress add git go
+apk -U --no-progress add git go build-base
 
 mkdir -p ${GOPATH}/src/github.com/MarvinMenzerath/
 ln -s /app/upandrunning2/ ${GOPATH}/src/github.com/MarvinMenzerath/UpAndRunning2
@@ -17,4 +17,4 @@ go get
 go build
 
 rm -rf $GOPATH
-apk --no-progress del git go
+apk --no-progress del git go build-base
