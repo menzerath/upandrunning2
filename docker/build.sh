@@ -18,3 +18,6 @@ go build
 
 rm -rf $GOPATH
 apk --no-progress del git go build-base
+
+# keep this one to enable telegram notifications
+apk -U --no-progress add ca-certificates
