@@ -25,7 +25,6 @@ _testmain.go
 
 # IDE (IntelliJ IDEA)
 .idea/
-UpAndRunning2.iml
 
 # Application
 config/local*.json
