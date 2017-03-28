@@ -40,6 +40,7 @@ docker run -d --name uar2 --link uar2-db:mysql -p 80:8080 marvinmenzerath/upandr
 ```
 
 ## Nice to know
+* The container uses a custom user and group (both called `uar2` with an id of `1777`)
 * If your database-server is running on the host, you need to set the database-server's bind-address to `0.0.0.0` and may want to setup a firewall policy to protect it
     * Additionally you should make sure to allow the database-user to access the database-server from a different ip-address
 * If you want to use an (Apache) proxy on the host, you need to set the exposed port in your `docker run` and make sure to bind the application on `0.0.0.0`
