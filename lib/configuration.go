@@ -81,16 +81,6 @@ func ReadConfigurationFromFile(filePath string) {
 	if err != nil {
 		logging.MustGetLogger("").Fatal("Unable to read Configuration. Make sure the File exists and is valid: ", err)
 	}
-
-	if os.Getenv("MYSQL_PORT_3306_TCP_ADDR") != "" && os.Getenv("MYSQL_ENV_MYSQL_ROOT_PASSWORD") != "" {
-		logging.MustGetLogger("").Info("Overwriting database configuration with linked container...")
-
-		config.Database.Host = os.Getenv("MYSQL_PORT_3306_TCP_ADDR")
-		config.Database.Port = 3306
-		config.Database.User = "root"
-		config.Database.Password = os.Getenv("MYSQL_ENV_MYSQL_ROOT_PASSWORD")
-		config.Database.Database = "upandrunning"
-	}
 }
 
 // Reads the default configuration-file from a specified path.
