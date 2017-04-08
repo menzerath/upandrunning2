@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/op/go-logging"
 	"os"
-	"strconv"
 )
 
 // This the one and only Configuration-object.
@@ -72,50 +71,6 @@ type StaticConfiguration struct {
 // Reads a configuration-file from a specified path.
 func ReadConfigurationFromFile(filePath string) {
 	ReadDefaultConfiguration("config/default.json")
-
-	if os.Getenv("UAR2_IS_DOCKER") == "true" {
-		logging.MustGetLogger("").Info("Reading Configuration from Environment Variables...")
-
-		config.Database.Host = os.Getenv("MYSQL_PORT_3306_TCP_ADDR")
-		config.Database.User = "root"
-		config.Database.Password = os.Getenv("MYSQL_ENV_MYSQL_ROOT_PASSWORD")
-		config.Database.Database = "upandrunning"
-
-		config.Application.Title = os.Getenv("UAR2_APPLICATION_TITLE")
-
-		i, err := strconv.Atoi(os.Getenv("UAR2_REDIRECTSTOFOLLOW"))
-		if err == nil {
-			config.Application.RedirectsToFollow = i
-		}
-
-		b, err := strconv.ParseBool(os.Getenv("UAR2_CHECKIFOFFLINE"))
-		if err == nil {
-			config.Application.RunCheckIfOffline = b
-		}
-
-		i, err = strconv.Atoi(os.Getenv("UAR2_CHECKLIFETIME"))
-		if err == nil {
-			config.Application.CheckLifetime = i
-		}
-
-		b, err = strconv.ParseBool(os.Getenv("UAR2_USEWEBFRONTEND"))
-		if err == nil {
-			config.Application.UseWebFrontend = b
-		}
-
-		config.Notification.Mailer.Host = os.Getenv("UAR2_MAILER_HOST")
-		i, err = strconv.Atoi(os.Getenv("UAR2_MAILER_PORT"))
-		if err == nil {
-			config.Notification.Mailer.Port = i
-		}
-		config.Notification.Mailer.User = os.Getenv("UAR2_MAILER_USER")
-		config.Notification.Mailer.Password = os.Getenv("UAR2_MAILER_PASSWORD")
-		config.Notification.Mailer.From = os.Getenv("UAR2_MAILER_FROM")
-
-		config.Notification.TelegramBotApiKey = os.Getenv("UAR2_TELEGRAMBOTAPIKEY")
-
-		return
-	}
 
 	logging.MustGetLogger("").Info("Reading Configuration from File (" + filePath + ")...")
 

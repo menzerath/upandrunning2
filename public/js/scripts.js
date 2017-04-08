@@ -170,11 +170,11 @@ function loadWebsiteData() {
 				newEntry += '</td><td>';
 
 				var responseTime = loadedWebsiteData[i].responseTime.split(' ')[0];
-				if (responseTime == 0 || responseTime >= 500) {
+				if (responseTime >= 500) {
 					newEntry += ' <span class="label label-danger">' + loadedWebsiteData[i].responseTime + '</span> ';
-				} else if (responseTime >= 100) {
+				} else if (responseTime >= 200) {
 					newEntry += ' <span class="label label-warning">' + loadedWebsiteData[i].responseTime + '</span> ';
-				} else if (responseTime >= 1) {
+				} else if (responseTime >= 0) {
 					newEntry += ' <span class="label label-success">' + loadedWebsiteData[i].responseTime + '</span> ';
 				} else {
 					newEntry += ' <span class="label label-info">' + loadedWebsiteData[i].responseTime + '</span> ';
@@ -193,18 +193,18 @@ function loadWebsiteData() {
 			}
 
 			if (dataStringUp === '') {
-				dataStringUp = '<tr><td colspan="4">No Websites found.</td></tr>';
+				dataStringUp = '<tr><td colspan="5">No Websites found.</td></tr>';
 			}
 			if (dataStringDown === '') {
-				dataStringDown = '<tr><td colspan="4">No Websites found.</td></tr>';
+				dataStringDown = '<tr><td colspan="5">No Websites found.</td></tr>';
 			}
 
 			$('#table-websites-up').html(dataStringUp);
 			$('#table-websites-down').html(dataStringDown);
 		},
 		error: function(error) {
-			$('#table-websites-up').html('<tr><td colspan="4">An Error occurred: ' + JSON.parse(error.responseText).message + '</td></tr>');
-			$('#table-websites-down').html('<tr><td colspan="4">An Error occurred: ' + JSON.parse(error.responseText).message + '</td></tr>');
+			$('#table-websites-up').html('<tr><td colspan="5">An Error occurred: ' + JSON.parse(error.responseText).message + '</td></tr>');
+			$('#table-websites-down').html('<tr><td colspan="5">An Error occurred: ' + JSON.parse(error.responseText).message + '</td></tr>');
 		}
 	});
 }
