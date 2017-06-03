@@ -1,0 +1,60 @@
+variables:
+    REPO_NAME: github.com/MarvinMenzerath/UpAndRunning2
+    REGISTRY_URL: "docker.marvin-menzerath.de"
+    PROJECT_GROUP: "marvin"
+    PROJECT_NAME: "upandrunning2"
+
+build:
+    stage: build
+    image: golang:1.8-alpine
+    artifacts:
+        paths:
+            - target/
+    script:
+        - go version
+        - apk -U add tar
+        - mkdir -p $GOPATH/src/$REPO_NAME
+        - mv $CI_PROJECT_DIR/* $GOPATH/src/$REPO_NAME/
+        - mkdir -p $CI_PROJECT_DIR/target
+        - cd $GOPATH/src/$REPO_NAME
+        - env GOOS=linux GOARCH=amd64 go build -o UpAndRunning2 && tar -czf $CI_PROJECT_DIR/target/linux_amd64.tar.gz config/ public/ views/ LICENSE README.md UpAndRunning2
+        - env GOOS=linux GOARCH=arm go build -o UpAndRunning2 && tar -czf $CI_PROJECT_DIR/target/linux_arm.tar.gz config/ public/ views/ LICENSE README.md UpAndRunning2
+        - env GOOS=linux GOARCH=arm64 go build -o UpAndRunning2 && tar -czf $CI_PROJECT_DIR/target/linux_arm64.tar.gz config/ public/ views/ LICENSE README.md UpAndRunning2
+        - env GOOS=windows GOARCH=amd64 go build -o UpAndRunning2.exe && tar -czf $CI_PROJECT_DIR/target/windows_arm64.tar.gz config/ public/ views/ LICENSE README.md UpAndRunning2.exe
+        - env GOOS=darwin GOARCH=amd64 go build -o UpAndRunning2 && tar -czf $CI_PROJECT_DIR/target/darwin_arm64.tar.gz config/ public/ views/ LICENSE README.md UpAndRunning2
+
+build_docker_master:
+    image: docker:latest
+    stage: build
+    services:
+        - docker:dind
+    only:
+        - master
+    script:
+        - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $REGISTRY_URL
+        - docker build -t $REGISTRY_URL/$PROJECT_GROUP/$PROJECT_NAME .
+        - docker push $REGISTRY_URL/$PROJECT_GROUP/$PROJECT_NAME
+
+build_docker_develop:
+    image: docker:latest
+    stage: build
+    services:
+        - docker:dind
+    only:
+        - develop
+    script:
+        - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $REGISTRY_URL
+        - docker build -t $REGISTRY_URL/$PROJECT_GROUP/$PROJECT_NAME:develop .
+        - docker push $REGISTRY_URL/$PROJECT_GROUP/$PROJECT_NAME:develop
+
+build_docker_tag:
+    image: docker:latest
+    stage: build
+    services:
+        - docker:dind
+    only:
+        - tags
+    script:
+        - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $REGISTRY_URL
+        - docker build -t $REGISTRY_URL/$PROJECT_GROUP/$PROJECT_NAME:$CI_COMMIT_TAG .
+        - docker push $REGISTRY_URL/$PROJECT_GROUP/$PROJECT_NAME:$CI_COMMIT_TAG
