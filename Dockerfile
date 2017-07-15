@@ -14,7 +14,7 @@ RUN export GOPATH=/tmp/go && \
     rm -rf $GOPATH && \
     apk --no-progress del git go build-base && \
     addgroup -g 1777 uar2 && adduser -h /app/upandrunning2/ -H -D -G uar2 -u 1777 uar2 && \
-    chown -R uar2:uar2 /app/upandrunning2/ && \
+    chown -R uar2:uar2 /app/upandrunning2/
 
 USER uar2
 EXPOSE 8080
