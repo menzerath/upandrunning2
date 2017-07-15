@@ -12,7 +12,7 @@ build:
             - target/
     script:
         - go version
-        - apk -U add tar
+        - apk -U add tar git
         - mkdir -p $GOPATH/src/$REPO_NAME
         - mv $CI_PROJECT_DIR/* $GOPATH/src/$REPO_NAME/
         - mkdir -p $CI_PROJECT_DIR/target
