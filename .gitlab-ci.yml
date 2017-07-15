@@ -17,6 +17,7 @@ build:
         - mv $CI_PROJECT_DIR/* $GOPATH/src/$REPO_NAME/
         - mkdir -p $CI_PROJECT_DIR/target
         - cd $GOPATH/src/$REPO_NAME
+        - go get
         - env GOOS=linux GOARCH=amd64 go build -o UpAndRunning2 && tar -czf $CI_PROJECT_DIR/target/linux_amd64.tar.gz config/ public/ views/ LICENSE README.md UpAndRunning2
         - env GOOS=linux GOARCH=arm go build -o UpAndRunning2 && tar -czf $CI_PROJECT_DIR/target/linux_arm.tar.gz config/ public/ views/ LICENSE README.md UpAndRunning2
         - env GOOS=linux GOARCH=arm64 go build -o UpAndRunning2 && tar -czf $CI_PROJECT_DIR/target/linux_arm64.tar.gz config/ public/ views/ LICENSE README.md UpAndRunning2
